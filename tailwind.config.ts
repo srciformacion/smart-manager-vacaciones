@@ -52,6 +52,37 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Colores personalizados para la aplicación
+				vacay: {
+					DEFAULT: '#3B82F6', // Azul principal
+					light: '#93C5FD',
+					dark: '#1E40AF',
+					foreground: '#FFFFFF'
+				},
+				success: {
+					DEFAULT: '#10B981', // Verde para aprobaciones
+					light: '#A7F3D0',
+					dark: '#047857',
+					foreground: '#FFFFFF'
+				},
+				warning: {
+					DEFAULT: '#F59E0B', // Amarillo para pendientes
+					light: '#FDE68A',
+					dark: '#B45309',
+					foreground: '#FFFFFF'
+				},
+				danger: {
+					DEFAULT: '#EF4444', // Rojo para rechazos
+					light: '#FCA5A5',
+					dark: '#B91C1C',
+					foreground: '#FFFFFF'
+				},
+				info: {
+					DEFAULT: '#8B5CF6', // Púrpura para información
+					light: '#C4B5FD',
+					dark: '#6D28D9',
+					foreground: '#FFFFFF'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
