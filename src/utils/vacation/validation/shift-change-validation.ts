@@ -1,93 +1,56 @@
 
 import { Request, User } from "@/types";
+import { isWeeklyRestDay } from '../weekly-rest';
+import { validateDatesForWorkGroup } from '../work-group-rules';
 
 export function validateShiftChangeRequest(
   startDate: Date,
-  returnDate: Date,
-  replacement: User,
+  endDate: Date,
   user: User,
-  requests: Request[],
-  currentDate: Date
+  replacementUser: User | null,
+  existingRequests: Request[]
 ): { valid: boolean; message: string } {
-  if (returnDate <= startDate) {
+  // Validar que hay un usuario de reemplazo
+  if (!replacementUser) {
     return {
       valid: false,
-      message: "La fecha de devolución debe ser posterior a la fecha del cambio"
+      message: 'Debe seleccionar un trabajador para el reemplazo'
     };
   }
 
-  const hasUserOverlap = requests.some(req => {
-    if (req.userId === user.id && req.status !== 'rejected') {
-      const reqDate = new Date(req.startDate);
-      
-      return (
-        reqDate.getDate() === startDate.getDate() &&
-        reqDate.getMonth() === startDate.getMonth() &&
-        reqDate.getFullYear() === startDate.getFullYear()
-      );
-    }
-    return false;
+  // Validar que el día no sea un día de descanso semanal
+  if (isWeeklyRestDay(startDate, user)) {
+    return {
+      valid: false,
+      message: 'No se puede solicitar cambio de turno en un día de descanso'
+    };
+  }
+
+  // Validar que el usuario de reemplazo no tenga otra solicitud para ese día
+  const replacementHasRequests = existingRequests.some(request => {
+    if (request.status === 'rejected') return false;
+    if (request.userId !== replacementUser.id) return false;
+
+    const requestStart = new Date(request.startDate);
+    const requestEnd = new Date(request.endDate);
+
+    return (
+      (startDate >= requestStart && startDate <= requestEnd) ||
+      (endDate >= requestStart && endDate <= requestEnd)
+    );
   });
 
-  if (hasUserOverlap) {
+  if (replacementHasRequests) {
     return {
       valid: false,
-      message: "Ya tiene una solicitud aprobada o pendiente para este día"
+      message: 'El trabajador de reemplazo ya tiene otra solicitud en esas fechas'
     };
   }
 
-  const hasReturnOverlap = requests.some(req => {
-    if ((req.userId === user.id || req.userId === replacement.id) && req.status !== 'rejected') {
-      const reqDate = new Date(req.startDate);
-      
-      return (
-        reqDate.getDate() === returnDate.getDate() &&
-        reqDate.getMonth() === returnDate.getMonth() &&
-        reqDate.getFullYear() === returnDate.getFullYear()
-      );
-    }
-    return false;
-  });
-
-  if (hasReturnOverlap) {
-    return {
-      valid: false,
-      message: "Ya existe una solicitud para la fecha de devolución"
-    };
-  }
-
-  const hasReplacementOverlap = requests.some(req => {
-    if (req.userId === replacement.id && req.status !== 'rejected') {
-      const reqDate = new Date(req.startDate);
-      
-      return (
-        reqDate.getDate() === startDate.getDate() &&
-        reqDate.getMonth() === startDate.getMonth() &&
-        reqDate.getFullYear() === startDate.getFullYear()
-      );
-    }
-    return false;
-  });
-
-  if (hasReplacementOverlap) {
-    return {
-      valid: false,  
-      message: "El compañero de reemplazo ya tiene una solicitud para esta fecha"
-    };
-  }
-  
-  if (replacement.department !== user.department) {
-    return {
-      valid: false,
-      message: "El compañero de reemplazo debe ser del mismo departamento"
-    };
-  }
-  
-  if (replacement.shift !== user.shift) {
-    return {
-      valid: false,
-      message: "El compañero de reemplazo debe tener el mismo turno"
-    };
+  // Validar que las fechas sean válidas para el grupo de trabajo
+  const isValidForGroup = validateDatesForWorkGroup(startDate, endDate, user.workGroup);
+  if (!isValidForGroup.valid) {
+    return isValidForGroup;
   }
 
   return { valid: true, message: 'Solicitud válida' };
