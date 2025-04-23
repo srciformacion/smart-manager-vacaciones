@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -6,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { LoadingState } from "@/components/profile/LoadingState";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileForm } from "@/components/profile/ProfileForm";
+import { MainLayout } from "@/components/layout/main-layout";
+import { User } from "@/types";
 
 type Profile = {
   id: string;
@@ -24,6 +27,7 @@ export default function ProfilePage() {
   const [form, setForm] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
   const [createMode, setCreateMode] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,6 +47,20 @@ export default function ProfilePage() {
         }
 
         setUserId(user.id);
+
+        // Simplificado para propósitos de demo
+        // En una implementación real, debería obtener más datos del usuario de la sesión
+        setUser({
+          id: user.id,
+          name: user.user_metadata?.name || "",
+          email: user.email || "",
+          role: 'worker', // Valor por defecto
+          shift: 'Programado', // Valor por defecto
+          workGroup: 'Grupo Programado', // Valor por defecto
+          workday: 'Completa', // Valor por defecto
+          department: '',
+          seniority: 0,
+        });
 
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
@@ -169,27 +187,29 @@ export default function ProfilePage() {
     setForm(profile);
   }
 
-  if (loading) {
-    return <LoadingState />;
-  }
-
   return (
-    <div className="max-w-xl mx-auto mt-8">
-      <Card className="p-8 bg-white shadow-md">
-        <ProfileHeader isCreateMode={createMode} />
-        {form && (
-          <ProfileForm
-            form={form}
-            edit={edit}
-            saving={saving}
-            createMode={createMode}
-            onSave={handleSave}
-            onCancel={handleCancel}
-            onEdit={() => setEdit(true)}
-            onChange={handleChange}
-          />
-        )}
-      </Card>
-    </div>
+    <MainLayout user={user}>
+      {loading ? (
+        <LoadingState />
+      ) : (
+        <div className="max-w-xl mx-auto mt-8">
+          <Card className="p-8 bg-white shadow-md">
+            <ProfileHeader isCreateMode={createMode} />
+            {form && (
+              <ProfileForm
+                form={form}
+                edit={edit}
+                saving={saving}
+                createMode={createMode}
+                onSave={handleSave}
+                onCancel={handleCancel}
+                onEdit={() => setEdit(true)}
+                onChange={handleChange}
+              />
+            )}
+          </Card>
+        </div>
+      )}
+    </MainLayout>
   );
 }
