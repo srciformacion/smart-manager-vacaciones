@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,7 +25,6 @@ import { getVacationRules } from "@/utils/workGroupAssignment";
 import { assignWorkGroup } from "@/utils/workGroupAssignment";
 import { useState, useEffect } from "react";
 
-// Esquema de validación para el formulario
 const formSchema = z.object({
   name: z.string().min(3, { message: "El nombre debe tener al menos 3 caracteres" }),
   email: z.string().email({ message: "Email no válido" }),
@@ -34,13 +32,12 @@ const formSchema = z.object({
   shift: z.string().min(1, { message: "Seleccione un turno" }),
   workday: z.string().min(1, { message: "Seleccione un tipo de jornada" }),
   seniority: z.coerce.number().min(0, { message: "La antigüedad no puede ser negativa" }),
-  // El grupo de trabajo se calculará automáticamente
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 interface WorkerFormProps {
-  worker?: User; // Si se proporciona, es edición; si no, es creación
+  worker?: User;
   onSubmit: (values: FormValues & { workGroup: WorkGroup }) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
@@ -52,18 +49,19 @@ export function WorkerForm({
   onCancel,
   isSubmitting = false,
 }: WorkerFormProps) {
-  // Lista de departamentos (ejemplo)
   const departments: Department[] = [
-    "Atención al cliente",
-    "Administración",
-    "Operaciones",
-    "TI",
+    "Urgencias y Emergencias (Transporte Urgente)",
+    "Transporte Sanitario Programado",
+    "Centro Coordinador Urgente",
+    "Centro Coordinador Programado",
+    "Mantenimiento de Vehículos",
+    "Logística y Almacén",
+    "Administración y Finanzas",
     "Recursos Humanos",
-    "Logística",
-    "Dirección",
+    "Calidad, Seguridad y Prevención de Riesgos Laborales",
+    "Formación",
   ];
 
-  // Lista de turnos
   const shifts: ShiftType[] = [
     "Localizado",
     "Urgente 24h",
@@ -74,13 +72,10 @@ export function WorkerForm({
     "Programado",
   ];
 
-  // Lista de tipos de jornada
   const workdayTypes: WorkdayType[] = ["Completa", "Parcial", "Reducida"];
 
-  // Estado para el grupo de trabajo calculado
   const [calculatedWorkGroup, setCalculatedWorkGroup] = useState<WorkGroup | null>(null);
 
-  // Inicializar formulario
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -93,14 +88,12 @@ export function WorkerForm({
     },
   });
 
-  // Observar cambios en departamento, turno y jornada para recalcular el grupo
   const department = form.watch("department");
   const shift = form.watch("shift");
   const workday = form.watch("workday");
 
   useEffect(() => {
     if (department && shift && workday) {
-      // Calcular grupo de trabajo según las reglas
       const group = assignWorkGroup(
         shift as ShiftType,
         workday as WorkdayType,
@@ -110,7 +103,6 @@ export function WorkerForm({
     }
   }, [department, shift, workday]);
 
-  // Manejar envío del formulario
   const handleSubmit = (values: FormValues) => {
     if (calculatedWorkGroup) {
       onSubmit({
@@ -133,7 +125,6 @@ export function WorkerForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            {/* Nombre */}
             <FormField
               control={form.control}
               name="name"
@@ -152,7 +143,6 @@ export function WorkerForm({
               )}
             />
 
-            {/* Email */}
             <FormField
               control={form.control}
               name="email"
@@ -172,7 +162,6 @@ export function WorkerForm({
               )}
             />
 
-            {/* Departamento */}
             <FormField
               control={form.control}
               name="department"
@@ -202,7 +191,6 @@ export function WorkerForm({
               )}
             />
 
-            {/* Turno */}
             <FormField
               control={form.control}
               name="shift"
@@ -235,7 +223,6 @@ export function WorkerForm({
               )}
             />
 
-            {/* Tipo de jornada */}
             <FormField
               control={form.control}
               name="workday"
@@ -265,7 +252,6 @@ export function WorkerForm({
               )}
             />
 
-            {/* Antigüedad */}
             <FormField
               control={form.control}
               name="seniority"
@@ -289,7 +275,6 @@ export function WorkerForm({
               )}
             />
 
-            {/* Grupo calculado (no editable) */}
             {calculatedWorkGroup && (
               <div className="rounded-lg border p-4">
                 <div className="text-sm font-medium mb-2">Grupo de trabajo asignado</div>
