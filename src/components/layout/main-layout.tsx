@@ -1,6 +1,7 @@
 
 import { ReactNode, useState } from "react";
 import { SidebarNavigation } from "./sidebar-navigation";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User, UserRole } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -13,11 +14,8 @@ interface MainLayoutProps {
 export function MainLayout({ children, user, className }: MainLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
   
-  // Maneja cierre de sesión
   const handleLogout = () => {
-    // Implementar lógica real de cierre de sesión aquí
     console.log("Logout");
-    // Redireccionar a la página de login
     window.location.href = "/login";
   };
 
@@ -32,12 +30,18 @@ export function MainLayout({ children, user, className }: MainLayoutProps) {
       
       <main
         className={cn(
-          "flex-1 p-6 transition-all duration-300 ease-in-out",
+          "flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out",
+          "max-w-full overflow-x-hidden",
           user ? "lg:ml-64" : "",
           className
         )}
       >
-        {children}
+        <div className="flex justify-end mb-4">
+          <ThemeToggle />
+        </div>
+        <div className="container mx-auto max-w-7xl">
+          {children}
+        </div>
       </main>
     </div>
   );

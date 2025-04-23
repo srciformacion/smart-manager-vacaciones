@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,10 +9,10 @@
     --foreground: 222.2 84% 4.9%;
 
     /* Colores principales de la marca */
-    --primary: 212 90% 22%; /* Azul oscuro real (#1A1F2C -> HSL approx) */
+    --primary: 212 90% 22%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 97 61.8% 93%; /* Verde Pantone muy suave (#F2FCE2) */
+    --secondary: 97 61.8% 93%;
     --secondary-foreground: 142 76% 19%;
 
     --muted: 210 40% 96.1%;
@@ -37,17 +36,47 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 212 90% 22%; /* Azul oscuro sidebar */
+    --sidebar-background: 212 90% 22%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 97 61.8% 93%; /* Verde Pantone sidebar */
+    --sidebar-accent: 97 61.8% 93%;
     --sidebar-accent-foreground: 212 90% 20%;
     --sidebar-border: 212 90% 32%;
     --sidebar-ring: 212.2 91.2% 59.8%;
+  }
 
-    /* Fuente personalizada */
-    --font-sans: 'Roboto', system-ui, sans-serif;
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 84% 4.9%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+
+    --sidebar-background: 222.2 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 210 40% 98%;
+    --sidebar-primary-foreground: 222.2 84% 4.9%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 27.5%;
+    --sidebar-ring: 212.7 26.8% 83.9%;
   }
 
   html {
