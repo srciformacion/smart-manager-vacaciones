@@ -32,8 +32,8 @@ function NavItem({ to, icon: Icon, label, active, onClick }: NavItemProps) {
       <Button
         variant="ghost"
         className={cn(
-          "w-full justify-start gap-2 font-normal text-sm tracking-tight", // Añadido text-sm y tracking-tight
-          active && "bg-sidebar-accent text-sidebar-accent-foreground"
+          "w-full justify-start gap-2 font-normal text-sm tracking-tight",
+          active && "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
         )}
       >
         <Icon className="h-4 w-4" />
@@ -46,9 +46,10 @@ function NavItem({ to, icon: Icon, label, active, onClick }: NavItemProps) {
 interface SidebarNavigationProps {
   userRole: UserRole;
   onLogout: () => void;
+  onNavigate?: () => void;
 }
 
-export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps) {
+export function SidebarNavigation({ userRole, onLogout, onNavigate }: SidebarNavigationProps) {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -58,6 +59,7 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
 
   const closeSidebar = () => {
     if (isOpen) setIsOpen(false);
+    if (onNavigate) onNavigate();
   };
 
   const isActive = (path: string) => location.pathname === path;
