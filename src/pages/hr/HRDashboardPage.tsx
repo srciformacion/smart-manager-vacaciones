@@ -62,11 +62,11 @@ const exampleWorkers: User[] = [
     name: "Francisco José Fernández López",
     email: "fjflopez@larioja.org",
     role: "worker",
-    shift: "Programado",
-    workGroup: "Grupo Programado",
+    shift: "Urgente 24h",
+    workGroup: "Urgente 24h",
     workday: "Completa",
-    department: "Recursos Humanos",
-    seniority: 7,
+    department: "Personal de movimiento",
+    seniority: 24,
   },
 ];
 

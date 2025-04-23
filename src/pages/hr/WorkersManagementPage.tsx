@@ -54,16 +54,17 @@ const exampleWorkers: User[] = [
     department: "Administración",
     seniority: 5,
   },
+  // Actualizado según tu petición
   {
     id: "4",
     name: "Francisco José Fernández López",
     email: "fjflopez@larioja.org",
     role: "worker",
-    shift: "Programado",
-    workGroup: "Grupo Programado",
+    shift: "Urgente 24h",
+    workGroup: "Urgente 24h",
     workday: "Completa",
-    department: "Recursos Humanos",
-    seniority: 7,
+    department: "Personal de movimiento",
+    seniority: 24,
   },
 ];
 
