@@ -55,17 +55,19 @@ const shiftTypes: { value: ShiftType; label: string }[] = [
 ];
 
 interface ShiftProfileFormProps {
-  user: User;
+  user?: User;
   existingProfile?: ShiftProfile;
   onSubmit: (values: FormValues) => void;
-  isSubmitting: boolean;
+  onCancel?: () => void;
+  isSubmitting?: boolean;
 }
 
 export function ShiftProfileForm({
   user,
   existingProfile,
   onSubmit,
-  isSubmitting
+  onCancel,
+  isSubmitting = false
 }: ShiftProfileFormProps) {
   // Inicializar el formulario con valores existentes o predeterminados
   const form = useForm<FormValues>({
@@ -82,7 +84,7 @@ export function ShiftProfileForm({
       workDays: [],
       startTime: '09:00',
       endTime: '17:00',
-      createdBy: user.role === 'hr' ? 'empresa' : 'trabajador',
+      createdBy: user?.role === 'hr' ? 'empresa' : 'trabajador',
       isDefault: false,
     },
   });
@@ -333,7 +335,7 @@ export function ShiftProfileForm({
 
             {/* Botones */}
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" type="button" disabled={isSubmitting}>
+              <Button variant="outline" type="button" onClick={onCancel} disabled={isSubmitting}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={isSubmitting}>

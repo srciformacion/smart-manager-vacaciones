@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { ShiftProfile, User } from "@/types";
+import { ShiftProfile } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import {
@@ -18,11 +18,12 @@ import { Clock, Calendar, Check, Pencil, Plus, Trash2 } from "lucide-react";
 
 interface ShiftProfilesListProps {
   profiles: ShiftProfile[];
-  user: User;
-  onCreateProfile: () => void;
-  onEditProfile: (profile: ShiftProfile) => void;
-  onDeleteProfile: (profileId: string) => void;
-  onSetDefaultProfile: (profileId: string) => void;
+  onUpdate?: (id: string, values: Partial<ShiftProfile>) => void;
+  onDelete?: (id: string) => void;
+  onCreateProfile?: () => void;
+  onEditProfile?: (profile: ShiftProfile) => void;
+  onSetDefaultProfile?: (profileId: string) => void;
+  user?: User;
 }
 
 // Función para convertir WeekDay a texto en español
@@ -41,12 +42,33 @@ const getWeekDayText = (day: string): string => {
 
 export function ShiftProfilesList({
   profiles,
-  user,
+  onUpdate,
+  onDelete,
   onCreateProfile,
   onEditProfile,
-  onDeleteProfile,
-  onSetDefaultProfile
+  onSetDefaultProfile,
+  user
 }: ShiftProfilesListProps) {
+  
+  const handleEdit = (profile: ShiftProfile) => {
+    if (onEditProfile) {
+      onEditProfile(profile);
+    } else if (onUpdate) {
+      // Compatibilidad con versiones anteriores
+      // Esta función no se llama en ShiftProfilePage actual, pero la añadimos por compatibilidad
+      console.warn('onEditProfile no definido, usando onUpdate');
+    }
+  };
+  
+  const handleSetDefault = (profileId: string) => {
+    if (onSetDefaultProfile) {
+      onSetDefaultProfile(profileId);
+    } else if (onUpdate) {
+      // Compatibilidad con implementación anterior
+      onUpdate(profileId, { isDefault: true });
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -121,7 +143,10 @@ export function ShiftProfilesList({
                           <Button 
                             size="sm" 
                             variant="ghost"
-                            onClick={() => onSetDefaultProfile(profile.id)}
+                            onClick={() => onSetDefaultProfile 
+                              ? onSetDefaultProfile(profile.id)
+                              : onUpdate && onUpdate(profile.id, { isDefault: true })
+                            }
                             title="Establecer como predeterminado"
                           >
                             <Check className="h-4 w-4" />
@@ -130,7 +155,10 @@ export function ShiftProfilesList({
                         <Button 
                           size="sm" 
                           variant="ghost"
-                          onClick={() => onEditProfile(profile)}
+                          onClick={() => onEditProfile 
+                            ? onEditProfile(profile) 
+                            : handleEdit(profile)
+                          }
                           title="Editar perfil"
                         >
                           <Pencil className="h-4 w-4" />
@@ -139,7 +167,7 @@ export function ShiftProfilesList({
                           size="sm" 
                           variant="ghost"
                           className="text-destructive hover:text-destructive"
-                          onClick={() => onDeleteProfile(profile.id)}
+                          onClick={() => onDelete && onDelete(profile.id)}
                           title="Eliminar perfil"
                           disabled={profile.isDefault}
                         >

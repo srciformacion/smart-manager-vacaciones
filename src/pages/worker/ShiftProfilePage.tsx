@@ -1,9 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { ShiftProfileForm } from "@/components/shift/shift-profile-form";
 import { ShiftProfilesList } from "@/components/shift/shift-profiles-list";
 import { Button } from "@/components/ui/button";
-import { User, ShiftProfile, ShiftType, WeekDay } from "@/types";
+import { User, ShiftProfile, ShiftType, WeekDay, Department } from "@/types";
 import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,7 +17,7 @@ const exampleUser: User = {
   shift: "Programado Mañana",
   workGroup: "Grupo Programado",
   workday: "Completa",
-  department: "Urgencias y Emergencias (Transporte Urgente)",
+  department: "Urgencias y Emergencias (Transporte Urgente)", // Corregido para que coincida con el tipo Department
   seniority: 5,
   startDate: new Date("2018-03-15"),
   workdays: ["monday", "tuesday", "wednesday", "thursday", "friday"],
@@ -55,6 +56,7 @@ export default function ShiftProfilePage() {
   const [user, setUser] = useState<User | null>(exampleUser);
   const [profiles, setProfiles] = useState<ShiftProfile[]>(exampleProfiles);
   const [isCreating, setIsCreating] = useState(false);
+  const [editingProfile, setEditingProfile] = useState<ShiftProfile | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -64,30 +66,59 @@ export default function ShiftProfilePage() {
 
   const handleCreate = () => {
     setIsCreating(true);
+    setEditingProfile(null);
   };
 
   const handleCancel = () => {
     setIsCreating(false);
+    setEditingProfile(null);
+  };
+
+  const handleEdit = (profile: ShiftProfile) => {
+    setEditingProfile(profile);
+    setIsCreating(false);
   };
 
   const handleSubmit = (values: Omit<ShiftProfile, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
-    // Simulación de creación de perfil
-    const newProfile: ShiftProfile = {
-      id: `prof-${Date.now()}`,
-      userId: user!.id,
-      ...values,
-      createdBy: "trabajador",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    if (editingProfile) {
+      // Actualizar perfil existente
+      const updatedProfiles = profiles.map(profile => {
+        if (profile.id === editingProfile.id) {
+          return {
+            ...profile,
+            ...values,
+            updatedAt: new Date()
+          };
+        }
+        return profile;
+      });
+      
+      setProfiles(updatedProfiles);
+      
+      toast({
+        title: "Perfil de turno actualizado",
+        description: "El perfil se ha actualizado correctamente.",
+      });
+    } else {
+      // Crear nuevo perfil
+      const newProfile: ShiftProfile = {
+        id: `prof-${Date.now()}`,
+        userId: user!.id,
+        ...values,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
-    setProfiles([...profiles, newProfile]);
+      setProfiles([...profiles, newProfile]);
+      
+      toast({
+        title: "Perfil de turno creado",
+        description: "El nuevo perfil se ha creado correctamente.",
+      });
+    }
+    
     setIsCreating(false);
-
-    toast({
-      title: "Perfil de turno creado",
-      description: "El perfil de turno se ha creado correctamente.",
-    });
+    setEditingProfile(null);
   };
 
   const handleUpdate = (id: string, values: Partial<ShiftProfile>) => {
@@ -122,6 +153,21 @@ export default function ShiftProfilePage() {
     });
   };
 
+  const handleSetDefaultProfile = (id: string) => {
+    const updatedProfiles = profiles.map((profile) => ({
+      ...profile,
+      isDefault: profile.id === id,
+      updatedAt: profile.id === id ? new Date() : profile.updatedAt
+    }));
+    
+    setProfiles(updatedProfiles);
+    
+    toast({
+      title: "Perfil predeterminado establecido",
+      description: "El perfil seleccionado ahora es el predeterminado.",
+    });
+  };
+
   return (
     <MainLayout user={user}>
       <div className="space-y-8">
@@ -134,10 +180,13 @@ export default function ShiftProfilePage() {
           </p>
         </div>
 
-        {isCreating ? (
+        {(isCreating || editingProfile) ? (
           <ShiftProfileForm
+            user={user || undefined}
+            existingProfile={editingProfile || undefined}
             onCancel={handleCancel}
             onSubmit={handleSubmit}
+            isSubmitting={false}
           />
         ) : (
           <>
@@ -150,8 +199,11 @@ export default function ShiftProfilePage() {
 
             <ShiftProfilesList
               profiles={profiles}
-              onUpdate={handleUpdate}
               onDelete={handleDelete}
+              onUpdate={handleUpdate}
+              onEditProfile={handleEdit}
+              onCreateProfile={handleCreate}
+              onSetDefaultProfile={handleSetDefaultProfile}
             />
           </>
         )}

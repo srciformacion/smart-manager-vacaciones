@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -60,6 +61,10 @@ export function WorkerForm({
     "Recursos Humanos",
     "Calidad, Seguridad y Prevención de Riesgos Laborales",
     "Formación",
+    "Atención al cliente",
+    "Operaciones",
+    "Administración",
+    "Personal de movimiento"
   ];
 
   const shifts: ShiftType[] = [
@@ -97,7 +102,7 @@ export function WorkerForm({
       const group = assignWorkGroup(
         shift as ShiftType,
         workday as WorkdayType,
-        department
+        department as Department // Asegurarse de que department sea tratado como Department
       );
       setCalculatedWorkGroup(group);
     }
