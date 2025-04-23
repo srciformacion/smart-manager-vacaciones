@@ -1,4 +1,3 @@
-
 // Tipos de usuario
 export type UserRole = 'worker' | 'hr';
 
@@ -62,20 +61,21 @@ export type WeekDay = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday'
 export interface User {
   id: string;
   name: string;
-  surname?: string; // Apellidos
-  dni?: string;     // DNI
+  surname?: string;
+  dni?: string;
   email: string;
   role: UserRole;
   shift: ShiftType;
   workGroup: WorkGroup;
   workday: WorkdayType;
   department: Department;
-  seniority: number; // Antigüedad en años
-  startDate?: Date;  // Fecha de ingreso
-  workdays?: WeekDay[]; // Días laborales habituales
-  shiftStartTime?: string; // Hora de inicio del turno
-  shiftEndTime?: string;   // Hora de fin del turno
-  profileCreator?: 'trabajador' | 'empresa'; // Quien creó el perfil
+  seniority: number;
+  startDate?: Date;
+  workdays?: WeekDay[];
+  shiftStartTime?: string;
+  shiftEndTime?: string;
+  profileCreator?: 'trabajador' | 'empresa';
+  phone?: string;
 }
 
 // Solicitud
@@ -85,18 +85,18 @@ export interface Request {
   type: RequestType;
   startDate: Date;
   endDate: Date;
-  startTime?: string; // Hora de inicio, para solicitudes por horas
-  endTime?: string;   // Hora de fin, para solicitudes por horas
+  startTime?: string;
+  endTime?: string;
   reason?: string;
   status: RequestStatus;
   attachmentUrl?: string;
   observations?: string;
   createdAt: Date;
   updatedAt: Date;
-  replacementUserId?: string; // Para solicitudes de cambio de turno
-  returnDate?: Date; // Fecha propuesta para devolver el turno
-  validatedByAntiquity?: boolean; // Si se ha validado por antigüedad
-  validatedByAvailability?: boolean; // Si se ha validado por disponibilidad departamental
+  replacementUserId?: string;
+  returnDate?: Date;
+  validatedByAntiquity?: boolean;
+  validatedByAvailability?: boolean;
 }
 
 // Saldo de días
@@ -107,7 +107,7 @@ export interface Balance {
   personalDays: number;
   leaveDays: number;
   year: number;
-  extraHoursForAntiquity?: number; // Horas extra por antigüedad
+  extraHoursForAntiquity?: number;
 }
 
 // Perfil de turno
@@ -132,7 +132,7 @@ export interface DepartmentAvailability {
   shiftType: ShiftType;
   totalStaff: number;
   availableStaff: number;
-  maxAllowedAbsence: number; // Porcentaje máximo permitido de ausencias
+  maxAllowedAbsence: number;
 }
 
 // Historial de cambios de turno
