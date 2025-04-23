@@ -16,6 +16,7 @@ import {
   LogOut,
   Menu,
   X,
+  Mountain,  // Added Mountain icon
 } from "lucide-react";
 
 interface NavItemProps {
@@ -91,6 +92,7 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
       >
         <div className="flex flex-col h-full p-4">
           <div className="flex items-center justify-center py-4 border-b border-sidebar-border">
+            <Mountain className="h-8 w-8 mr-2 text-primary" />
             <h2 className="text-xl font-bold text-sidebar-foreground">
               VacaySmart
             </h2>
