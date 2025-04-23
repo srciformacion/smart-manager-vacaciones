@@ -1,16 +1,18 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { User } from "@/types";
 
 // Páginas
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-
-// Páginas de autenticación
-import LoginPage from "./pages/auth/LoginPage";
+import AuthPage from "./pages/auth/AuthPage";
 
 // Páginas de trabajador
 import DashboardPage from "./pages/worker/DashboardPage";
@@ -31,6 +33,34 @@ import ProfilePage from "./pages/ProfilePage";
 
 const queryClient = new QueryClient();
 
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const [session, setSession] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(!!session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (session === null) {
+    return null; // Loading state
+  }
+
+  if (!session) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="system" enableSystem>
@@ -40,24 +70,24 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/auth" element={<AuthPage />} />
             
-            {/* Rutas de trabajador */}
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/solicitudes/vacaciones" element={<VacationRequestPage />} />
-            <Route path="/solicitudes/asuntos-propios" element={<PersonalDayRequestPage />} />
-            <Route path="/solicitudes/permisos" element={<LeaveRequestPage />} />
-            <Route path="/perfiles-turno" element={<ShiftProfilePage />} />
-            <Route path="/historial" element={<HistoryPage />} />
+            {/* Rutas protegidas de trabajador */}
+            <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+            <Route path="/solicitudes/vacaciones" element={<PrivateRoute><VacationRequestPage /></PrivateRoute>} />
+            <Route path="/solicitudes/asuntos-propios" element={<PrivateRoute><PersonalDayRequestPage /></PrivateRoute>} />
+            <Route path="/solicitudes/permisos" element={<PrivateRoute><LeaveRequestPage /></PrivateRoute>} />
+            <Route path="/perfiles-turno" element={<PrivateRoute><ShiftProfilePage /></PrivateRoute>} />
+            <Route path="/historial" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
             
-            {/* Rutas de RRHH */}
-            <Route path="/rrhh/dashboard" element={<HRDashboardPage />} />
-            <Route path="/rrhh/trabajadores" element={<WorkersManagementPage />} />
-            <Route path="/rrhh/solicitudes" element={<RequestsManagementPage />} />
-            <Route path="/rrhh/asistente" element={<SmartAssistantPage />} />
+            {/* Rutas protegidas de RRHH */}
+            <Route path="/rrhh/dashboard" element={<PrivateRoute><HRDashboardPage /></PrivateRoute>} />
+            <Route path="/rrhh/trabajadores" element={<PrivateRoute><WorkersManagementPage /></PrivateRoute>} />
+            <Route path="/rrhh/solicitudes" element={<PrivateRoute><RequestsManagementPage /></PrivateRoute>} />
+            <Route path="/rrhh/asistente" element={<PrivateRoute><SmartAssistantPage /></PrivateRoute>} />
             
-            {/* Ruta por defecto */}
-            <Route path="/perfil" element={<ProfilePage />} />
+            {/* Ruta protegida de perfil */}
+            <Route path="/perfil" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

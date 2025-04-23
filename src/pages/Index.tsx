@@ -1,49 +1,33 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LoginForm } from "@/components/auth/login-form";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 export default function Index() {
   const navigate = useNavigate();
 
-  // Verificar si hay una sesión activa
   useEffect(() => {
-    const userRole = localStorage.getItem("userRole");
-    const userEmail = localStorage.getItem("userEmail");
-    
-    if (userRole && userEmail) {
-      // Redirigir según rol
-      if (userRole === "hr") {
-        navigate("/rrhh/dashboard");
-      } else {
-        navigate("/dashboard");
-      }
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      navigate("/dashboard");
     }
-  }, [navigate]);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-primary">La Rioja Cuida</h1>
-          <p className="mt-2 text-muted-foreground">
-            Sistema inteligente de gestión de vacaciones y permisos
-          </p>
-        </div>
-        
-        <LoginForm onSubmit={(values) => {
-          // Simulación de inicio de sesión
-          if (values.email.includes("hr") || values.email.includes("rrhh")) {
-            // Usuario de RRHH
-            localStorage.setItem("userRole", "hr");
-            localStorage.setItem("userEmail", values.email);
-            navigate("/rrhh/dashboard");
-          } else {
-            // Usuario trabajador
-            localStorage.setItem("userRole", "worker");
-            localStorage.setItem("userEmail", values.email);
-            navigate("/dashboard");
-          }
-        }} />
+      <div className="w-full max-w-md text-center">
+        <h1 className="text-3xl font-bold text-primary mb-8">La Rioja Cuida</h1>
+        <p className="text-muted-foreground mb-8">
+          Sistema inteligente de gestión de vacaciones y permisos
+        </p>
+        <Button onClick={() => navigate("/auth")} size="lg">
+          Comenzar
+        </Button>
       </div>
     </div>
   );
