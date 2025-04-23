@@ -27,31 +27,29 @@ export default function Index() {
         <div className="mb-8 text-center">
           <img
             src="/placeholder.svg"
-            alt="Vacaciones y Permisos Logo"
+            alt="SCRI Logo"
             className="mx-auto h-12 w-auto mb-4"
           />
-          <h1 className="text-3xl font-bold text-primary">Vacaciones y Permisos</h1>
+          <h1 className="text-3xl font-bold text-primary">SCRI</h1>
           <p className="mt-2 text-muted-foreground">
             Sistema inteligente de gestión de vacaciones y permisos
           </p>
         </div>
         
-        <LoginForm
-          onSubmit={(values) => {
-            // Simulación de inicio de sesión
-            if (values.email.includes("hr") || values.email.includes("rrhh")) {
-              // Usuario de RRHH
-              localStorage.setItem("userRole", "hr");
-              localStorage.setItem("userEmail", values.email);
-              navigate("/rrhh/dashboard");
-            } else {
-              // Usuario trabajador
-              localStorage.setItem("userRole", "worker");
-              localStorage.setItem("userEmail", values.email);
-              navigate("/dashboard");
-            }
-          }}
-        />
+        <LoginForm onSubmit={(values) => {
+          // Simulación de inicio de sesión
+          if (values.email.includes("hr") || values.email.includes("rrhh")) {
+            // Usuario de RRHH
+            localStorage.setItem("userRole", "hr");
+            localStorage.setItem("userEmail", values.email);
+            navigate("/rrhh/dashboard");
+          } else {
+            // Usuario trabajador
+            localStorage.setItem("userRole", "worker");
+            localStorage.setItem("userEmail", values.email);
+            navigate("/dashboard");
+          }
+        }} />
       </div>
     </div>
   );

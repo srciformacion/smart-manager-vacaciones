@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -16,7 +15,7 @@ import {
   LogOut,
   Menu,
   X,
-  Mountain,  // Added Mountain icon
+  Mountain,
 } from "lucide-react";
 
 interface NavItemProps {
@@ -65,7 +64,6 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
 
   return (
     <>
-      {/* Botón móvil para abrir/cerrar el sidebar */}
       <Button
         variant="ghost"
         size="icon"
@@ -75,7 +73,6 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
         {isOpen ? <X /> : <Menu />}
       </Button>
 
-      {/* Overlay para cerrar el sidebar en móvil */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -83,7 +80,6 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar transition-transform duration-300 ease-in-out transform lg:translate-x-0",
@@ -94,7 +90,7 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
           <div className="flex items-center justify-center py-4 border-b border-sidebar-border">
             <Mountain className="h-8 w-8 mr-2 text-primary" />
             <h2 className="text-xl font-bold text-sidebar-foreground">
-              VacaySmart
+              SCRI
             </h2>
           </div>
 
@@ -107,7 +103,6 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
               onClick={closeSidebar}
             />
 
-            {/* Menú para Trabajadores */}
             <div className="py-2">
               <h3 className="px-3 text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider">
                 Solicitudes
@@ -144,7 +139,6 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
               </div>
             </div>
 
-            {/* Menú para RRHH */}
             {userRole === "hr" && (
               <div className="py-2">
                 <h3 className="px-3 text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider">
@@ -176,7 +170,6 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
               </div>
             )}
 
-            {/* Configuración y Salir */}
             <div className="py-2">
               <div className="mt-2 space-y-1">
                 <NavItem
