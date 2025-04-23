@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -31,12 +32,12 @@ function NavItem({ to, icon: Icon, label, active, onClick }: NavItemProps) {
       <Button
         variant="ghost"
         className={cn(
-          "w-full justify-start gap-2 font-normal",
+          "w-full justify-start gap-2 font-normal text-sm tracking-tight", // Añadido text-sm y tracking-tight
           active && "bg-sidebar-accent text-sidebar-accent-foreground"
         )}
       >
         <Icon className="h-4 w-4" />
-        <span>{label}</span>
+        <span className="font-medium">{label}</span>
       </Button>
     </Link>
   );
@@ -86,9 +87,8 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
         )}
       >
         <div className="flex flex-col h-full p-4">
-          {/* LOGO personalizado */}
           <div className="flex flex-col items-center justify-center py-4 border-b border-sidebar-border">
-            <h2 className="text-xl font-bold text-sidebar-foreground text-center">
+            <h2 className="text-xl font-bold text-sidebar-foreground text-center tracking-tight">
               La Rioja Cuida
             </h2>
           </div>
@@ -180,14 +180,14 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
                 />
                 <Button
                   variant="ghost"
-                  className="w-full justify-start gap-2 font-normal"
+                  className="w-full justify-start gap-2 font-normal text-sm tracking-tight"
                   onClick={() => {
                     onLogout();
                     closeSidebar();
                   }}
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Cerrar sesión</span>
+                  <span className="font-medium">Cerrar sesión</span>
                 </Button>
               </div>
             </div>
