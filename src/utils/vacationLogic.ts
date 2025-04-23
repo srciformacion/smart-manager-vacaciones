@@ -80,7 +80,7 @@ export function validateVacationRequest(
 }
 
 // Valida que las fechas cumplan con las reglas del grupo de trabajo
-function validateDatesForWorkGroup(
+export function validateDatesForWorkGroup(
   startDate: Date,
   endDate: Date,
   workGroup: WorkGroup
