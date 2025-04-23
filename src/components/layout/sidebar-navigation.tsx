@@ -88,12 +88,6 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
         <div className="flex flex-col h-full p-4">
           {/* LOGO personalizado */}
           <div className="flex flex-col items-center justify-center py-4 border-b border-sidebar-border">
-            <img
-              src="/lovable-uploads/351371ca-566d-4cb4-92dc-7ba5d23a5505.png"
-              alt="La Rioja Cuida Logo"
-              className="h-10 w-10 mb-2"
-              style={{ borderRadius: "4px", background: "white" }}
-            />
             <h2 className="text-xl font-bold text-sidebar-foreground text-center">
               La Rioja Cuida
             </h2>
