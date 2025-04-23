@@ -1,32 +1,29 @@
-
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { ShiftProfileForm } from "@/components/shift/shift-profile-form";
 import { ShiftProfilesList } from "@/components/shift/shift-profiles-list";
-import { User, ShiftProfile } from "@/types";
 import { Button } from "@/components/ui/button";
-import { 
-  Alert, 
-  AlertDescription, 
-  AlertTitle 
-} from "@/components/ui/alert";
-import { ArrowLeft } from "lucide-react";
+import { User, ShiftProfile, ShiftType, WeekDay } from "@/types";
+import { PlusCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // Datos de ejemplo
 const exampleUser: User = {
   id: "1",
-  name: "Ana Martínez",
-  email: "ana.martinez@empresa.com",
+  name: "Ana García",
+  email: "ana.garcia@empresa.com",
   role: "worker",
   shift: "Programado Mañana",
   workGroup: "Grupo Programado",
   workday: "Completa",
-  department: "Urgencias y Emergencias",
-  seniority: 3,
+  department: "Urgencias y Emergencias (Transporte Urgente)",
+  seniority: 5,
+  startDate: new Date("2018-03-15"),
+  workdays: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+  shiftStartTime: "08:00",
+  shiftEndTime: "15:00"
 };
 
-// Ejemplos de perfiles de turno
 const exampleProfiles: ShiftProfile[] = [
   {
     id: "prof-1",
@@ -35,241 +32,129 @@ const exampleProfiles: ShiftProfile[] = [
     workDays: ["monday", "tuesday", "wednesday", "thursday", "friday"],
     startTime: "08:00",
     endTime: "15:00",
-    createdBy: "empresa",
+    createdBy: "trabajador",
     createdAt: new Date("2023-01-15"),
     updatedAt: new Date("2023-01-15"),
-    isDefault: true,
+    isDefault: true
   },
   {
     id: "prof-2",
     userId: "1",
-    shiftType: "Turno 24h",
-    workDays: ["saturday", "sunday"],
-    startTime: "08:00",
-    endTime: "08:00",
+    shiftType: "Programado Tarde",
+    workDays: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+    startTime: "15:00",
+    endTime: "22:00",
     createdBy: "trabajador",
     createdAt: new Date("2023-02-20"),
     updatedAt: new Date("2023-02-20"),
-    isDefault: false,
+    isDefault: false
   }
 ];
 
-type PageState = 
-  | "list"
-  | "create"
-  | "edit"
-  | "success";
-
 export default function ShiftProfilePage() {
-  const [user] = useState<User>(exampleUser);
+  const [user, setUser] = useState<User | null>(exampleUser);
   const [profiles, setProfiles] = useState<ShiftProfile[]>(exampleProfiles);
-  const [pageState, setPageState] = useState<PageState>("list");
-  const [selectedProfile, setSelectedProfile] = useState<ShiftProfile | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  
-  const navigate = useNavigate();
+  const [isCreating, setIsCreating] = useState(false);
+  const { toast } = useToast();
 
-  // Manejar la creación de un nuevo perfil
-  const handleCreateProfile = () => {
-    setSelectedProfile(null);
-    setPageState("create");
+  useEffect(() => {
+    // Aquí podrías cargar los perfiles de turno del usuario desde la base de datos
+    // o desde un contexto global
+  }, []);
+
+  const handleCreate = () => {
+    setIsCreating(true);
   };
 
-  // Manejar la edición de un perfil
-  const handleEditProfile = (profile: ShiftProfile) => {
-    setSelectedProfile(profile);
-    setPageState("edit");
+  const handleCancel = () => {
+    setIsCreating(false);
   };
 
-  // Manejar el envío del formulario
-  const handleFormSubmit = async (values: any) => {
-    setIsSubmitting(true);
-    
-    try {
-      // En una implementación real, enviaríamos a una API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simular petición
-      
-      if (pageState === "create") {
-        // Crear nuevo perfil
-        const newProfile: ShiftProfile = {
-          id: `prof-${Date.now()}`,
-          userId: user.id,
-          shiftType: values.shiftType as any,
-          workDays: values.workDays as any,
-          startTime: values.startTime,
-          endTime: values.endTime,
-          createdBy: values.createdBy as any,
-          createdAt: new Date(),
+  const handleSubmit = (values: Omit<ShiftProfile, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
+    // Simulación de creación de perfil
+    const newProfile: ShiftProfile = {
+      id: `prof-${Date.now()}`,
+      userId: user!.id,
+      ...values,
+      createdBy: "trabajador",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    setProfiles([...profiles, newProfile]);
+    setIsCreating(false);
+
+    toast({
+      title: "Perfil de turno creado",
+      description: "El perfil de turno se ha creado correctamente.",
+    });
+  };
+
+  const handleUpdate = (id: string, values: Partial<ShiftProfile>) => {
+    // Simulación de actualización de perfil
+    const updatedProfiles = profiles.map((profile) => {
+      if (profile.id === id) {
+        return {
+          ...profile,
+          ...values,
           updatedAt: new Date(),
-          isDefault: values.isDefault,
         };
-        
-        // Si es perfil predeterminado, actualizar otros perfiles
-        const updatedProfiles = values.isDefault
-          ? profiles.map(p => ({ ...p, isDefault: false }))
-          : [...profiles];
-        
-        setProfiles([...updatedProfiles, newProfile]);
-        setSuccessMessage("Perfil de turno creado correctamente");
-      } else if (pageState === "edit" && selectedProfile) {
-        // Actualizar perfil existente
-        const updatedProfiles = profiles.map(profile => {
-          if (profile.id === selectedProfile.id) {
-            return {
-              ...profile,
-              shiftType: values.shiftType as any,
-              workDays: values.workDays as any,
-              startTime: values.startTime,
-              endTime: values.endTime,
-              createdBy: values.createdBy as any,
-              updatedAt: new Date(),
-              isDefault: values.isDefault,
-            };
-          }
-          
-          // Si el perfil editado se establece como predeterminado, los demás no lo son
-          if (values.isDefault && profile.isDefault) {
-            return { ...profile, isDefault: false };
-          }
-          
-          return profile;
-        });
-        
-        setProfiles(updatedProfiles);
-        setSuccessMessage("Perfil de turno actualizado correctamente");
       }
-      
-      setPageState("success");
-      
-      // Volver a la lista después de un tiempo
-      setTimeout(() => {
-        setPageState("list");
-        setSuccessMessage(null);
-      }, 2000);
-      
-    } catch (error) {
-      console.error("Error al guardar perfil:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+      return profile;
+    });
+
+    setProfiles(updatedProfiles);
+
+    toast({
+      title: "Perfil de turno actualizado",
+      description: "El perfil de turno se ha actualizado correctamente.",
+    });
   };
 
-  // Manejar la eliminación de un perfil
-  const handleDeleteProfile = async (profileId: string) => {
-    try {
-      // En una implementación real, enviaríamos a una API
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simular petición
-      
-      const updatedProfiles = profiles.filter(profile => profile.id !== profileId);
-      setProfiles(updatedProfiles);
-      
-      // Mostrar mensaje de éxito
-      setSuccessMessage("Perfil de turno eliminado correctamente");
-      setPageState("success");
-      
-      // Volver a la lista después de un tiempo
-      setTimeout(() => {
-        setPageState("list");
-        setSuccessMessage(null);
-      }, 2000);
-      
-    } catch (error) {
-      console.error("Error al eliminar perfil:", error);
-    }
-  };
+  const handleDelete = (id: string) => {
+    // Simulación de eliminación de perfil
+    const updatedProfiles = profiles.filter((profile) => profile.id !== id);
+    setProfiles(updatedProfiles);
 
-  // Manejar establecer un perfil como predeterminado
-  const handleSetDefaultProfile = async (profileId: string) => {
-    try {
-      // En una implementación real, enviaríamos a una API
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simular petición
-      
-      const updatedProfiles = profiles.map(profile => ({
-        ...profile,
-        isDefault: profile.id === profileId
-      }));
-      
-      setProfiles(updatedProfiles);
-      
-      // Mostrar mensaje de éxito
-      setSuccessMessage("Perfil de turno establecido como predeterminado");
-      setPageState("success");
-      
-      // Volver a la lista después de un tiempo
-      setTimeout(() => {
-        setPageState("list");
-        setSuccessMessage(null);
-      }, 2000);
-      
-    } catch (error) {
-      console.error("Error al establecer perfil predeterminado:", error);
-    }
-  };
-
-  // Renderizar el contenido según el estado
-  const renderContent = () => {
-    switch (pageState) {
-      case "create":
-        return (
-          <ShiftProfileForm
-            user={user}
-            onSubmit={handleFormSubmit}
-            isSubmitting={isSubmitting}
-          />
-        );
-
-      case "edit":
-        return selectedProfile ? (
-          <ShiftProfileForm
-            user={user}
-            existingProfile={selectedProfile}
-            onSubmit={handleFormSubmit}
-            isSubmitting={isSubmitting}
-          />
-        ) : null;
-
-      case "success":
-        return (
-          <Alert className="bg-success/10 border-success/30">
-            <AlertTitle>Operación completada</AlertTitle>
-            <AlertDescription>{successMessage}</AlertDescription>
-          </Alert>
-        );
-
-      case "list":
-      default:
-        return (
-          <ShiftProfilesList
-            profiles={profiles}
-            user={user}
-            onCreateProfile={handleCreateProfile}
-            onEditProfile={handleEditProfile}
-            onDeleteProfile={handleDeleteProfile}
-            onSetDefaultProfile={handleSetDefaultProfile}
-          />
-        );
-    }
+    toast({
+      title: "Perfil de turno eliminado",
+      description: "El perfil de turno se ha eliminado correctamente.",
+    });
   };
 
   return (
     <MainLayout user={user}>
-      <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-3xl font-bold tracking-tight">Gestión de perfiles de turno</h1>
-        </div>
-
-        <div className="px-4 py-3 bg-primary/10 rounded-lg">
-          <p className="text-sm">
-            Los perfiles de turno le permiten definir sus horarios habituales para facilitar la solicitud de vacaciones, 
-            permisos y cambios de turno. Puede crear múltiples perfiles y establecer uno como predeterminado.
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Perfiles de turno
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Administra tus perfiles de turno personalizados
           </p>
         </div>
 
-        {renderContent()}
+        {isCreating ? (
+          <ShiftProfileForm
+            onCancel={handleCancel}
+            onSubmit={handleSubmit}
+          />
+        ) : (
+          <>
+            <div className="flex justify-end">
+              <Button onClick={handleCreate}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Crear perfil
+              </Button>
+            </div>
+
+            <ShiftProfilesList
+              profiles={profiles}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+            />
+          </>
+        )}
       </div>
     </MainLayout>
   );

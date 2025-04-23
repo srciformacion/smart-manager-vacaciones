@@ -1,3 +1,4 @@
+
 // Tipos de usuario
 export type UserRole = 'worker' | 'hr';
 
@@ -20,6 +21,16 @@ export type ShiftType =
 
 // Tipos de jornada - Actualizado para incluir todas las variantes
 export type WorkdayType = 'Completa' | 'Parcial' | 'Localizada' | 'Reducida';
+
+// Grupos de trabajo - Restaurado y actualizado
+export type WorkGroup = 
+  | 'Grupo Localizado'  // Quincenas naturales
+  | 'Grupo Programado'  // Semanas naturales (lunes a domingo) + bloque de 4 días
+  | 'Urgente 24h'       // Tres bloques de guardias (2/3/2) o 32 días regulables
+  | 'Urgente 12h'       // Quincenas naturales
+  | 'GES Sala Sanitaria' // Tres bloques (10/10/12)
+  | 'Top Programado'    // Semanas naturales + bloque de 4 días
+  | 'Grupo 1/3';        // Quincenas naturales
 
 // Grupos de departamento - Actualizado para incluir todos los departamentos usados
 export type Department = 
