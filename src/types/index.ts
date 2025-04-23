@@ -29,7 +29,7 @@ export type WorkGroup =
 export type Department = string;
 
 // Tipo de solicitud
-export type RequestType = 'vacation' | 'personalDay' | 'leave';
+export type RequestType = 'vacation' | 'personalDay' | 'leave' | 'shiftChange';
 
 // Estado de solicitud
 export type RequestStatus = 'pending' | 'approved' | 'rejected' | 'moreInfo';
@@ -60,6 +60,8 @@ export interface Request {
   observations?: string;
   createdAt: Date;
   updatedAt: Date;
+  replacementUserId?: string; // Para solicitudes de cambio de turno
+  returnDate?: Date; // Fecha propuesta para devolver el turno
 }
 
 // Saldo de días

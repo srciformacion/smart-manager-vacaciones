@@ -64,6 +64,17 @@ export function validateVacationRequest(
       message: 'Las fechas solicitadas se solapan con otra solicitud existente'
     };
   }
+
+  // Validación 4: No debe solapar con baja médica (IT) o permiso especial
+  // En un sistema real, verificaríamos contra una base de datos de bajas médicas
+  const hasOverlappingMedicalLeave = false; // Implementación simplificada
+  
+  if (hasOverlappingMedicalLeave) {
+    return {
+      valid: false,
+      message: 'Las fechas solicitadas coinciden con un periodo de baja médica o permiso especial'
+    };
+  }
   
   return { valid: true, message: 'Solicitud válida' };
 }
@@ -287,10 +298,127 @@ export function calculateAvailableDays(user: User, balance: Balance): Balance {
   // Copia del balance para no modificar el original
   const updatedBalance = { ...balance };
   
-  // Ajustar días de vacaciones según antigüedad (8 horas por día de antigüedad)
-  // Asumimos que cada día de antigüedad son 8 horas, que equivale a 1 día
-  const additionalDays = Math.floor(user.seniority);
-  updatedBalance.vacationDays += additionalDays;
+  // Ajustar días de vacaciones según antigüedad
+  const baseVacationDays = 22; // Días base según convenio
+  
+  // Por cada 5 años de antigüedad, se añade 1 día adicional (ajustar según convenio real)
+  const additionalVacationDays = Math.floor(user.seniority / 5);
+  
+  updatedBalance.vacationDays = baseVacationDays + additionalVacationDays;
+  
+  // Ajustar días de asuntos propios según antigüedad
+  let personalDays = 3; // Base de 3 días por convenio
+  
+  // Si tiene más de 15 años, sumar horas extra
+  if (user.seniority >= 25) {
+    personalDays += 2; // 2 días adicionales para >25 años
+  } else if (user.seniority >= 15) {
+    personalDays += 1; // 1 día adicional para >15 años
+  }
+  
+  updatedBalance.personalDays = personalDays;
   
   return updatedBalance;
+}
+
+// Validar solicitud de día de asuntos propios
+export function validatePersonalDayRequest(
+  date: Date,
+  user: User,
+  allRequests: Request[],
+  allUsers: User[]
+): { valid: boolean; message: string } {
+  // Verificar si no se supera el 10% del personal de su categoría ese día
+  const sameDepUsers = allUsers.filter(u => u.department === user.department);
+  const totalDepartmentUsers = sameDepUsers.length;
+  
+  // Obtener solicitudes para ese día y departamento
+  const sameDepRequests = allRequests.filter(req => {
+    // Solo considerar solicitudes aprobadas o pendientes
+    if (req.status === 'rejected') return false;
+    
+    // Verificar si la solicitud es para el mismo día y es un asunto propio o vacaciones
+    const reqDate = new Date(req.startDate);
+    return (
+      reqDate.getFullYear() === date.getFullYear() &&
+      reqDate.getMonth() === date.getMonth() &&
+      reqDate.getDate() === date.getDate() &&
+      (req.type === 'personalDay' || req.type === 'vacation')
+    );
+  });
+  
+  // Calcular cuántos usuarios del mismo departamento tienen solicitudes para ese día
+  const usersWithRequestsForDay = sameDepRequests
+    .map(req => req.userId)
+    .filter(userId => {
+      const user = allUsers.find(u => u.id === userId);
+      return user && user.department === user.department;
+    });
+  
+  // Eliminar duplicados
+  const uniqueUsers = [...new Set(usersWithRequestsForDay)];
+  
+  // Calcular porcentaje
+  const percentageAbsent = (uniqueUsers.length / totalDepartmentUsers) * 100;
+  
+  if (percentageAbsent >= 10) {
+    return {
+      valid: false,
+      message: `No se puede aprobar su solicitud porque ya hay un ${Math.round(percentageAbsent)}% del personal de su departamento ausente ese día (máximo permitido: 10%)`
+    };
+  }
+  
+  // Verificar que el bloque horario es válido (8h, 12h, o 24h)
+  // Esta validación depende del turno y la jornada del usuario
+  // Implementación simplificada
+  
+  return { valid: true, message: 'Solicitud válida' };
+}
+
+// Validar solicitud de cambio de turno
+export function validateShiftChangeRequest(
+  requestedDate: Date,
+  replacement: User, // Usuario con quien se intercambia el turno
+  user: User,
+  allRequests: Request[]
+): { valid: boolean; message: string } {
+  // Verificar que sea con función equivalente
+  if (user.department !== replacement.department) {
+    return {
+      valid: false,
+      message: 'El cambio de turno debe ser con un compañero del mismo departamento'
+    };
+  }
+  
+  // Verificar que se respete el descanso mínimo legal (12 horas entre jornadas)
+  // Implementación simplificada que asume que ya tenemos los turnos registrados
+  const hasMinimumRest = true; // En un sistema real, verificaríamos contra los turnos existentes
+  
+  if (!hasMinimumRest) {
+    return {
+      valid: false,
+      message: 'El cambio solicitado no respeta el descanso mínimo legal de 12 horas entre jornadas'
+    };
+  }
+  
+  // Verificar que el reemplazo no tiene ya una solicitud para ese día
+  const replacementHasRequest = allRequests.some(req => {
+    if (req.userId !== replacement.id || req.status === 'rejected') return false;
+    
+    const reqDate = new Date(req.startDate);
+    return (
+      reqDate.getFullYear() === requestedDate.getFullYear() &&
+      reqDate.getMonth() === requestedDate.getMonth() &&
+      reqDate.getDate() === requestedDate.getDate()
+    );
+  });
+  
+  if (replacementHasRequest) {
+    return {
+      valid: false,
+      message: 'El compañero seleccionado ya tiene otra solicitud para ese día'
+    };
+  }
+  
+  return { valid: true, message: 'Solicitud de cambio válida' };
 }

@@ -3,11 +3,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/main-layout";
 import { RequestForm } from "@/components/requests/request-form";
-import { User, Request, WorkGroup } from "@/types";
+import { User, Request, WorkGroup, Balance } from "@/types";
 import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { validateVacationRequest, suggestAlternativeDates } from "@/utils/vacationLogic";
+import { validateVacationRequest, suggestAlternativeDates, calculateAvailableDays } from "@/utils/vacationLogic";
 import { getVacationRules } from "@/utils/workGroupAssignment";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -31,13 +31,23 @@ const exampleRequests: Request[] = [
     id: "req-1",
     userId: "1",
     type: "vacation",
-    startDate: new Date("2023-08-01"),
-    endDate: new Date("2023-08-07"),
+    startDate: new Date("2025-08-01"),
+    endDate: new Date("2025-08-07"),
     status: "approved",
-    createdAt: new Date("2023-06-15"),
-    updatedAt: new Date("2023-06-16"),
+    createdAt: new Date("2025-06-15"),
+    updatedAt: new Date("2025-06-16"),
   },
 ];
+
+// Ejemplo de balance de días
+const exampleBalance = {
+  id: "bal-1",
+  userId: "1", // Ana Martínez
+  vacationDays: 22,
+  personalDays: 3,
+  leaveDays: 4,
+  year: 2025,
+};
 
 export default function VacationRequestPage() {
   const [user] = useState<User>(exampleUser);
@@ -46,8 +56,25 @@ export default function VacationRequestPage() {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<DateRange[]>([]);
   const [success, setSuccess] = useState(false);
+  const [balance, setBalance] = useState<Balance>(exampleBalance);
   
   const navigate = useNavigate();
+
+  // Calcular días disponibles según antigüedad
+  const availableBalance = calculateAvailableDays(user, balance);
+
+  // Calcular días ya utilizados
+  const usedVacationDays = requests.reduce((total, req) => {
+    if (req.type === 'vacation' && (req.status === 'approved' || req.status === 'pending')) {
+      const startDate = new Date(req.startDate);
+      const endDate = new Date(req.endDate);
+      const days = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      return total + days;
+    }
+    return total;
+  }, 0);
+
+  const remainingDays = availableBalance.vacationDays - usedVacationDays;
 
   const handleSubmit = async (
     values: { dateRange: DateRange; reason?: string; notes?: string },
@@ -60,6 +87,17 @@ export default function VacationRequestPage() {
     // Verificar que hay fechas válidas
     if (!values.dateRange?.from || !values.dateRange?.to) {
       setValidationError("Por favor, seleccione un rango de fechas válido");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Verificar días disponibles
+    const requestedDays = Math.floor(
+      (values.dateRange.to.getTime() - values.dateRange.from.getTime()) / (1000 * 60 * 60 * 24)
+    ) + 1;
+
+    if (requestedDays > remainingDays) {
+      setValidationError(`No dispone de suficientes días de vacaciones. Solicitados: ${requestedDays}, Disponibles: ${remainingDays}`);
       setIsSubmitting(false);
       return;
     }
@@ -156,6 +194,12 @@ export default function VacationRequestPage() {
           <p className="text-sm">
             <strong>Regla vacacional:</strong>{" "}
             {getVacationRules(user.workGroup as WorkGroup)}
+          </p>
+          <p className="text-sm">
+            <strong>Días disponibles:</strong> {remainingDays} de {availableBalance.vacationDays} días 
+            {user.seniority > 0 && (
+              <span className="text-xs"> (incluye {Math.floor(user.seniority / 5)} días adicionales por antigüedad)</span>
+            )}
           </p>
         </div>
 
