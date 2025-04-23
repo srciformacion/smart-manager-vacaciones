@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 
 // Esquema de validación para el formulario
 const formSchema = z.object({
@@ -46,7 +46,7 @@ export function LoginForm({ onSubmit, isSubmitting = false, error }: LoginFormPr
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">VacaySmart</CardTitle>
+        <CardTitle className="text-2xl font-bold">Vacaciones y Permisos</CardTitle>
         <CardDescription>
           Inicia sesión para acceder a la plataforma de gestión de vacaciones
         </CardDescription>
