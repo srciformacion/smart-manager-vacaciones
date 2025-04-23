@@ -1,23 +1,20 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    /* Fondo base y color de texto */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 212 90% 48.2%; /* Azul oscuro (#1A1F2C) */
+    /* Colores principales de la marca */
+    --primary: 212 90% 22%; /* Azul oscuro real (#1A1F2C -> HSL approx) */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 97 61.8% 94%; /* Verde pantone (#F2FCE2) */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 97 61.8% 93%; /* Verde Pantone muy suave (#F2FCE2) */
+    --secondary-foreground: 142 76% 19%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
@@ -40,25 +37,34 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 212 90% 48.2%; /* Azul oscuro */
+    --sidebar-background: 212 90% 22%; /* Azul oscuro sidebar */
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 97 61.8% 94%; /* Verde pantone */
+    --sidebar-accent: 97 61.8% 93%; /* Verde Pantone sidebar */
     --sidebar-accent-foreground: 212 90% 20%;
-    --sidebar-border: 212 90% 50%;
+    --sidebar-border: 212 90% 32%;
     --sidebar-ring: 212.2 91.2% 59.8%;
 
-    /* Fuentes personalizadas */
+    /* Fuente personalizada */
     --font-sans: 'Roboto', system-ui, sans-serif;
+  }
+
+  html {
+    font-size: 17px; /* Base más legible */
+    font-family: 'Roboto', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased tracking-tight leading-relaxed;
+    font-family: var(--font-sans);
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tighter text-primary;
+    font-family: var(--font-sans);
   }
 }
 
@@ -69,5 +75,6 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
   }
 }
