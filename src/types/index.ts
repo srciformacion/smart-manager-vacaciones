@@ -1,8 +1,7 @@
-
 // Tipos de usuario
 export type UserRole = 'worker' | 'hr';
 
-// Tipos de turnos
+// Tipos de turnos - Actualizado para incluir todos los tipos usados
 export type ShiftType = 
   | 'Turno 24h'
   | 'Localizado'
@@ -11,24 +10,20 @@ export type ShiftType =
   | 'Programado Noche'
   | 'Teleoperación Turno Mañana'
   | 'Teleoperación Turno Tarde'
-  | 'Teleoperación Turno Noche';
+  | 'Teleoperación Turno Noche'
+  | 'Urgente 24h'
+  | 'Urgente 12h'
+  | 'GES Sala Sanitaria'
+  | 'Top Programado'
+  | 'Grupo 1/3'
+  | 'Programado';
 
-// Tipos de jornada
-export type WorkdayType = 'Completa' | 'Parcial' | 'Localizada';
+// Tipos de jornada - Actualizado para incluir todas las variantes
+export type WorkdayType = 'Completa' | 'Parcial' | 'Localizada' | 'Reducida';
 
-// Grupos de trabajo
-export type WorkGroup = 
-  | 'Grupo Localizado'  // Quincenas naturales
-  | 'Grupo Programado'  // Semanas naturales (lunes a domingo) + bloque de 4 días
-  | 'Urgente 24h'       // Tres bloques de guardias (2/3/2) o 32 días regulables
-  | 'Urgente 12h'       // Quincenas naturales
-  | 'GES Sala Sanitaria' // Tres bloques (10/10/12)
-  | 'Top Programado'    // Semanas naturales + bloque de 4 días
-  | 'Grupo 1/3';        // Quincenas naturales
-
-// Tipo de departamento o unidad
+// Grupos de departamento - Actualizado para incluir todos los departamentos usados
 export type Department = 
-  | 'Urgencias y Emergencias'
+  | 'Urgencias y Emergencias (Transporte Urgente)'
   | 'Transporte Sanitario Programado'
   | 'Centro Coordinador Urgente'
   | 'Centro Coordinador Programado'
@@ -37,7 +32,11 @@ export type Department =
   | 'Administración y Finanzas'
   | 'Recursos Humanos'
   | 'Calidad, Seguridad y Prevención de Riesgos Laborales'
-  | 'Formación';
+  | 'Formación'
+  | 'Atención al cliente'
+  | 'Operaciones'
+  | 'Administración'
+  | 'Personal de movimiento';
 
 // Tipo de solicitud
 export type RequestType = 'vacation' | 'personalDay' | 'leave' | 'shiftChange';
