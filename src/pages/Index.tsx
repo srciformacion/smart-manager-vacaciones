@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoginForm } from "@/components/auth/login-form";
@@ -26,13 +25,12 @@ export default function Index() {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <img
-            src="/lovable-uploads/d515316f-ac07-4fbc-bc29-7cf8880265e0.png"
-            alt="La Rioja Logo"
+            src="/lovable-uploads/351371ca-566d-4cb4-92dc-7ba5d23a5505.png"
+            alt="La Rioja Cuida Logo"
             className="mx-auto h-12 w-auto mb-4"
             style={{ borderRadius: "4px", background: "white" }}
           />
-          <h1 className="text-3xl font-bold text-primary">SCRI</h1>
-          <p className="text-base font-semibold text-muted-foreground mb-1">COMO EMPRESA</p>
+          <h1 className="text-3xl font-bold text-primary">La Rioja Cuida</h1>
           <p className="mt-2 text-muted-foreground">
             Sistema inteligente de gestión de vacaciones y permisos
           </p>

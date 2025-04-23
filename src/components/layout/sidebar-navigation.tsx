@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -16,7 +15,6 @@ import {
   LogOut,
   Menu,
   X,
-  // Mountain, // Eliminado, ya no usamos el icono Mountain
 } from "lucide-react";
 
 interface NavItemProps {
@@ -91,14 +89,13 @@ export function SidebarNavigation({ userRole, onLogout }: SidebarNavigationProps
           {/* LOGO personalizado */}
           <div className="flex flex-col items-center justify-center py-4 border-b border-sidebar-border">
             <img
-              src="/lovable-uploads/d515316f-ac07-4fbc-bc29-7cf8880265e0.png"
-              alt="La Rioja Logo"
+              src="/lovable-uploads/351371ca-566d-4cb4-92dc-7ba5d23a5505.png"
+              alt="La Rioja Cuida Logo"
               className="h-10 w-10 mb-2"
               style={{ borderRadius: "4px", background: "white" }}
             />
             <h2 className="text-xl font-bold text-sidebar-foreground text-center">
-              SCRI <br />
-              <span className="text-base font-semibold block">COMO EMPRESA</span>
+              La Rioja Cuida
             </h2>
           </div>
 
