@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,7 +52,7 @@ export default function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md p-6">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary">VacaySmart</h1>
+          <h1 className="text-3xl font-bold text-primary">La Rioja Cuida</h1>
           <p className="mt-2 text-muted-foreground">
             Sistema inteligente de gestión de vacaciones y permisos
           </p>
