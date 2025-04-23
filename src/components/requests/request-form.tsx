@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -19,9 +19,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { FileUpload } from "@/components/ui/file-upload";
-import { RequestType, User, WorkGroup } from "@/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RequestType, User, WorkGroup, ShiftProfile } from "@/types";
 import { getVacationRules } from "@/utils/workGroupAssignment";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Clock } from "lucide-react";
 
 // Esquema de validación para el formulario
 const formSchema = z.object({
@@ -31,6 +39,10 @@ const formSchema = z.object({
   }),
   reason: z.string().optional(),
   notes: z.string().optional(),
+  shiftProfileId: z.string().optional(),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
+  replacementUserId: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -38,6 +50,8 @@ type FormValues = z.infer<typeof formSchema>;
 interface RequestFormProps {
   requestType: RequestType;
   user: User;
+  availableUsers?: User[];
+  shiftProfiles?: ShiftProfile[];
   onSubmit: (values: FormValues, file: File | null) => void;
   isSubmitting?: boolean;
 }
@@ -45,10 +59,16 @@ interface RequestFormProps {
 export function RequestForm({
   requestType,
   user,
+  availableUsers = [],
+  shiftProfiles = [],
   onSubmit,
   isSubmitting = false,
 }: RequestFormProps) {
   const [file, setFile] = useState<File | null>(null);
+  const [showTimeSelectors, setShowTimeSelectors] = useState(requestType === 'personalDay');
+  
+  // Obtener el perfil de turno predeterminado si existe
+  const defaultProfile = shiftProfiles.find(profile => profile.isDefault);
   
   // Inicializar formulario
   const form = useForm<FormValues>({
@@ -60,8 +80,24 @@ export function RequestForm({
       },
       reason: "",
       notes: "",
+      shiftProfileId: defaultProfile?.id || "",
+      startTime: defaultProfile?.startTime || "08:00",
+      endTime: defaultProfile?.endTime || "15:00",
     },
   });
+
+  // Manejar cambios en el perfil de turno seleccionado
+  const selectedProfileId = form.watch("shiftProfileId");
+  
+  useEffect(() => {
+    if (selectedProfileId) {
+      const selectedProfile = shiftProfiles.find(profile => profile.id === selectedProfileId);
+      if (selectedProfile) {
+        form.setValue("startTime", selectedProfile.startTime);
+        form.setValue("endTime", selectedProfile.endTime);
+      }
+    }
+  }, [selectedProfileId, shiftProfiles, form]);
 
   // Manejar envío del formulario
   const handleSubmit = (values: FormValues) => {
@@ -76,6 +112,8 @@ export function RequestForm({
         return "Solicitud de asuntos propios";
       case "leave":
         return "Solicitud de permiso justificado";
+      case "shiftChange":
+        return "Solicitud de cambio de turno";
       default:
         return "Nueva solicitud";
     }
@@ -87,9 +125,11 @@ export function RequestForm({
         const rules = getVacationRules(user.workGroup as WorkGroup);
         return `Grupo de trabajo: ${user.workGroup}. ${rules}`;
       case "personalDay":
-        return "Solicitud de días por asuntos propios.";
+        return "Solicitud de días por asuntos propios. Los días pueden solicitarse en bloques de 8h, 12h o 24h según su turno.";
       case "leave":
         return "Solicitud de permiso justificado con documento acreditativo.";
+      case "shiftChange":
+        return "Solicitud de cambio de turno con otro compañero. Debe especificar la fecha de devolución.";
       default:
         return "";
     }
@@ -104,6 +144,41 @@ export function RequestForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            {/* Perfil de turno (para todos los tipos de solicitud) */}
+            {shiftProfiles.length > 0 && (
+              <FormField
+                control={form.control}
+                name="shiftProfileId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Perfil de turno</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                      disabled={isSubmitting}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione un perfil de turno" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {shiftProfiles.map((profile) => (
+                          <SelectItem key={profile.id} value={profile.id}>
+                            {profile.shiftType} {profile.isDefault && "(Predeterminado)"}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Seleccione el perfil de turno para esta solicitud
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             {/* Selector de rango de fechas */}
             <FormField
               control={form.control}
@@ -119,12 +194,102 @@ export function RequestForm({
                     />
                   </FormControl>
                   <FormDescription>
-                    Seleccione el rango de fechas para su solicitud
+                    {requestType === "personalDay" 
+                      ? "Seleccione el día para su solicitud de asuntos propios" 
+                      : "Seleccione el rango de fechas para su solicitud"}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/* Selector de horas (para asuntos propios o cambios de turno) */}
+            {(requestType === 'personalDay' || requestType === 'shiftChange') && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="startTime"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Hora de inicio</FormLabel>
+                      <div className="relative">
+                        <Clock className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <FormControl>
+                          <Input
+                            type="time"
+                            className="pl-8"
+                            disabled={isSubmitting}
+                            {...field}
+                            value={field.value || ""}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="endTime"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Hora de fin</FormLabel>
+                      <div className="relative">
+                        <Clock className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <FormControl>
+                          <Input
+                            type="time"
+                            className="pl-8"
+                            disabled={isSubmitting}
+                            {...field}
+                            value={field.value || ""}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+
+            {/* Selector de reemplazo (solo para cambios de turno) */}
+            {requestType === 'shiftChange' && availableUsers.length > 0 && (
+              <FormField
+                control={form.control}
+                name="replacementUserId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Compañero de reemplazo</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                      disabled={isSubmitting}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione un compañero" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableUsers
+                          .filter(u => u.id !== user.id && u.department === user.department)
+                          .map((u) => (
+                            <SelectItem key={u.id} value={u.id}>
+                              {u.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Seleccione el compañero con quien desea intercambiar el turno
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/* Motivo (obligatorio para permisos justificados) */}
             <FormField

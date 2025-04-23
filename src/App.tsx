@@ -17,6 +17,7 @@ import DashboardPage from "./pages/worker/DashboardPage";
 import VacationRequestPage from "./pages/worker/VacationRequestPage";
 import PersonalDayRequestPage from "./pages/worker/PersonalDayRequestPage";
 import LeaveRequestPage from "./pages/worker/LeaveRequestPage";
+import ShiftProfilePage from "./pages/worker/ShiftProfilePage";
 import HistoryPage from "./pages/worker/HistoryPage";
 
 // Páginas de RRHH
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/solicitudes/vacaciones" element={<VacationRequestPage />} />
           <Route path="/solicitudes/asuntos-propios" element={<PersonalDayRequestPage />} />
           <Route path="/solicitudes/permisos" element={<LeaveRequestPage />} />
+          <Route path="/perfiles-turno" element={<ShiftProfilePage />} />
           <Route path="/historial" element={<HistoryPage />} />
           
           {/* Rutas de RRHH */}
