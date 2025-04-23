@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { RequestList } from "@/components/requests/request-list";
 import { RequestDetails } from "@/components/requests/request-details";
 import { User, Request, RequestStatus } from "@/types";
 import NocoDBAPI from "@/utils/nocodbApi";
+import { useToast } from "@/hooks/use-toast";
+import { sendEmailNotification } from "@/utils/emailService";
 
 // Datos de ejemplo para demostración
 const exampleUser: User = {
@@ -129,6 +130,7 @@ export default function RequestsManagementPage() {
   const [requests, setRequests] = useState<Request[]>(exampleRequests);
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [selectedWorker, setSelectedWorker] = useState<User | null>(null);
+  const { toast } = useToast();
 
   // Manejar cambio de estado de solicitud
   const handleStatusChange = async (request: Request, newStatus: RequestStatus) => {
@@ -146,11 +148,54 @@ export default function RequestsManagementPage() {
       setRequests(updatedRequests);
       setSelectedRequest(null);
       
-      // Mostrar algún tipo de notificación
-      alert(`Solicitud ${request.id} actualizada a estado: ${newStatus}`);
+      // Buscar el trabajador para enviar notificación
+      const worker = workers.find(w => w.id === request.userId);
+      
+      if (worker) {
+        // Determinar el tipo de notificación según el nuevo estado
+        let notificationType;
+        switch (newStatus) {
+          case "approved":
+            notificationType = "requestApproved";
+            break;
+          case "rejected":
+            notificationType = "requestRejected";
+            break;
+          case "moreInfo":
+            notificationType = "requestMoreInfo";
+            break;
+          default:
+            return;
+        }
+        
+        // Enviar notificación por email
+        const updatedRequest = updatedRequests.find(r => r.id === request.id);
+        if (updatedRequest) {
+          sendEmailNotification(notificationType, updatedRequest, worker)
+            .then(success => {
+              if (success) {
+                toast({
+                  title: "Notificación enviada",
+                  description: `Se ha enviado un email a ${worker.name} informando del cambio de estado de su solicitud.`,
+                });
+              }
+            });
+        }
+      }
+      
+      // Mostrar notificación de éxito
+      toast({
+        title: "Solicitud actualizada",
+        description: `Solicitud ${request.id} actualizada a estado: ${newStatus}`,
+      });
       
     } catch (error) {
       console.error("Error al actualizar solicitud:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo actualizar la solicitud. Inténtelo de nuevo.",
+      });
     }
   };
 

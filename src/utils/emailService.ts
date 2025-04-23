@@ -1,0 +1,154 @@
+
+import { supabase } from "@/integrations/supabase/client";
+import { User, Request } from "@/types";
+
+// Tipos de notificación
+export type NotificationType = 
+  | "requestCreated" 
+  | "requestApproved" 
+  | "requestRejected" 
+  | "requestMoreInfo";
+
+interface EmailPayload {
+  to: string;
+  subject: string;
+  html: string;
+}
+
+// Función para generar el contenido HTML del email según el tipo de notificación
+const generateEmailContent = (
+  type: NotificationType,
+  request: Request,
+  user: User
+): { subject: string; html: string } => {
+  const requestTypeNames = {
+    vacation: "vacaciones",
+    personalDay: "asuntos propios",
+    leave: "permiso justificado",
+    shiftChange: "cambio de turno",
+  };
+  
+  const requestTypeName = requestTypeNames[request.type];
+  const startDate = new Date(request.startDate).toLocaleDateString("es-ES");
+  const endDate = new Date(request.endDate).toLocaleDateString("es-ES");
+  
+  switch (type) {
+    case "requestCreated":
+      return {
+        subject: `Nueva solicitud de ${requestTypeName} - ${user.name}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Nueva solicitud de ${requestTypeName}</h2>
+            <p>Se ha registrado una nueva solicitud con los siguientes detalles:</p>
+            <ul>
+              <li><strong>Solicitante:</strong> ${user.name}</li>
+              <li><strong>Tipo:</strong> ${requestTypeName}</li>
+              <li><strong>Fecha inicio:</strong> ${startDate}</li>
+              <li><strong>Fecha fin:</strong> ${endDate}</li>
+              ${request.reason ? `<li><strong>Motivo:</strong> ${request.reason}</li>` : ''}
+            </ul>
+            <p>La solicitud está pendiente de revisión.</p>
+          </div>
+        `,
+      };
+    case "requestApproved":
+      return {
+        subject: `Solicitud de ${requestTypeName} aprobada`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Solicitud aprobada</h2>
+            <p>Tu solicitud de ${requestTypeName} ha sido aprobada:</p>
+            <ul>
+              <li><strong>Tipo:</strong> ${requestTypeName}</li>
+              <li><strong>Fecha inicio:</strong> ${startDate}</li>
+              <li><strong>Fecha fin:</strong> ${endDate}</li>
+            </ul>
+            <p>No es necesario realizar ninguna acción adicional.</p>
+          </div>
+        `,
+      };
+    case "requestRejected":
+      return {
+        subject: `Solicitud de ${requestTypeName} rechazada`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Solicitud rechazada</h2>
+            <p>Lamentamos informarte que tu solicitud de ${requestTypeName} ha sido rechazada:</p>
+            <ul>
+              <li><strong>Tipo:</strong> ${requestTypeName}</li>
+              <li><strong>Fecha inicio:</strong> ${startDate}</li>
+              <li><strong>Fecha fin:</strong> ${endDate}</li>
+              ${request.observations ? `<li><strong>Motivo del rechazo:</strong> ${request.observations}</li>` : ''}
+            </ul>
+            <p>Puedes ponerte en contacto con el departamento de RRHH para más información.</p>
+          </div>
+        `,
+      };
+    case "requestMoreInfo":
+      return {
+        subject: `Se requiere más información para tu solicitud de ${requestTypeName}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Información adicional requerida</h2>
+            <p>Para poder procesar tu solicitud de ${requestTypeName}, necesitamos información adicional:</p>
+            <ul>
+              <li><strong>Tipo:</strong> ${requestTypeName}</li>
+              <li><strong>Fecha inicio:</strong> ${startDate}</li>
+              <li><strong>Fecha fin:</strong> ${endDate}</li>
+              ${request.observations ? `<li><strong>Información solicitada:</strong> ${request.observations}</li>` : ''}
+            </ul>
+            <p>Por favor, ponte en contacto con el departamento de RRHH lo antes posible para proporcionar esta información.</p>
+          </div>
+        `,
+      };
+    default:
+      return {
+        subject: `Actualización sobre tu solicitud de ${requestTypeName}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Actualización de solicitud</h2>
+            <p>Ha habido una actualización en tu solicitud de ${requestTypeName}:</p>
+            <ul>
+              <li><strong>Tipo:</strong> ${requestTypeName}</li>
+              <li><strong>Fecha inicio:</strong> ${startDate}</li>
+              <li><strong>Fecha fin:</strong> ${endDate}</li>
+              <li><strong>Estado:</strong> ${request.status}</li>
+            </ul>
+          </div>
+        `,
+      };
+  }
+};
+
+// Función principal para enviar notificaciones por email
+export const sendEmailNotification = async (
+  type: NotificationType,
+  request: Request,
+  user: User,
+  recipientEmail?: string
+): Promise<boolean> => {
+  try {
+    const { subject, html } = generateEmailContent(type, request, user);
+    
+    const emailPayload: EmailPayload = {
+      to: recipientEmail || user.email,
+      subject,
+      html,
+    };
+
+    const { data, error } = await supabase.functions.invoke("send-email", {
+      body: emailPayload,
+    });
+
+    if (error) {
+      console.error("Error al enviar email:", error);
+      return false;
+    }
+
+    console.log("Email enviado correctamente:", data);
+    return true;
+  } catch (error) {
+    console.error("Error en sendEmailNotification:", error);
+    return false;
+  }
+};
