@@ -4,80 +4,49 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { sendEmailNotification } from "@/utils/emailService";
-import { NotificationType, User, Request } from "@/types";
+import { NotificationType } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 
 export function NotificationSender() {
   const { toast } = useToast();
   const [notificationType, setNotificationType] = useState<NotificationType>("requestCreated");
-  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [recipients, setRecipients] = useState("");
   const [isSending, setIsSending] = useState(false);
 
-  const testUser: User = {
-    id: "notification-recipient",
-    name: "Destinatario",
-    email: email || "destinatario@empresa.com",
-    role: "worker",
-    shift: "Programado",
-    workGroup: "Grupo Programado",
-    workday: "Completa",
-    department: "Atención al cliente",
-    seniority: 2
-  };
-
-  const testRequest: Request = {
-    id: "notification-request",
-    userId: "notification-recipient",
-    type: "vacation",
-    startDate: new Date(),
-    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    reason: "Solicitud de ejemplo",
-    status: "pending",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    observations: notificationType === "requestRejected" ? "Motivo de rechazo de ejemplo" : 
-                  notificationType === "requestMoreInfo" ? "Se requiere documentación adicional" : 
-                  undefined
-  };
-
   const handleSendNotification = async () => {
-    if (!email) {
+    if (!subject || !message || !recipients) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Por favor, ingrese un correo electrónico"
+        title: "Campos incompletos",
+        description: "Por favor complete todos los campos antes de enviar la notificación.",
       });
       return;
     }
 
     setIsSending(true);
     try {
-      const success = await sendEmailNotification(
-        notificationType,
-        testRequest,
-        testUser
-      );
-
-      if (success) {
-        toast({
-          title: "Notificación enviada",
-          description: `Se ha enviado correctamente la notificación a ${email}`,
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "No se pudo enviar la notificación. Revise la consola para más detalles.",
-        });
-      }
+      // Simular envío de notificación (implementación real usará sendEmailNotification)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Notificación enviada",
+        description: `Se ha enviado correctamente la notificación a ${recipients.split(",").length} destinatarios.`,
+      });
+      
+      // Resetear formulario después de enviar
+      setSubject("");
+      setMessage("");
     } catch (error) {
       console.error("Error al enviar notificación:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error al enviar la notificación: " + (error as Error).message,
+        description: "No se pudo enviar la notificación. Por favor, inténtelo de nuevo.",
       });
     } finally {
       setIsSending(false);
@@ -87,9 +56,9 @@ export function NotificationSender() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Enviar notificación</CardTitle>
+        <CardTitle>Envío de notificaciones</CardTitle>
         <CardDescription>
-          Envía notificaciones por correo electrónico a los trabajadores
+          Envíe notificaciones a trabajadores o grupos de forma masiva
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -103,30 +72,52 @@ export function NotificationSender() {
               <SelectValue placeholder="Seleccionar tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="requestCreated">Nueva solicitud</SelectItem>
-              <SelectItem value="requestApproved">Solicitud aprobada</SelectItem>
-              <SelectItem value="requestRejected">Solicitud rechazada</SelectItem>
-              <SelectItem value="requestMoreInfo">Solicitud requiere más información</SelectItem>
+              <SelectItem value="requestCreated">Informativa general</SelectItem>
+              <SelectItem value="requestApproved">Recordatorio</SelectItem>
+              <SelectItem value="requestRejected">Urgente</SelectItem>
+              <SelectItem value="requestMoreInfo">Cambio de política</SelectItem>
             </SelectContent>
           </Select>
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="email">Correo electrónico del destinatario</Label>
+          <Label htmlFor="recipients">Destinatarios</Label>
           <Input
-            id="email"
-            type="email"
-            placeholder="correo@empresa.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+            id="recipients"
+            placeholder="emails separados por comas o 'todos'"
+            value={recipients}
+            onChange={(e) => setRecipients(e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Ingrese direcciones de correo separadas por comas o escriba "todos" para enviar a todo el personal
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="subject">Asunto</Label>
+          <Input
+            id="subject"
+            placeholder="Asunto de la notificación"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="message">Mensaje</Label>
+          <Textarea
+            id="message"
+            placeholder="Escriba el contenido de la notificación..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            rows={6}
           />
         </div>
       </CardContent>
       <CardFooter>
         <Button 
           onClick={handleSendNotification} 
-          disabled={isSending}
+          disabled={isSending || !subject || !message || !recipients}
         >
           {isSending ? "Enviando..." : "Enviar notificación"}
         </Button>

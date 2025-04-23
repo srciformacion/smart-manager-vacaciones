@@ -24,6 +24,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [form, setForm] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
+  const [createMode, setCreateMode] = useState(false);
 
   // Obtener ID de usuario actual y cargar perfil
   useEffect(() => {
@@ -48,11 +49,27 @@ export default function ProfilePage() {
       if (!ignore) {
         if (error) {
           toast({ title: "Error", description: "No se pudo cargar tu perfil." });
+          setLoading(false);
         } else if (data) {
           setProfile(data as Profile);
           setForm(data as Profile);
+          setLoading(false);
+        } else {
+          // No existe perfil, configuramos modo de creación
+          setCreateMode(true);
+          // Inicializamos un formulario con datos básicos
+          const initialForm = {
+            id: id,
+            name: user.user.user_metadata?.name || "",
+            surname: user.user.user_metadata?.surname || "",
+            email: user.user.email || "",
+            dni: "",
+            department: ""
+          } as Profile;
+          setForm(initialForm);
+          setLoading(false);
+          setEdit(true);
         }
-        setLoading(false);
       }
     }
     fetchProfile();
@@ -69,33 +86,71 @@ export default function ProfilePage() {
   async function handleSave() {
     if (!form || !userId) return;
     setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        name: form.name,
-        surname: form.surname,
-        dni: form.dni,
-      })
-      .eq("id", userId);
 
-    setSaving(false);
+    try {
+      if (createMode) {
+        // Crear nuevo perfil
+        const { error } = await supabase
+          .from("profiles")
+          .insert([{
+            id: userId,
+            name: form.name,
+            surname: form.surname,
+            email: form.email,
+            dni: form.dni,
+            department: form.department
+          }]);
 
-    if (error) {
-      toast({ title: "Error", description: "No se pudieron guardar los cambios." });
-    } else {
+        if (error) throw error;
+        
+        toast({ title: "Perfil creado", description: "Tu perfil ha sido creado correctamente." });
+        setCreateMode(false);
+      } else {
+        // Actualizar perfil existente
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            name: form.name,
+            surname: form.surname,
+            dni: form.dni,
+            department: form.department
+          })
+          .eq("id", userId);
+
+        if (error) throw error;
+        
+        toast({ title: "Perfil actualizado", description: "Tus datos han sido guardados." });
+      }
+      
       setEdit(false);
       setProfile(form);
-      toast({ title: "Perfil actualizado", description: "Tus datos han sido guardados." });
+    } catch (error: any) {
+      toast({ 
+        variant: "destructive",
+        title: "Error", 
+        description: error.message || "No se pudieron guardar los cambios." 
+      });
+    } finally {
+      setSaving(false);
     }
   }
 
   // Cancelar edición
   function handleCancel() {
+    if (createMode && !profile) {
+      // Si estamos en modo creación y no hay perfil, no podemos cancelar
+      toast({ 
+        variant: "destructive",
+        title: "Información requerida", 
+        description: "Debes completar tu perfil para continuar."
+      });
+      return;
+    }
     setEdit(false);
     setForm(profile);
   }
 
-  if (loading || !form) {
+  if (loading) {
     return (
       <div className="max-w-xl mx-auto mt-16 text-center text-muted-foreground text-lg">
         Cargando perfil...
@@ -111,70 +166,75 @@ export default function ProfilePage() {
             <User size={32} className="text-purple-600" />
           </div>
           <h1 className="text-2xl font-bold">
-            Perfil de usuario
+            {createMode ? "Crear perfil de usuario" : "Perfil de usuario"}
           </h1>
         </div>
 
-        <div className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium mb-1">Nombre</label>
-            <Input
-              name="name"
-              disabled={!edit}
-              value={form.name || ""}
-              onChange={handleChange}
-              autoComplete="off"
-            />
+        {form && (
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium mb-1">Nombre</label>
+              <Input
+                name="name"
+                disabled={!edit}
+                value={form.name || ""}
+                onChange={handleChange}
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Apellidos</label>
+              <Input
+                name="surname"
+                disabled={!edit}
+                value={form.surname || ""}
+                onChange={handleChange}
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <Input
+                type="email"
+                name="email"
+                disabled
+                value={form.email || ""}
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">DNI</label>
+              <Input
+                name="dni"
+                disabled={!edit}
+                value={form.dni || ""}
+                onChange={handleChange}
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Departamento</label>
+              <Input
+                name="department"
+                disabled={!edit}
+                value={form.department || ""}
+                onChange={handleChange}
+                autoComplete="off"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Apellidos</label>
-            <Input
-              name="surname"
-              disabled={!edit}
-              value={form.surname || ""}
-              onChange={handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <Input
-              type="email"
-              name="email"
-              disabled
-              value={form.email || ""}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">DNI</label>
-            <Input
-              name="dni"
-              disabled={!edit}
-              value={form.dni || ""}
-              onChange={handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Departamento</label>
-            <Input
-              name="department"
-              disabled
-              value={form.department || ""}
-              autoComplete="off"
-            />
-          </div>
-        </div>
+        )}
 
         <div className="mt-8 flex gap-3 justify-end">
           {edit ? (
             <>
-              <Button variant="outline" onClick={handleCancel} disabled={saving}>
-                Cancelar
-              </Button>
+              {!createMode && (
+                <Button variant="outline" onClick={handleCancel} disabled={saving}>
+                  Cancelar
+                </Button>
+              )}
               <Button onClick={handleSave} disabled={saving}>
-                {saving ? "Guardando..." : "Guardar cambios"}
+                {saving ? "Guardando..." : createMode ? "Crear perfil" : "Guardar cambios"}
               </Button>
             </>
           ) : (
