@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { WorkerList } from "@/components/hr/worker-list";
@@ -9,9 +8,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Datos de ejemplo para demostración
 const exampleUser: User = {
-  id: "admin",
-  name: "Carlos Rodríguez",
-  email: "carlos.rodriguez@empresa.com",
+  id: "rrhh-user",
+  name: "Carlos Rodríguez", 
+  email: "rrhh@email.com",
   role: "hr",
   shift: "Programado",
   workGroup: "Grupo Programado",

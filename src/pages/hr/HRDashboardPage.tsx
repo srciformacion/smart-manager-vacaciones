@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { HRStats } from "@/components/dashboard/hr-stats";
@@ -14,9 +13,9 @@ import NocoDBAPI from "@/utils/nocodbApi";
 
 // Datos de ejemplo para demostración
 const exampleUser: User = {
-  id: "admin",
+  id: "rrhh-user",
   name: "Carlos Rodríguez",
-  email: "carlos.rodriguez@empresa.com",
+  email: "rrhh@email.com",
   role: "hr",
   shift: "Programado",
   workGroup: "Grupo Programado",
