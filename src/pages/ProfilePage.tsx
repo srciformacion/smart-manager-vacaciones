@@ -1,12 +1,11 @@
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { LoadingState } from "@/components/profile/LoadingState";
+import { ProfileHeader } from "@/components/profile/ProfileHeader";
+import { ProfileForm } from "@/components/profile/ProfileForm";
 
 type Profile = {
   id: string;
@@ -27,7 +26,6 @@ export default function ProfilePage() {
   const [createMode, setCreateMode] = useState(false);
   const navigate = useNavigate();
 
-  // Obtener ID de usuario actual y cargar perfil
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -54,7 +52,6 @@ export default function ProfilePage() {
 
         if (profileError) {
           if (profileError.code === 'PGRST116') {
-            // Perfil no existe, configurar modo creación
             setCreateMode(true);
             const initialForm = {
               id: user.id,
@@ -173,100 +170,25 @@ export default function ProfilePage() {
   }
 
   if (loading) {
-    return (
-      <div className="max-w-xl mx-auto mt-16 text-center text-muted-foreground text-lg">
-        Cargando perfil...
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return (
     <div className="max-w-xl mx-auto mt-8">
       <Card className="p-8 bg-white shadow-md">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="rounded-full bg-purple-100 p-3">
-            <User size={32} className="text-purple-600" />
-          </div>
-          <h1 className="text-2xl font-bold">
-            {createMode ? "Crear perfil de usuario" : "Perfil de usuario"}
-          </h1>
-        </div>
-
+        <ProfileHeader isCreateMode={createMode} />
         {form && (
-          <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium mb-1">Nombre</label>
-              <Input
-                name="name"
-                disabled={!edit}
-                value={form.name || ""}
-                onChange={handleChange}
-                autoComplete="off"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Apellidos</label>
-              <Input
-                name="surname"
-                disabled={!edit}
-                value={form.surname || ""}
-                onChange={handleChange}
-                autoComplete="off"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
-              <Input
-                type="email"
-                name="email"
-                disabled
-                value={form.email || ""}
-                autoComplete="off"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">DNI</label>
-              <Input
-                name="dni"
-                disabled={!edit}
-                value={form.dni || ""}
-                onChange={handleChange}
-                autoComplete="off"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Departamento</label>
-              <Input
-                name="department"
-                disabled={!edit}
-                value={form.department || ""}
-                onChange={handleChange}
-                autoComplete="off"
-                required
-              />
-            </div>
-          </div>
+          <ProfileForm
+            form={form}
+            edit={edit}
+            saving={saving}
+            createMode={createMode}
+            onSave={handleSave}
+            onCancel={handleCancel}
+            onEdit={() => setEdit(true)}
+            onChange={handleChange}
+          />
         )}
-
-        <div className="mt-8 flex gap-3 justify-end">
-          {edit ? (
-            <>
-              {!createMode && (
-                <Button variant="outline" onClick={handleCancel} disabled={saving}>
-                  Cancelar
-                </Button>
-              )}
-              <Button onClick={handleSave} disabled={saving}>
-                {saving ? "Guardando..." : createMode ? "Crear perfil" : "Guardar cambios"}
-              </Button>
-            </>
-          ) : (
-            <Button onClick={() => setEdit(true)}>Editar perfil</Button>
-          )}
-        </div>
       </Card>
     </div>
   );
