@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,7 +30,6 @@ import { getVacationRules } from "@/utils/workGroupAssignment";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock } from "lucide-react";
 
-// Esquema de validación para el formulario
 const formSchema = z.object({
   dateRange: z.object({
     from: z.date(),
@@ -67,10 +65,8 @@ export function RequestForm({
   const [file, setFile] = useState<File | null>(null);
   const [showTimeSelectors, setShowTimeSelectors] = useState(requestType === 'personalDay');
   
-  // Obtener el perfil de turno predeterminado si existe
   const defaultProfile = shiftProfiles.find(profile => profile.isDefault);
   
-  // Inicializar formulario
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -86,7 +82,6 @@ export function RequestForm({
     },
   });
 
-  // Manejar cambios en el perfil de turno seleccionado
   const selectedProfileId = form.watch("shiftProfileId");
   
   useEffect(() => {
@@ -99,7 +94,6 @@ export function RequestForm({
     }
   }, [selectedProfileId, shiftProfiles, form]);
 
-  // Manejar envío del formulario
   const handleSubmit = (values: FormValues) => {
     onSubmit(values, file);
   };
@@ -144,7 +138,6 @@ export function RequestForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            {/* Perfil de turno (para todos los tipos de solicitud) */}
             {shiftProfiles.length > 0 && (
               <FormField
                 control={form.control}
@@ -179,7 +172,6 @@ export function RequestForm({
               />
             )}
 
-            {/* Selector de rango de fechas */}
             <FormField
               control={form.control}
               name="dateRange"
@@ -191,6 +183,7 @@ export function RequestForm({
                       value={field.value as DateRange}
                       onChange={field.onChange}
                       disabled={isSubmitting}
+                      workGroup={user.workGroup}
                     />
                   </FormControl>
                   <FormDescription>
@@ -203,7 +196,6 @@ export function RequestForm({
               )}
             />
 
-            {/* Selector de horas (para asuntos propios o cambios de turno) */}
             {(requestType === 'personalDay' || requestType === 'shiftChange') && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -254,7 +246,6 @@ export function RequestForm({
               </div>
             )}
 
-            {/* Selector de reemplazo (solo para cambios de turno) */}
             {requestType === 'shiftChange' && availableUsers.length > 0 && (
               <FormField
                 control={form.control}
@@ -291,7 +282,6 @@ export function RequestForm({
               />
             )}
 
-            {/* Motivo (obligatorio para permisos justificados) */}
             <FormField
               control={form.control}
               name="reason"
@@ -316,7 +306,6 @@ export function RequestForm({
               )}
             />
 
-            {/* Notas adicionales */}
             <FormField
               control={form.control}
               name="notes"
@@ -336,7 +325,6 @@ export function RequestForm({
               )}
             />
 
-            {/* Carga de archivo (solo para permisos justificados) */}
             {requestType === "leave" && (
               <FormItem>
                 <FormLabel>Justificante</FormLabel>
@@ -355,7 +343,6 @@ export function RequestForm({
               </FormItem>
             )}
 
-            {/* Botón de envío */}
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? "Enviando..." : "Enviar solicitud"}
             </Button>
