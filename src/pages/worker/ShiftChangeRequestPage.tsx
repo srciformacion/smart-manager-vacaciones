@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/main-layout";
@@ -86,9 +87,11 @@ export default function ShiftChangeRequestPage() {
     // Validar según reglas
     const validation = validateShiftChangeRequest(
       values.date,
+      values.returnDate || values.date, // Fix: provide a default end date if return date is not provided
       replacement,
       user,
-      requests
+      requests,
+      new Date() // Fix: provide current date as the sixth argument
     );
 
     if (!validation.valid) {
