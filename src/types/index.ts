@@ -146,3 +146,10 @@ export interface ShiftChangeHistory {
   isReturned: boolean;
   returnedAt?: Date;
 }
+
+// Tipo de notificación
+export type NotificationType = 
+  | 'requestCreated' 
+  | 'requestApproved' 
+  | 'requestRejected' 
+  | 'requestMoreInfo';

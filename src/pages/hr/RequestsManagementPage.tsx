@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
-import { RequestList } from "@/components/requests/request-list";
 import { RequestDetails } from "@/components/requests/request-details";
-import { User, Request, RequestStatus } from "@/types";
-import NocoDBAPI from "@/utils/nocodbApi";
-import { useToast } from "@/hooks/use-toast";
-import { sendEmailNotification } from "@/utils/emailService";
+import { User, Request } from "@/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NotificationTester } from "@/components/hr/notification-tester";
+import { RequestsTabContent } from "@/components/hr/requests-tab-content";
+import { useRequests } from "@/hooks/use-requests";
 
 const exampleUser: User = {
   id: "admin",
@@ -127,95 +125,26 @@ const exampleRequests: Request[] = [
 
 export default function RequestsManagementPage() {
   const [user, setUser] = useState<User | null>(exampleUser);
-  const [workers, setWorkers] = useState<User[]>(exampleWorkers);
-  const [requests, setRequests] = useState<Request[]>(exampleRequests);
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [selectedWorker, setSelectedWorker] = useState<User | null>(null);
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("solicitudes");
-
-  const handleStatusChange = async (request: Request, newStatus: RequestStatus) => {
-    try {
-      // En una implementación real, actualizaríamos en NocoDB
-      // await NocoDBAPI.updateRequestStatus(request.id, newStatus);
-      
-      // Actualizar estado local
-      const updatedRequests = requests.map(req => 
-        req.id === request.id 
-          ? { ...req, status: newStatus, updatedAt: new Date() } 
-          : req
-      );
-      
-      setRequests(updatedRequests);
-      setSelectedRequest(null);
-      
-      // Buscar el trabajador para enviar notificación
-      const worker = workers.find(w => w.id === request.userId);
-      
-      if (worker) {
-        // Determinar el tipo de notificación según el nuevo estado
-        let notificationType;
-        switch (newStatus) {
-          case "approved":
-            notificationType = "requestApproved";
-            break;
-          case "rejected":
-            notificationType = "requestRejected";
-            break;
-          case "moreInfo":
-            notificationType = "requestMoreInfo";
-            break;
-          default:
-            return;
-        }
-        
-        // Enviar notificación por email
-        const updatedRequest = updatedRequests.find(r => r.id === request.id);
-        if (updatedRequest) {
-          sendEmailNotification(notificationType, updatedRequest, worker)
-            .then(success => {
-              if (success) {
-                toast({
-                  title: "Notificación enviada",
-                  description: `Se ha enviado un email a ${worker.name} informando del cambio de estado de su solicitud.`,
-                });
-              }
-            });
-        }
-      }
-      
-      // Mostrar notificación de éxito
-      toast({
-        title: "Solicitud actualizada",
-        description: `Solicitud ${request.id} actualizada a estado: ${newStatus}`,
-      });
-      
-    } catch (error) {
-      console.error("Error al actualizar solicitud:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudo actualizar la solicitud. Inténtelo de nuevo.",
-      });
-    }
-  };
+  
+  const { requests, handleStatusChange } = useRequests(exampleRequests, exampleWorkers);
 
   const handleViewRequestDetails = (request: Request) => {
-    // Encontrar el trabajador asociado a esta solicitud
-    const worker = workers.find(w => w.id === request.userId) || null;
+    const worker = exampleWorkers.find(w => w.id === request.userId) || null;
     setSelectedWorker(worker);
     setSelectedRequest(request);
   };
 
   const handleDownloadAttachment = () => {
     if (selectedRequest?.attachmentUrl) {
-      // En una implementación real, descargaríamos el archivo
       console.log("Descargando adjunto:", selectedRequest.attachmentUrl);
       alert("Descargando archivo justificante...");
     }
   };
 
-  const handleDetailStatusChange = (status: RequestStatus) => {
+  const handleDetailStatusChange = (status: Request["status"]) => {
     if (selectedRequest) {
       handleStatusChange(selectedRequest, status);
     }
@@ -250,10 +179,9 @@ export default function RequestsManagementPage() {
               <TabsTrigger value="notificaciones">Probar notificaciones</TabsTrigger>
             </TabsList>
             <TabsContent value="solicitudes">
-              <RequestList
+              <RequestsTabContent
                 requests={requests}
-                users={workers}
-                isHRView={true}
+                workers={exampleWorkers}
                 onViewDetails={handleViewRequestDetails}
                 onStatusChange={handleStatusChange}
                 onDownloadAttachment={handleViewRequestDetails}
