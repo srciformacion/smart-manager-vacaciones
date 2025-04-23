@@ -1,5 +1,5 @@
 
-import { Request, User } from '@/types';
+import { Request, User, WorkGroup } from "@/types";
 import { isWeeklyRestDay } from './weekly-rest';
 import { validateDatesForWorkGroup } from './work-group-rules';
 
@@ -9,7 +9,6 @@ export function validateVacationRequest(
   user: User,
   existingRequests: Request[]
 ): { valid: boolean; message: string } {
-  
   if (isWeeklyRestDay(startDate, user)) {
     return {
       valid: false,
@@ -42,15 +41,6 @@ export function validateVacationRequest(
     };
   }
 
-  const hasOverlappingMedicalLeave = false;
-  
-  if (hasOverlappingMedicalLeave) {
-    return {
-      valid: false,
-      message: 'Las fechas solicitadas coinciden con un periodo de baja médica o permiso especial'
-    };
-  }
-  
   return { valid: true, message: 'Solicitud válida' };
 }
 
@@ -96,44 +86,93 @@ export function validatePersonalDayRequest(
 }
 
 export function validateShiftChangeRequest(
-  requestedDate: Date,
+  startDate: Date,
+  returnDate: Date,
   replacement: User,
   user: User,
-  allRequests: Request[]
+  requests: Request[],
+  currentDate: Date
 ): { valid: boolean; message: string } {
-  if (user.department !== replacement.department) {
+  if (returnDate <= startDate) {
     return {
       valid: false,
-      message: 'El cambio de turno debe ser con un compañero del mismo departamento'
+      message: "La fecha de devolución debe ser posterior a la fecha del cambio"
     };
   }
-  
-  const hasMinimumRest = true;
-  
-  if (!hasMinimumRest) {
-    return {
-      valid: false,
-      message: 'El cambio solicitado no respeta el descanso mínimo legal de 12 horas entre jornadas'
-    };
-  }
-  
-  const replacementHasRequest = allRequests.some(req => {
-    if (req.userId !== replacement.id || req.status === 'rejected') return false;
-    
-    const reqDate = new Date(req.startDate);
-    return (
-      reqDate.getFullYear() === requestedDate.getFullYear() &&
-      reqDate.getMonth() === requestedDate.getMonth() &&
-      reqDate.getDate() === requestedDate.getDate()
-    );
+
+  const hasUserOverlap = requests.some(req => {
+    if (req.userId === user.id && req.status !== 'rejected') {
+      const reqDate = new Date(req.startDate);
+      
+      return (
+        reqDate.getDate() === startDate.getDate() &&
+        reqDate.getMonth() === startDate.getMonth() &&
+        reqDate.getFullYear() === startDate.getFullYear()
+      );
+    }
+    return false;
   });
-  
-  if (replacementHasRequest) {
+
+  if (hasUserOverlap) {
     return {
       valid: false,
-      message: 'El compañero seleccionado ya tiene otra solicitud para ese día'
+      message: "Ya tiene una solicitud aprobada o pendiente para este día"
+    };
+  }
+
+  const hasReturnOverlap = requests.some(req => {
+    if ((req.userId === user.id || req.userId === replacement.id) && req.status !== 'rejected') {
+      const reqDate = new Date(req.startDate);
+      
+      return (
+        reqDate.getDate() === returnDate.getDate() &&
+        reqDate.getMonth() === returnDate.getMonth() &&
+        reqDate.getFullYear() === returnDate.getFullYear()
+      );
+    }
+    return false;
+  });
+
+  if (hasReturnOverlap) {
+    return {
+      valid: false,
+      message: "Ya existe una solicitud para la fecha de devolución"
+    };
+  }
+
+  const hasReplacementOverlap = requests.some(req => {
+    if (req.userId === replacement.id && req.status !== 'rejected') {
+      const reqDate = new Date(req.startDate);
+      
+      return (
+        reqDate.getDate() === startDate.getDate() &&
+        reqDate.getMonth() === startDate.getMonth() &&
+        reqDate.getFullYear() === startDate.getFullYear()
+      );
+    }
+    return false;
+  });
+
+  if (hasReplacementOverlap) {
+    return {
+      valid: false,
+      message: "El compañero de reemplazo ya tiene una solicitud para esta fecha"
     };
   }
   
-  return { valid: true, message: 'Solicitud de cambio válida' };
+  if (replacement.department !== user.department) {
+    return {
+      valid: false,
+      message: "El compañero de reemplazo debe ser del mismo departamento"
+    };
+  }
+  
+  if (replacement.shift !== user.shift) {
+    return {
+      valid: false,
+      message: "El compañero de reemplazo debe tener el mismo turno"
+    };
+  }
+
+  return { valid: true, message: 'Solicitud válida' };
 }
