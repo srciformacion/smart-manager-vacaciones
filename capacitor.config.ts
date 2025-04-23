@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   appName: 'smart-manager-vacaciones',
   webDir: 'dist',
   server: {
-    url: 'https://598b4b67-79b6-4e8a-88d3-f670afcb5781.lovableproject.com?forceHideBadge=true',
+    url: 'https://vacaciones.hhrrsrci.online',
     cleartext: true
   },
   ios: {
