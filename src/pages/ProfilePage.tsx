@@ -8,7 +8,7 @@ import { LoadingState } from "@/components/profile/LoadingState";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { MainLayout } from "@/components/layout/main-layout";
-import { User } from "@/types";
+import { User, Department } from "@/types";
 
 type Profile = {
   id: string;
@@ -58,7 +58,7 @@ export default function ProfilePage() {
           shift: 'Programado', // Valor por defecto
           workGroup: 'Grupo Programado', // Valor por defecto
           workday: 'Completa', // Valor por defecto
-          department: '',
+          department: 'Administración' as Department, // Fixed: Using a valid Department value
           seniority: 0,
         });
 
