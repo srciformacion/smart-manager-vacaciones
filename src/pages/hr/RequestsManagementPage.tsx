@@ -6,8 +6,9 @@ import { User, Request, RequestStatus } from "@/types";
 import NocoDBAPI from "@/utils/nocodbApi";
 import { useToast } from "@/hooks/use-toast";
 import { sendEmailNotification } from "@/utils/emailService";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { NotificationTester } from "@/components/hr/notification-tester";
 
-// Datos de ejemplo para demostración
 const exampleUser: User = {
   id: "admin",
   name: "Carlos Rodríguez",
@@ -131,8 +132,8 @@ export default function RequestsManagementPage() {
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [selectedWorker, setSelectedWorker] = useState<User | null>(null);
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("solicitudes");
 
-  // Manejar cambio de estado de solicitud
   const handleStatusChange = async (request: Request, newStatus: RequestStatus) => {
     try {
       // En una implementación real, actualizaríamos en NocoDB
@@ -199,7 +200,6 @@ export default function RequestsManagementPage() {
     }
   };
 
-  // Manejar la vista de detalles de solicitud
   const handleViewRequestDetails = (request: Request) => {
     // Encontrar el trabajador asociado a esta solicitud
     const worker = workers.find(w => w.id === request.userId) || null;
@@ -207,7 +207,6 @@ export default function RequestsManagementPage() {
     setSelectedRequest(request);
   };
 
-  // Manejar descarga de adjunto
   const handleDownloadAttachment = () => {
     if (selectedRequest?.attachmentUrl) {
       // En una implementación real, descargaríamos el archivo
@@ -216,7 +215,6 @@ export default function RequestsManagementPage() {
     }
   };
 
-  // Manejar cambio de estado desde la vista de detalles
   const handleDetailStatusChange = (status: RequestStatus) => {
     if (selectedRequest) {
       handleStatusChange(selectedRequest, status);
@@ -246,14 +244,27 @@ export default function RequestsManagementPage() {
             </p>
           </div>
 
-          <RequestList
-            requests={requests}
-            users={workers}
-            isHRView={true}
-            onViewDetails={handleViewRequestDetails}
-            onStatusChange={handleStatusChange}
-            onDownloadAttachment={handleViewRequestDetails}
-          />
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList>
+              <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
+              <TabsTrigger value="notificaciones">Probar notificaciones</TabsTrigger>
+            </TabsList>
+            <TabsContent value="solicitudes">
+              <RequestList
+                requests={requests}
+                users={workers}
+                isHRView={true}
+                onViewDetails={handleViewRequestDetails}
+                onStatusChange={handleStatusChange}
+                onDownloadAttachment={handleViewRequestDetails}
+              />
+            </TabsContent>
+            <TabsContent value="notificaciones">
+              <div className="max-w-2xl mx-auto">
+                <NotificationTester />
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       )}
     </MainLayout>
