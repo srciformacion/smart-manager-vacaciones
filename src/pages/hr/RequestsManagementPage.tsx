@@ -3,7 +3,7 @@ import { MainLayout } from "@/components/layout/main-layout";
 import { RequestDetails } from "@/components/requests/request-details";
 import { User, Request } from "@/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { NotificationTester } from "@/components/hr/notification-tester";
+import { NotificationSender } from "@/components/hr/notification-sender";
 import { RequestsTabContent } from "@/components/hr/requests-tab-content";
 import { useRequests } from "@/hooks/use-requests";
 
