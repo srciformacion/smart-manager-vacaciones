@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +24,9 @@ import HRDashboardPage from "./pages/hr/HRDashboardPage";
 import WorkersManagementPage from "./pages/hr/WorkersManagementPage";
 import RequestsManagementPage from "./pages/hr/RequestsManagementPage";
 import SmartAssistantPage from "./pages/hr/SmartAssistantPage";
+
+// Páginas adicionales
+import ProfilePage from "./pages/ProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +55,7 @@ const App = () => (
           <Route path="/rrhh/asistente" element={<SmartAssistantPage />} />
           
           {/* Ruta por defecto */}
+          <Route path="/perfil" element={<ProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
