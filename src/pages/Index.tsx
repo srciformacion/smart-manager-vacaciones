@@ -23,7 +23,7 @@ export default function Index() {
       <div className="w-full max-w-md text-center">
         <h1 className="text-3xl font-bold text-primary mb-8">La Rioja Cuida</h1>
         <p className="text-muted-foreground mb-8">
-          Sistema inteligente de gestión de vacaciones y permisos
+          Sistema de gestión de vacaciones y permisos
         </p>
         <Button onClick={() => navigate("/auth")} size="lg">
           Comenzar
