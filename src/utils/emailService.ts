@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { User, Request } from "@/types";
 
@@ -13,6 +12,8 @@ interface EmailPayload {
   to: string;
   subject: string;
   html: string;
+  whatsapp?: boolean;
+  phone?: string;
 }
 
 // Función para generar el contenido HTML del email según el tipo de notificación
@@ -120,20 +121,23 @@ const generateEmailContent = (
   }
 };
 
-// Función principal para enviar notificaciones por email
+// Función principal para enviar notificaciones por email y WhatsApp
 export const sendEmailNotification = async (
   type: NotificationType,
   request: Request,
   user: User,
-  recipientEmail?: string
+  recipientEmail?: string,
+  sendWhatsApp: boolean = false
 ): Promise<boolean> => {
   try {
     const { subject, html } = generateEmailContent(type, request, user);
     
-    const emailPayload: EmailPayload = {
+    const emailPayload = {
       to: recipientEmail || user.email,
       subject,
       html,
+      whatsapp: sendWhatsApp,
+      phone: user.phone
     };
 
     const { data, error } = await supabase.functions.invoke("send-email", {
@@ -141,11 +145,11 @@ export const sendEmailNotification = async (
     });
 
     if (error) {
-      console.error("Error al enviar email:", error);
+      console.error("Error al enviar notificaciones:", error);
       return false;
     }
 
-    console.log("Email enviado correctamente:", data);
+    console.log("Notificaciones enviadas correctamente:", data);
     return true;
   } catch (error) {
     console.error("Error en sendEmailNotification:", error);
