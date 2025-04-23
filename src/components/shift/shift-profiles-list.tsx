@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { ShiftProfile } from "@/types";
+import { ShiftProfile, User } from "@/types";  // Added User import
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import {
