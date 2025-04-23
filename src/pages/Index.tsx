@@ -26,11 +26,13 @@ export default function Index() {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <img
-            src="/placeholder.svg"
-            alt="SCRI Logo"
+            src="/lovable-uploads/d515316f-ac07-4fbc-bc29-7cf8880265e0.png"
+            alt="La Rioja Logo"
             className="mx-auto h-12 w-auto mb-4"
+            style={{ borderRadius: "4px", background: "white" }}
           />
           <h1 className="text-3xl font-bold text-primary">SCRI</h1>
+          <p className="text-base font-semibold text-muted-foreground mb-1">COMO EMPRESA</p>
           <p className="mt-2 text-muted-foreground">
             Sistema inteligente de gestión de vacaciones y permisos
           </p>
