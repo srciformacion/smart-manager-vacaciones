@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
-// Tipo para el perfil según la tabla de Supabase
 type Profile = {
   id: string;
   name: string;
@@ -25,71 +25,90 @@ export default function ProfilePage() {
   const [form, setForm] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
   const [createMode, setCreateMode] = useState(false);
+  const navigate = useNavigate();
 
   // Obtener ID de usuario actual y cargar perfil
   useEffect(() => {
-    let ignore = false;
-    async function fetchProfile() {
-      setLoading(true);
-      const { data: user, error: userError } = await supabase.auth.getUser();
-      if (userError || !user?.user) {
-        setLoading(false);
-        toast({ title: "Error", description: "No se pudo obtener el usuario actual." });
-        return;
-      }
-      const id = user.user.id;
-      setUserId(id);
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", id)
-        .maybeSingle();
-
-      if (!ignore) {
-        if (error) {
-          toast({ title: "Error", description: "No se pudo cargar tu perfil." });
-          setLoading(false);
-        } else if (data) {
-          setProfile(data as Profile);
-          setForm(data as Profile);
-          setLoading(false);
-        } else {
-          // No existe perfil, configuramos modo de creación
-          setCreateMode(true);
-          // Inicializamos un formulario con datos básicos
-          const initialForm = {
-            id: id,
-            name: user.user.user_metadata?.name || "",
-            surname: user.user.user_metadata?.surname || "",
-            email: user.user.email || "",
-            dni: "",
-            department: ""
-          } as Profile;
-          setForm(initialForm);
-          setLoading(false);
-          setEdit(true);
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          toast({ 
+            variant: "destructive",
+            title: "Error de autenticación", 
+            description: "Por favor inicia sesión para acceder a tu perfil." 
+          });
+          navigate("/login");
+          return;
         }
-      }
-    }
-    fetchProfile();
-    return () => { ignore = true; };
-  }, []);
 
-  // Manejar cambios en el formulario
+        setUserId(user.id);
+
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError) {
+          if (profileError.code === 'PGRST116') {
+            // Perfil no existe, configurar modo creación
+            setCreateMode(true);
+            const initialForm = {
+              id: user.id,
+              name: user.user_metadata?.name || "",
+              surname: user.user_metadata?.surname || "",
+              email: user.email || "",
+              dni: "",
+              department: ""
+            };
+            setForm(initialForm);
+            setEdit(true);
+          } else {
+            toast({ 
+              variant: "destructive",
+              title: "Error", 
+              description: "No se pudo cargar el perfil." 
+            });
+          }
+        } else {
+          setProfile(profileData);
+          setForm(profileData);
+        }
+      } catch (error) {
+        toast({ 
+          variant: "destructive",
+          title: "Error", 
+          description: "Ocurrió un error al cargar el perfil." 
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!form) return;
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  // Guardar los cambios
   async function handleSave() {
-    if (!form || !userId) return;
-    setSaving(true);
+    if (!form || !userId) {
+      toast({ 
+        variant: "destructive",
+        title: "Error", 
+        description: "Datos de formulario inválidos." 
+      });
+      return;
+    }
 
+    setSaving(true);
     try {
       if (createMode) {
-        // Crear nuevo perfil
         const { error } = await supabase
           .from("profiles")
           .insert([{
@@ -103,10 +122,12 @@ export default function ProfilePage() {
 
         if (error) throw error;
         
-        toast({ title: "Perfil creado", description: "Tu perfil ha sido creado correctamente." });
+        toast({ 
+          title: "Perfil creado", 
+          description: "Tu perfil ha sido creado exitosamente." 
+        });
         setCreateMode(false);
       } else {
-        // Actualizar perfil existente
         const { error } = await supabase
           .from("profiles")
           .update({
@@ -119,7 +140,10 @@ export default function ProfilePage() {
 
         if (error) throw error;
         
-        toast({ title: "Perfil actualizado", description: "Tus datos han sido guardados." });
+        toast({ 
+          title: "Perfil actualizado", 
+          description: "Los cambios han sido guardados exitosamente." 
+        });
       }
       
       setEdit(false);
@@ -135,14 +159,12 @@ export default function ProfilePage() {
     }
   }
 
-  // Cancelar edición
   function handleCancel() {
     if (createMode && !profile) {
-      // Si estamos en modo creación y no hay perfil, no podemos cancelar
       toast({ 
         variant: "destructive",
         title: "Información requerida", 
-        description: "Debes completar tu perfil para continuar."
+        description: "Debes completar tu perfil para continuar." 
       });
       return;
     }
@@ -180,6 +202,7 @@ export default function ProfilePage() {
                 value={form.name || ""}
                 onChange={handleChange}
                 autoComplete="off"
+                required
               />
             </div>
             <div>
@@ -190,6 +213,7 @@ export default function ProfilePage() {
                 value={form.surname || ""}
                 onChange={handleChange}
                 autoComplete="off"
+                required
               />
             </div>
             <div>
@@ -210,6 +234,7 @@ export default function ProfilePage() {
                 value={form.dni || ""}
                 onChange={handleChange}
                 autoComplete="off"
+                required
               />
             </div>
             <div>
@@ -220,6 +245,7 @@ export default function ProfilePage() {
                 value={form.department || ""}
                 onChange={handleChange}
                 autoComplete="off"
+                required
               />
             </div>
           </div>
