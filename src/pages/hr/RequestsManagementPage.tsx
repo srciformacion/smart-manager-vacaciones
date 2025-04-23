@@ -176,7 +176,7 @@ export default function RequestsManagementPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
               <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
-              <TabsTrigger value="notificaciones">Probar notificaciones</TabsTrigger>
+              <TabsTrigger value="notificaciones">Enviar notificaciones</TabsTrigger>
             </TabsList>
             <TabsContent value="solicitudes">
               <RequestsTabContent
@@ -189,7 +189,7 @@ export default function RequestsManagementPage() {
             </TabsContent>
             <TabsContent value="notificaciones">
               <div className="max-w-2xl mx-auto">
-                <NotificationTester />
+                <NotificationSender />
               </div>
             </TabsContent>
           </Tabs>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/main-layout";
@@ -7,7 +6,7 @@ import { User, Request } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ArrowLeft } from "lucide-react";
-import { validateShiftChangeRequest } from "@/utils/vacationLogic";
+import { validateShiftChangeRequest } from "@/utils/vacation/validation";
 
 // Datos de ejemplo para demostración
 const exampleUser: User = {
@@ -84,14 +83,13 @@ export default function ShiftChangeRequestPage() {
       return;
     }
 
-    // Validar según reglas - Fixed argument types here
+    // Validar según reglas
     const validation = validateShiftChangeRequest(
       values.date,
       values.returnDate || values.date,
-      replacement,
       user,
-      requests,
-      new Date()
+      replacement,
+      requests
     );
 
     if (!validation.valid) {
