@@ -1,11 +1,9 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/main-layout";
 import { ShiftChangeForm } from "@/components/requests/shift-change-form";
 import { User, Request } from "@/types";
 import { Button } from "@/components/ui/button";
-import { DateRange } from "react-day-picker";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ArrowLeft } from "lucide-react";
 import { validateShiftChangeRequest } from "@/utils/vacationLogic";

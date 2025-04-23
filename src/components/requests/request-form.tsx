@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RequestType, User, ShiftProfile } from "@/types";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
 import { FileUpload } from "@/components/ui/file-upload";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formSchema, FormValues } from "./form/request-form-schema";
@@ -12,6 +11,7 @@ import { DateRangeSection } from "./form/date-range-section";
 import { TimeSelectionSection } from "./form/time-selection-section";
 import { ReplacementSection } from "./form/replacement-section";
 import { RequestDetailsSection } from "./form/request-details-section";
+import { getVacationRules } from "@/utils/vacationLogic";
 
 interface RequestFormProps {
   requestType: RequestType;
@@ -154,4 +154,3 @@ export function RequestForm({
     </Card>
   );
 }
-

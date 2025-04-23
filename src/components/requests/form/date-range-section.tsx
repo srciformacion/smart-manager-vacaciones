@@ -1,14 +1,14 @@
 
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
-import { DateRangePicker } from "@/components/ui/date-range-picker";
+import React from "react";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { User } from "@/types";
-import { UseFormReturn } from "react-hook-form";
-import { FormValues } from "./request-form-schema";
+import { getVacationRules } from "@/utils/vacationLogic";
 
 interface DateRangeSectionProps {
-  form: UseFormReturn<FormValues>;
+  form: any;
   user: User;
-  isSubmitting?: boolean;
+  isSubmitting: boolean;
 }
 
 export function DateRangeSection({ form, user, isSubmitting }: DateRangeSectionProps) {
@@ -18,18 +18,21 @@ export function DateRangeSection({ form, user, isSubmitting }: DateRangeSectionP
       name="dateRange"
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel>Periodo solicitado</FormLabel>
+          <FormLabel>Fechas</FormLabel>
           <FormControl>
-            <DateRangePicker
-              value={field.value}
-              onChange={field.onChange}
+            <DatePickerWithRange
+              date={{
+                from: field.value?.from || undefined,
+                to: field.value?.to || undefined,
+              }}
+              onSelect={field.onChange}
               disabled={isSubmitting}
-              workGroup={user.workGroup}
+              className="w-full"
             />
           </FormControl>
+          <FormMessage />
         </FormItem>
       )}
     />
   );
 }
-

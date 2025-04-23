@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/main-layout";
@@ -7,8 +6,7 @@ import { User, Request, WorkGroup, Balance } from "@/types";
 import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { validateVacationRequest, suggestAlternativeDates, calculateAvailableDays } from "@/utils/vacationLogic";
-import { getVacationRules } from "@/utils/workGroupAssignment";
+import { validateVacationRequest, suggestAlternativeDates, calculateAvailableDays, getVacationRules } from "@/utils/vacationLogic";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ArrowLeft } from "lucide-react";
