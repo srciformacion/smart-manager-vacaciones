@@ -207,10 +207,10 @@ export const validatePersonalDayRequest = (
 export const validateShiftChangeRequest = (
   startDate: Date,
   returnDate: Date,
+  replacement: User,
   user: User,
-  replacementUserId: string,
   requests: Request[],
-  allUsers: User[]
+  currentDate: Date
 ): { valid: boolean; message?: string } => {
   if (returnDate <= startDate) {
     return {
@@ -240,7 +240,7 @@ export const validateShiftChangeRequest = (
   }
 
   const hasReturnOverlap = requests.some(req => {
-    if ((req.userId === user.id || req.userId === replacementUserId) && req.status !== 'rejected') {
+    if ((req.userId === user.id || req.userId === replacement.id) && req.status !== 'rejected') {
       const reqDate = new Date(req.startDate);
       
       return (
@@ -260,7 +260,7 @@ export const validateShiftChangeRequest = (
   }
 
   const hasReplacementOverlap = requests.some(req => {
-    if (req.userId === replacementUserId && req.status !== 'rejected') {
+    if (req.userId === replacement.id && req.status !== 'rejected') {
       const reqDate = new Date(req.startDate);
       
       return (
@@ -278,24 +278,15 @@ export const validateShiftChangeRequest = (
       message: "El compañero de reemplazo ya tiene una solicitud para esta fecha"
     };
   }
-
-  const replacementUser = allUsers.find(u => u.id === replacementUserId);
   
-  if (!replacementUser) {
-    return {
-      valid: false,
-      message: "No se encontró al usuario de reemplazo"
-    };
-  }
-  
-  if (replacementUser.department !== user.department) {
+  if (replacement.department !== user.department) {
     return {
       valid: false,
       message: "El compañero de reemplazo debe ser del mismo departamento"
     };
   }
   
-  if (replacementUser.shift !== user.shift) {
+  if (replacement.shift !== user.shift) {
     return {
       valid: false,
       message: "El compañero de reemplazo debe tener el mismo turno"

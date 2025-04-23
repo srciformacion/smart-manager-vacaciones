@@ -84,14 +84,14 @@ export default function ShiftChangeRequestPage() {
       return;
     }
 
-    // Validar según reglas
+    // Validar según reglas - Fixed argument types here
     const validation = validateShiftChangeRequest(
       values.date,
-      values.returnDate || values.date, // Fix: provide a default end date if return date is not provided
+      values.returnDate || values.date,
       replacement,
       user,
       requests,
-      new Date() // Fix: provide current date as the sixth argument
+      new Date()
     );
 
     if (!validation.valid) {
