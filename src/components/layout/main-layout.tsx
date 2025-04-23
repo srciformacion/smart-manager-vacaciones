@@ -1,9 +1,11 @@
 
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { SidebarNavigation } from "./sidebar-navigation";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User, UserRole } from "@/types";
 import { cn } from "@/lib/utils";
+import { MainLayoutMobile } from "./main-layout-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -12,12 +14,16 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children, user, className }: MainLayoutProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  const isMobile = useIsMobile();
   
   const handleLogout = () => {
     console.log("Logout");
     window.location.href = "/login";
   };
+
+  if (isMobile) {
+    return <MainLayoutMobile user={user} className={className}>{children}</MainLayoutMobile>;
+  }
 
   return (
     <div className="min-h-screen flex bg-background">
