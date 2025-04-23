@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { WorkerList } from "@/components/hr/worker-list";
@@ -53,6 +54,17 @@ const exampleWorkers: User[] = [
     department: "Administración",
     seniority: 5,
   },
+  {
+    id: "4",
+    name: "Francisco José Fernández López",
+    email: "fjflopez@larioja.org",
+    role: "worker",
+    shift: "Programado",
+    workGroup: "Grupo Programado",
+    workday: "Completa",
+    department: "Recursos Humanos",
+    seniority: 7,
+  },
 ];
 
 const exampleBalances: Record<string, Balance> = {
@@ -77,6 +89,14 @@ const exampleBalances: Record<string, Balance> = {
     userId: "3",
     vacationDays: 25,
     personalDays: 6,
+    leaveDays: 3,
+    year: 2023,
+  },
+  "4": {
+    id: "balance-4",
+    userId: "4",
+    vacationDays: 30,
+    personalDays: 5,
     leaveDays: 3,
     year: 2023,
   },

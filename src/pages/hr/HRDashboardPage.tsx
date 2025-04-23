@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import SmartAssistant from "@/utils/smartAssistant";
 import NocoDBAPI from "@/utils/nocodbApi";
 
-// Datos de ejemplo para demostración
 const exampleUser: User = {
   id: "rrhh-user",
   name: "Carlos Rodríguez",
@@ -57,6 +56,17 @@ const exampleWorkers: User[] = [
     workday: "Completa",
     department: "Administración",
     seniority: 5,
+  },
+  {
+    id: "4",
+    name: "Francisco José Fernández López",
+    email: "fjflopez@larioja.org",
+    role: "worker",
+    shift: "Programado",
+    workGroup: "Grupo Programado",
+    workday: "Completa",
+    department: "Recursos Humanos",
+    seniority: 7,
   },
 ];
 
@@ -143,14 +153,12 @@ export default function HRDashboardPage() {
   
   const navigate = useNavigate();
 
-  // Análisis inteligente
   const smartAnalysis = SmartAssistant.analyzeAll(
     requests,
     workers,
     Object.values(balances)
   );
 
-  // Estadísticas para el panel
   const totalWorkers = workers.length;
   const pendingRequests = requests.filter((req) => req.status === "pending").length;
   const approvedRequests = requests.filter((req) => req.status === "approved").length;
@@ -160,7 +168,6 @@ export default function HRDashboardPage() {
     smartAnalysis.permissionAccumulation.length + 
     smartAnalysis.vacationLimit.length;
     
-  // Solicitudes de esta semana (último 7 días)
   const now = new Date();
   const oneWeekAgo = new Date(now);
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -168,13 +175,11 @@ export default function HRDashboardPage() {
     (req) => new Date(req.createdAt) >= oneWeekAgo
   ).length;
 
-  // Manejar cambio de estado de solicitud
   const handleStatusChange = async (request: Request, newStatus: Request["status"]) => {
     try {
       // En una implementación real, actualizaríamos en NocoDB
       // await NocoDBAPI.updateRequestStatus(request.id, newStatus);
       
-      // Actualizar estado local
       const updatedRequests = requests.map(req => 
         req.id === request.id 
           ? { ...req, status: newStatus, updatedAt: new Date() } 
@@ -184,7 +189,6 @@ export default function HRDashboardPage() {
       setRequests(updatedRequests);
       setSelectedRequest(null);
       
-      // Mostrar algún tipo de notificación
       alert(`Solicitud ${request.id} actualizada a estado: ${newStatus}`);
       
     } catch (error) {
@@ -192,18 +196,14 @@ export default function HRDashboardPage() {
     }
   };
 
-  // Manejar la vista de detalles de solicitud
   const handleViewRequestDetails = (request: Request) => {
-    // Encontrar el trabajador asociado a esta solicitud
     const worker = workers.find(w => w.id === request.userId) || null;
     setSelectedWorker(worker);
     setSelectedRequest(request);
   };
 
-  // Manejar descarga de adjunto
   const handleDownloadAttachment = () => {
     if (selectedRequest?.attachmentUrl) {
-      // En una implementación real, descargaríamos el archivo
       console.log("Descargando adjunto:", selectedRequest.attachmentUrl);
       alert("Descargando archivo justificante...");
     }
@@ -232,7 +232,6 @@ export default function HRDashboardPage() {
             </p>
           </div>
 
-          {/* Estadísticas de RRHH */}
           <HRStats
             totalWorkers={totalWorkers}
             pendingRequests={pendingRequests}
@@ -241,7 +240,6 @@ export default function HRDashboardPage() {
             weeklyRequests={weeklyRequests}
           />
 
-          {/* Panel inteligente */}
           <SmartAssistantPanel
             overlaps={smartAnalysis.overlaps}
             groupCrowding={smartAnalysis.groupCrowding}
@@ -249,7 +247,6 @@ export default function HRDashboardPage() {
             vacationLimit={smartAnalysis.vacationLimit}
           />
 
-          {/* Solicitudes pendientes */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-md font-medium">
