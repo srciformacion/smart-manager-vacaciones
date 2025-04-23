@@ -1,9 +1,8 @@
-
 # Vacaciones y Permisos
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/598b4b67-79b6-4e8a-88d3-f670afcb5781
+**URL**: https://vacaciones.hhrrsrci.online
 
 ## How can I edit this code?
 
