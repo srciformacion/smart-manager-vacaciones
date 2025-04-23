@@ -1,49 +1,17 @@
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { DateRange } from "react-day-picker";
-
+import { RequestType, User, ShiftProfile } from "@/types";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { Form } from "@/components/ui/form";
 import { FileUpload } from "@/components/ui/file-upload";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { RequestType, User, WorkGroup, ShiftProfile } from "@/types";
-import { getVacationRules } from "@/utils/workGroupAssignment";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock } from "lucide-react";
-
-const formSchema = z.object({
-  dateRange: z.object({
-    from: z.date(),
-    to: z.date(),
-  }),
-  reason: z.string().optional(),
-  notes: z.string().optional(),
-  shiftProfileId: z.string().optional(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-  replacementUserId: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { formSchema, FormValues } from "./form/request-form-schema";
+import { DateRangeSection } from "./form/date-range-section";
+import { TimeSelectionSection } from "./form/time-selection-section";
+import { ReplacementSection } from "./form/replacement-section";
+import { RequestDetailsSection } from "./form/request-details-section";
 
 interface RequestFormProps {
   requestType: RequestType;
@@ -63,7 +31,7 @@ export function RequestForm({
   isSubmitting = false,
 }: RequestFormProps) {
   const [file, setFile] = useState<File | null>(null);
-  const [showTimeSelectors, setShowTimeSelectors] = useState(requestType === 'personalDay');
+  const [showTimeSelectors] = useState(requestType === 'personalDay');
   
   const defaultProfile = shiftProfiles.find(profile => profile.isDefault);
   
@@ -116,7 +84,7 @@ export function RequestForm({
   const getRequestTypeDescription = () => {
     switch (requestType) {
       case "vacation":
-        const rules = getVacationRules(user.workGroup as WorkGroup);
+        const rules = getVacationRules(user.workGroup);
         return `Grupo de trabajo: ${user.workGroup}. ${rules}`;
       case "personalDay":
         return "Solicitud de días por asuntos propios. Los días pueden solicitarse en bloques de 8h, 12h o 24h según su turno.";
@@ -138,191 +106,25 @@ export function RequestForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            {shiftProfiles.length > 0 && (
-              <FormField
-                control={form.control}
-                name="shiftProfileId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Perfil de turno</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                      disabled={isSubmitting}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione un perfil de turno" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {shiftProfiles.map((profile) => (
-                          <SelectItem key={profile.id} value={profile.id}>
-                            {profile.shiftType} {profile.isDefault && "(Predeterminado)"}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Seleccione el perfil de turno para esta solicitud
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+            <DateRangeSection form={form} user={user} isSubmitting={isSubmitting} />
 
-            <FormField
-              control={form.control}
-              name="dateRange"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Periodo solicitado</FormLabel>
-                  <FormControl>
-                    <DateRangePicker
-                      value={field.value as DateRange}
-                      onChange={field.onChange}
-                      disabled={isSubmitting}
-                      workGroup={user.workGroup}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {requestType === "personalDay" 
-                      ? "Seleccione el día para su solicitud de asuntos propios" 
-                      : "Seleccione el rango de fechas para su solicitud"}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {(requestType === 'personalDay' || requestType === 'shiftChange') && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="startTime"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Hora de inicio</FormLabel>
-                      <div className="relative">
-                        <Clock className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <FormControl>
-                          <Input
-                            type="time"
-                            className="pl-8"
-                            disabled={isSubmitting}
-                            {...field}
-                            value={field.value || ""}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="endTime"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Hora de fin</FormLabel>
-                      <div className="relative">
-                        <Clock className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <FormControl>
-                          <Input
-                            type="time"
-                            className="pl-8"
-                            disabled={isSubmitting}
-                            {...field}
-                            value={field.value || ""}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            {showTimeSelectors && (
+              <TimeSelectionSection form={form} isSubmitting={isSubmitting} />
             )}
 
             {requestType === 'shiftChange' && availableUsers.length > 0 && (
-              <FormField
-                control={form.control}
-                name="replacementUserId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Compañero de reemplazo</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                      disabled={isSubmitting}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione un compañero" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {availableUsers
-                          .filter(u => u.id !== user.id && u.department === user.department)
-                          .map((u) => (
-                            <SelectItem key={u.id} value={u.id}>
-                              {u.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Seleccione el compañero con quien desea intercambiar el turno
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+              <ReplacementSection 
+                form={form} 
+                user={user} 
+                availableUsers={availableUsers} 
+                isSubmitting={isSubmitting} 
               />
             )}
 
-            <FormField
-              control={form.control}
-              name="reason"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Motivo</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Indique el motivo de la solicitud"
-                      disabled={isSubmitting}
-                      {...field}
-                      value={field.value || ""}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {requestType === "leave"
-                      ? "Obligatorio para permisos justificados"
-                      : "Opcional"}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notas adicionales</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Información adicional que desee aportar"
-                      disabled={isSubmitting}
-                      {...field}
-                      value={field.value || ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <RequestDetailsSection 
+              form={form} 
+              requestType={requestType} 
+              isSubmitting={isSubmitting} 
             />
 
             {requestType === "leave" && (
@@ -352,3 +154,4 @@ export function RequestForm({
     </Card>
   );
 }
+
