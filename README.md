@@ -1,4 +1,5 @@
-# Welcome to your Lovable project
+
+# Vacaciones y Permisos
 
 ## Project info
 

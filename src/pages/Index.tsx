@@ -27,10 +27,10 @@ export default function Index() {
         <div className="mb-8 text-center">
           <img
             src="/placeholder.svg"
-            alt="VacaySmart Logo"
+            alt="Vacaciones y Permisos Logo"
             className="mx-auto h-12 w-auto mb-4"
           />
-          <h1 className="text-3xl font-bold text-primary">VacaySmart</h1>
+          <h1 className="text-3xl font-bold text-primary">Vacaciones y Permisos</h1>
           <p className="mt-2 text-muted-foreground">
             Sistema inteligente de gestión de vacaciones y permisos
           </p>
