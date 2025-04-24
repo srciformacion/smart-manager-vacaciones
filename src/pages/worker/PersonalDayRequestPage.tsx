@@ -8,6 +8,7 @@ import { DateRange } from "react-day-picker";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ArrowLeft } from "lucide-react";
 import { validatePersonalDayRequest, calculateAvailableDays } from "@/utils/vacationLogic";
+import { useToast } from "@/hooks/use-toast";
 
 // Datos de ejemplo para demostración
 const exampleUser: User = {
@@ -83,6 +84,7 @@ export default function PersonalDayRequestPage() {
   const [balance, setBalance] = useState(exampleBalance);
   
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Calcular días disponibles según antigüedad
   const availableBalance = calculateAvailableDays(user, balance);
@@ -129,6 +131,11 @@ export default function PersonalDayRequestPage() {
     
     if (!validation.valid) {
       setError(validation.message);
+      toast({
+        variant: "destructive",
+        title: "Error de validación",
+        description: validation.message
+      });
       setIsSubmitting(false);
       return;
     }
@@ -150,6 +157,11 @@ export default function PersonalDayRequestPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Mostrar mensaje de éxito
+      toast({
+        title: "Solicitud enviada",
+        description: "Tu solicitud de asuntos propios ha sido registrada exitosamente."
+      });
+      
       setSuccess(true);
       
       // Redirigir después de un tiempo
@@ -159,7 +171,11 @@ export default function PersonalDayRequestPage() {
       
     } catch (error) {
       console.error("Error al crear solicitud:", error);
-      setError("Error al enviar la solicitud. Inténtelo de nuevo.");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo enviar la solicitud. Por favor, intenta de nuevo."
+      });
     } finally {
       setIsSubmitting(false);
     }

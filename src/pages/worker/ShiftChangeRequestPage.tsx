@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ArrowLeft } from "lucide-react";
 import { validateShiftChangeRequest } from "@/utils/vacation/validation";
+import { useToast } from "@/hooks/use-toast";
 
 // Datos de ejemplo para demostración
 const exampleUser: User = {
@@ -54,6 +55,7 @@ export default function ShiftChangeRequestPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { toast } = useToast();
   
   const navigate = useNavigate();
 
@@ -71,6 +73,11 @@ export default function ShiftChangeRequestPage() {
     // Verificar que hay fecha válida y usuario de reemplazo
     if (!values.date || !values.replacementUserId) {
       setValidationError("Por favor, complete todos los campos obligatorios");
+      toast({
+        variant: "destructive",
+        title: "Error de validación",
+        description: "Por favor, complete todos los campos obligatorios"
+      });
       setIsSubmitting(false);
       return;
     }
@@ -79,6 +86,11 @@ export default function ShiftChangeRequestPage() {
     const replacement = coworkers.find(c => c.id === values.replacementUserId);
     if (!replacement) {
       setValidationError("Usuario de reemplazo no encontrado");
+      toast({
+        variant: "destructive",
+        title: "Error de validación",
+        description: "Usuario de reemplazo no encontrado"
+      });
       setIsSubmitting(false);
       return;
     }
@@ -94,6 +106,11 @@ export default function ShiftChangeRequestPage() {
 
     if (!validation.valid) {
       setValidationError(validation.message);
+      toast({
+        variant: "destructive",
+        title: "Error de validación",
+        description: validation.message
+      });
       setIsSubmitting(false);
       return;
     }
@@ -116,6 +133,11 @@ export default function ShiftChangeRequestPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Mostrar mensaje de éxito
+      toast({
+        title: "Solicitud enviada",
+        description: "Tu solicitud de cambio de turno ha sido registrada exitosamente."
+      });
+      
       setSuccess(true);
       
       // Redirigir después de un tiempo
@@ -125,7 +147,11 @@ export default function ShiftChangeRequestPage() {
       
     } catch (error) {
       console.error("Error al crear solicitud:", error);
-      setValidationError("Error al enviar la solicitud. Inténtelo de nuevo.");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo enviar la solicitud. Por favor, intenta de nuevo."
+      });
     } finally {
       setIsSubmitting(false);
     }

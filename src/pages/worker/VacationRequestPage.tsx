@@ -10,8 +10,8 @@ import { validateVacationRequest, suggestAlternativeDates, calculateAvailableDay
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ArrowLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-// Datos de ejemplo para demostración
 const exampleUser: User = {
   id: "1",
   name: "Ana Martínez",
@@ -37,10 +37,9 @@ const exampleRequests: Request[] = [
   },
 ];
 
-// Ejemplo de balance de días
 const exampleBalance = {
   id: "bal-1",
-  userId: "1", // Ana Martínez
+  userId: "1",
   vacationDays: 22,
   personalDays: 3,
   leaveDays: 4,
@@ -55,13 +54,12 @@ export default function VacationRequestPage() {
   const [suggestions, setSuggestions] = useState<DateRange[]>([]);
   const [success, setSuccess] = useState(false);
   const [balance, setBalance] = useState<Balance>(exampleBalance);
+  const { toast } = useToast();
   
   const navigate = useNavigate();
 
-  // Calcular días disponibles según antigüedad
   const availableBalance = calculateAvailableDays(user, balance);
 
-  // Calcular días ya utilizados
   const usedVacationDays = requests.reduce((total, req) => {
     if (req.type === 'vacation' && (req.status === 'approved' || req.status === 'pending')) {
       const startDate = new Date(req.startDate);
@@ -82,14 +80,12 @@ export default function VacationRequestPage() {
     setValidationError(null);
     setSuggestions([]);
 
-    // Verificar que hay fechas válidas
     if (!values.dateRange?.from || !values.dateRange?.to) {
       setValidationError("Por favor, seleccione un rango de fechas válido");
       setIsSubmitting(false);
       return;
     }
 
-    // Verificar días disponibles
     const requestedDays = Math.floor(
       (values.dateRange.to.getTime() - values.dateRange.from.getTime()) / (1000 * 60 * 60 * 24)
     ) + 1;
@@ -100,7 +96,6 @@ export default function VacationRequestPage() {
       return;
     }
 
-    // Validar según reglas
     const validation = validateVacationRequest(
       values.dateRange.from,
       values.dateRange.to,
@@ -110,8 +105,12 @@ export default function VacationRequestPage() {
 
     if (!validation.valid) {
       setValidationError(validation.message);
+      toast({
+        variant: "destructive",
+        title: "Error de validación",
+        description: validation.message
+      });
       
-      // Generar sugerencias
       const alternatives = suggestAlternativeDates(
         values.dateRange.from,
         values.dateRange.to,
@@ -130,43 +129,30 @@ export default function VacationRequestPage() {
     }
 
     try {
-      // En una implementación real, enviaríamos a NocoDB
-      // const newRequest = {
-      //   userId: user.id,
-      //   type: "vacation",
-      //   startDate: values.dateRange.from,
-      //   endDate: values.dateRange.to,
-      //   reason: values.reason || "",
-      //   notes: values.notes || "",
-      //   status: "pending",
-      // };
-      // await NocoDBAPI.createRequest(newRequest);
-
-      // Simular una petición
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast({
+        title: "Solicitud enviada",
+        description: "Tu solicitud de vacaciones ha sido registrada exitosamente."
+      });
       
-      // Mostrar mensaje de éxito
       setSuccess(true);
-      
-      // Redirigir después de un tiempo
-      setTimeout(() => {
-        navigate("/historial");
-      }, 2000);
+      setTimeout(() => navigate("/historial"), 2000);
       
     } catch (error) {
       console.error("Error al crear solicitud:", error);
-      setValidationError("Error al enviar la solicitud. Inténtelo de nuevo.");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo enviar la solicitud. Por favor, intenta de nuevo."
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Aplicar sugerencia
   const applySuggestion = (suggestion: DateRange) => {
     setValidationError(null);
     setSuggestions([]);
     
-    // Simulamos enviar el formulario con las fechas sugeridas
     handleSubmit(
       {
         dateRange: suggestion,
