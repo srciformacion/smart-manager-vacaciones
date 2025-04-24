@@ -3,12 +3,11 @@ import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { RequestDetails } from "@/components/requests/request-details";
 import { Request, User } from "@/types";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { NotificationSender } from "@/components/hr/notification-sender";
-import { RequestsTabContent } from "@/components/hr/requests-tab-content";
 import { useRequests } from "@/hooks/use-requests";
 import { exampleUser, exampleWorkers } from "@/data/example-users";
 import { exampleRequests } from "@/data/example-requests";
+import { RequestsManagementHeader } from "@/components/hr/requests-management/header";
+import { RequestsManagementTabs } from "@/components/hr/requests-management/tabs-content";
 
 export default function RequestsManagementPage() {
   const [user] = useState<User | null>(exampleUser);
@@ -53,33 +52,20 @@ export default function RequestsManagementPage() {
         />
       ) : (
         <div className="space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Gestión de solicitudes</h1>
-            <p className="text-muted-foreground mt-2">
-              Administre todas las solicitudes de los trabajadores
-            </p>
-          </div>
+          <RequestsManagementHeader 
+            title="Gestión de solicitudes"
+            description="Administre todas las solicitudes de los trabajadores"
+          />
 
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
-              <TabsTrigger value="notificaciones">Enviar notificaciones</TabsTrigger>
-            </TabsList>
-            <TabsContent value="solicitudes">
-              <RequestsTabContent
-                requests={requests}
-                workers={exampleWorkers}
-                onViewDetails={handleViewRequestDetails}
-                onStatusChange={handleStatusChange}
-                onDownloadAttachment={handleViewRequestDetails}
-              />
-            </TabsContent>
-            <TabsContent value="notificaciones">
-              <div className="max-w-2xl mx-auto">
-                <NotificationSender />
-              </div>
-            </TabsContent>
-          </Tabs>
+          <RequestsManagementTabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            requests={requests}
+            workers={exampleWorkers}
+            onViewDetails={handleViewRequestDetails}
+            onStatusChange={handleStatusChange}
+            onDownloadAttachment={handleViewRequestDetails}
+          />
         </div>
       )}
     </MainLayout>
