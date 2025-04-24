@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RequestType, User, ShiftProfile } from "@/types";
 import { Button } from "@/components/ui/button";
-import { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
-import { FileUpload } from "@/components/ui/file-upload";
+import { Form } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formSchema, FormValues } from "./form/request-form-schema";
 import { DateRangeSection } from "./form/date-range-section";
 import { TimeSelectionSection } from "./form/time-selection-section";
 import { ReplacementSection } from "./form/replacement-section";
 import { RequestDetailsSection } from "./form/request-details-section";
+import { FileUploadSection } from "./form/file-upload-section";
 import { getVacationRules } from "@/utils/vacationLogic";
 
 interface RequestFormProps {
@@ -50,22 +51,6 @@ export function RequestForm({
     },
   });
 
-  const selectedProfileId = form.watch("shiftProfileId");
-  
-  useEffect(() => {
-    if (selectedProfileId) {
-      const selectedProfile = shiftProfiles.find(profile => profile.id === selectedProfileId);
-      if (selectedProfile) {
-        form.setValue("startTime", selectedProfile.startTime);
-        form.setValue("endTime", selectedProfile.endTime);
-      }
-    }
-  }, [selectedProfileId, shiftProfiles, form]);
-
-  const handleSubmit = (values: FormValues) => {
-    onSubmit(values, file);
-  };
-
   const getRequestTypeTitle = () => {
     switch (requestType) {
       case "vacation":
@@ -97,6 +82,10 @@ export function RequestForm({
     }
   };
 
+  const handleSubmit = (values: FormValues) => {
+    onSubmit(values, file);
+  };
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -123,26 +112,15 @@ export function RequestForm({
 
             <RequestDetailsSection 
               form={form} 
-              requestType={requestType} 
+              requestType={requestType}
               isSubmitting={isSubmitting} 
             />
 
             {requestType === "leave" && (
-              <FormItem>
-                <FormLabel>Justificante</FormLabel>
-                <FormControl>
-                  <FileUpload
-                    onFileChange={setFile}
-                    disabled={isSubmitting}
-                    buttonText="Subir justificante"
-                    placeholder="Seleccione un archivo"
-                  />
-                </FormControl>
-                <FormDescription>
-                  Suba un documento justificativo (PDF, imagen)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
+              <FileUploadSection
+                onFileChange={setFile}
+                isSubmitting={isSubmitting}
+              />
             )}
 
             <Button type="submit" disabled={isSubmitting} className="w-full">
