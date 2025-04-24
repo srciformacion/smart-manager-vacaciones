@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
 
 interface SearchInputProps {
   value: string;
@@ -12,7 +11,7 @@ interface SearchInputProps {
 export function SearchInput({ value, onChange, placeholder = "Buscar..." }: SearchInputProps) {
   return (
     <div className="relative flex-1">
-      <Image 
+      <img 
         src="/lovable-uploads/430ee6e3-abee-48b3-ad9b-9aec46685e6e.png" 
         alt="Search" 
         width={20} 
