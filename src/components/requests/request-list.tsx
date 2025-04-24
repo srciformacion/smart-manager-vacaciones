@@ -1,22 +1,10 @@
+
 import React, { useState } from "react";
 import { Request, RequestStatus, RequestType, User } from "@/types";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { RequestTypeBadge } from "@/components/ui/request-type-badge";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Download, FileX } from "lucide-react";
-import Image from "next/image";
+import { FileX } from "lucide-react";
+import { RequestFilters } from "./filters/request-filters";
+import { RequestTable } from "./table/request-table";
 
 interface RequestListProps {
   requests: Request[];
@@ -51,12 +39,6 @@ export function RequestList({
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const getUserName = (userId: string) => {
-    if (!users) return userId;
-    const user = users.find((u) => u.id === userId);
-    return user ? user.name : userId;
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -72,46 +54,14 @@ export function RequestList({
             </CardDescription>
           </div>
           
-          <div className="flex flex-col md:flex-row gap-2">
-            <div className="relative">
-              <Image 
-                src="/lovable-uploads/430ee6e3-abee-48b3-ad9b-9aec46685e6e.png" 
-                alt="Search" 
-                width={20} 
-                height={20} 
-                className="absolute left-2 top-2.5 text-sidebar-foreground/70" 
-              />
-              <Input
-                placeholder="Buscar..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8 w-full md:w-auto"
-              />
-            </div>
-            
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as RequestStatus | "all")}
-              className="px-3 py-2 rounded-md border border-input bg-background text-sm"
-            >
-              <option value="all">Todos los estados</option>
-              <option value="pending">Pendiente</option>
-              <option value="approved">Aprobado</option>
-              <option value="rejected">Rechazado</option>
-              <option value="moreInfo">Más información</option>
-            </select>
-            
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value as RequestType | "all")}
-              className="px-3 py-2 rounded-md border border-input bg-background text-sm"
-            >
-              <option value="all">Todos los tipos</option>
-              <option value="vacation">Vacaciones</option>
-              <option value="personalDay">Asuntos propios</option>
-              <option value="leave">Permisos justificados</option>
-            </select>
-          </div>
+          <RequestFilters
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            statusFilter={statusFilter}
+            onStatusChange={setStatusFilter}
+            typeFilter={typeFilter}
+            onTypeChange={setTypeFilter}
+          />
         </div>
       </CardHeader>
       <CardContent>
@@ -126,90 +76,14 @@ export function RequestList({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {isHRView && <TableHead>Trabajador</TableHead>}
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Fecha inicio</TableHead>
-                  <TableHead>Fecha fin</TableHead>
-                  <TableHead>Estado</TableHead>
-                  {isHRView && <TableHead>Justificante</TableHead>}
-                  <TableHead>Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredRequests.map((request) => (
-                  <TableRow key={request.id}>
-                    {isHRView && (
-                      <TableCell>{getUserName(request.userId)}</TableCell>
-                    )}
-                    <TableCell>
-                      <RequestTypeBadge type={request.type} />
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(request.startDate), "dd MMM yyyy", { locale: es })}
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(request.endDate), "dd MMM yyyy", { locale: es })}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={request.status} />
-                    </TableCell>
-                    {isHRView && (
-                      <TableCell>
-                        {request.attachmentUrl ? (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onDownloadAttachment?.(request)}
-                          >
-                            <Download className="h-4 w-4 mr-1" />
-                            Descargar
-                          </Button>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">N/A</span>
-                        )}
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onViewDetails?.(request)}
-                        >
-                          Detalles
-                        </Button>
-                        
-                        {isHRView && request.status === "pending" && (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="bg-success/10 text-success hover:bg-success/20"
-                              onClick={() => onStatusChange?.(request, "approved")}
-                            >
-                              Aprobar
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="bg-danger/10 text-danger hover:bg-danger/20"
-                              onClick={() => onStatusChange?.(request, "rejected")}
-                            >
-                              Rechazar
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <RequestTable
+            requests={filteredRequests}
+            users={users}
+            isHRView={isHRView}
+            onViewDetails={(request) => onViewDetails?.(request)}
+            onStatusChange={onStatusChange}
+            onDownloadAttachment={onDownloadAttachment}
+          />
         )}
       </CardContent>
     </Card>
