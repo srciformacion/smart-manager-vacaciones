@@ -8,11 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 
+type AuthMode = "login" | "signup" | "passwordReset" | "passwordResetSent";
+
 export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,23 +24,40 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
+      if (authMode === "signup") {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              name,
+              surname,
+            },
+          },
         });
         if (error) throw error;
         toast({
           title: "Registro exitoso",
           description: "Por favor revisa tu email para confirmar tu cuenta.",
         });
-      } else {
+        setAuthMode("login");
+      } else if (authMode === "login") {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
         navigate("/dashboard");
+      } else if (authMode === "passwordReset") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth?mode=updatePassword`,
+        });
+        if (error) throw error;
+        setAuthMode("passwordResetSent");
+        toast({
+          title: "Correo enviado",
+          description: "Por favor revisa tu email para restablecer tu contraseña.",
+        });
       }
     } catch (error: any) {
       toast({
@@ -46,6 +67,199 @@ export default function AuthPage() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const renderLoginForm = () => (
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          placeholder="tu@email.com"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="password">Contraseña</Label>
+        <Input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          placeholder="••••••••"
+        />
+      </div>
+
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? "Procesando..." : "Iniciar sesión"}
+      </Button>
+
+      <div className="flex justify-between items-center text-sm">
+        <Button
+          variant="link"
+          className="p-0 h-auto"
+          onClick={() => setAuthMode("signup")}
+        >
+          Registrarse
+        </Button>
+        <Button
+          variant="link"
+          className="p-0 h-auto"
+          onClick={() => setAuthMode("passwordReset")}
+        >
+          ¿Olvidaste tu contraseña?
+        </Button>
+      </div>
+    </>
+  );
+
+  const renderSignUpForm = () => (
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="signup-email">Email</Label>
+        <Input
+          id="signup-email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          placeholder="tu@email.com"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="name">Nombre</Label>
+        <Input
+          id="name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          placeholder="Tu nombre"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="surname">Apellidos</Label>
+        <Input
+          id="surname"
+          type="text"
+          value={surname}
+          onChange={(e) => setSurname(e.target.value)}
+          required
+          placeholder="Tus apellidos"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="signup-password">Contraseña</Label>
+        <Input
+          id="signup-password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          placeholder="••••••••"
+        />
+      </div>
+
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? "Procesando..." : "Crear cuenta"}
+      </Button>
+
+      <div className="text-center">
+        <Button
+          variant="link"
+          className="p-0 h-auto"
+          onClick={() => setAuthMode("login")}
+        >
+          ¿Ya tienes cuenta? Inicia sesión
+        </Button>
+      </div>
+    </>
+  );
+
+  const renderPasswordResetForm = () => (
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="reset-email">Email</Label>
+        <Input
+          id="reset-email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          placeholder="tu@email.com"
+        />
+      </div>
+
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? "Procesando..." : "Enviar instrucciones"}
+      </Button>
+
+      <div className="text-center">
+        <Button
+          variant="link"
+          className="p-0 h-auto"
+          onClick={() => setAuthMode("login")}
+        >
+          Volver a inicio de sesión
+        </Button>
+      </div>
+    </>
+  );
+
+  const renderPasswordResetSent = () => (
+    <>
+      <div className="text-center py-4">
+        <h3 className="text-lg font-medium">Correo enviado</h3>
+        <p className="mt-2 text-muted-foreground">
+          Revisa tu bandeja de entrada para encontrar el enlace de recuperación de contraseña.
+        </p>
+      </div>
+
+      <Button
+        className="w-full"
+        onClick={() => setAuthMode("login")}
+      >
+        Volver a inicio de sesión
+      </Button>
+    </>
+  );
+
+  const getFormTitle = () => {
+    switch (authMode) {
+      case "login":
+        return "Iniciar sesión";
+      case "signup":
+        return "Crear cuenta";
+      case "passwordReset":
+        return "Recuperar contraseña";
+      case "passwordResetSent":
+        return "Correo enviado";
+      default:
+        return "La Rioja Cuida";
+    }
+  };
+
+  const renderForm = () => {
+    switch (authMode) {
+      case "login":
+        return renderLoginForm();
+      case "signup":
+        return renderSignUpForm();
+      case "passwordReset":
+        return renderPasswordResetForm();
+      case "passwordResetSent":
+        return renderPasswordResetSent();
+      default:
+        return renderLoginForm();
     }
   };
 
@@ -59,51 +273,10 @@ export default function AuthPage() {
           </p>
         </div>
 
+        <h2 className="text-2xl font-semibold text-center mb-6">{getFormTitle()}</h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="tu@email.com"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-            />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              "Procesando..."
-            ) : isSignUp ? (
-              "Crear cuenta"
-            ) : (
-              "Iniciar sesión"
-            )}
-          </Button>
-
-          <p className="text-center text-sm text-muted-foreground">
-            {isSignUp ? "¿Ya tienes una cuenta?" : "¿No tienes una cuenta?"}
-            <Button
-              variant="link"
-              className="ml-1"
-              onClick={() => setIsSignUp(!isSignUp)}
-            >
-              {isSignUp ? "Inicia sesión" : "Regístrate"}
-            </Button>
-          </p>
+          {renderForm()}
         </form>
       </Card>
     </div>
