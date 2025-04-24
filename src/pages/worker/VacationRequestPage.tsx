@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DateRange } from "react-day-picker"; // Added this import to resolve the error
 import { MainLayout } from "@/components/layout/main-layout";
 import { RequestForm } from "@/components/requests/request-form";
 import { User, Request, Balance } from "@/types";
