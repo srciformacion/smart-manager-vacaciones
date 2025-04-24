@@ -1,16 +1,15 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/main-layout";
 import { RequestForm } from "@/components/requests/request-form";
-import { User, Request, WorkGroup, Balance } from "@/types";
+import { User, Request, Balance } from "@/types";
 import { Button } from "@/components/ui/button";
-import { DateRange } from "react-day-picker";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { validateVacationRequest, suggestAlternativeDates, calculateAvailableDays, getVacationRules } from "@/utils/vacationLogic";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { ArrowLeft } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { VacationBalanceInfo } from "@/components/vacation/vacation-balance-info";
+import { VacationSuggestions } from "@/components/vacation/vacation-suggestions";
+import { useVacationRequest } from "@/hooks/use-vacation-request";
 
 const exampleUser: User = {
   id: "1",
@@ -49,116 +48,25 @@ const exampleBalance = {
 export default function VacationRequestPage() {
   const [user] = useState<User>(exampleUser);
   const [requests] = useState<Request[]>(exampleRequests);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [validationError, setValidationError] = useState<string | null>(null);
-  const [suggestions, setSuggestions] = useState<DateRange[]>([]);
-  const [success, setSuccess] = useState(false);
-  const [balance, setBalance] = useState<Balance>(exampleBalance);
-  const { toast } = useToast();
-  
+  const [balance] = useState<Balance>(exampleBalance);
   const navigate = useNavigate();
 
-  const availableBalance = calculateAvailableDays(user, balance);
-
-  const usedVacationDays = requests.reduce((total, req) => {
-    if (req.type === 'vacation' && (req.status === 'approved' || req.status === 'pending')) {
-      const startDate = new Date(req.startDate);
-      const endDate = new Date(req.endDate);
-      const days = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-      return total + days;
-    }
-    return total;
-  }, 0);
-
-  const remainingDays = availableBalance.vacationDays - usedVacationDays;
-
-  const handleSubmit = async (
-    values: { dateRange: DateRange; reason?: string; notes?: string },
-    file: File | null
-  ) => {
-    setIsSubmitting(true);
-    setValidationError(null);
-    setSuggestions([]);
-
-    if (!values.dateRange?.from || !values.dateRange?.to) {
-      setValidationError("Por favor, seleccione un rango de fechas válido");
-      setIsSubmitting(false);
-      return;
-    }
-
-    const requestedDays = Math.floor(
-      (values.dateRange.to.getTime() - values.dateRange.from.getTime()) / (1000 * 60 * 60 * 24)
-    ) + 1;
-
-    if (requestedDays > remainingDays) {
-      setValidationError(`No dispone de suficientes días de vacaciones. Solicitados: ${requestedDays}, Disponibles: ${remainingDays}`);
-      setIsSubmitting(false);
-      return;
-    }
-
-    const validation = validateVacationRequest(
-      values.dateRange.from,
-      values.dateRange.to,
-      user,
-      requests
-    );
-
-    if (!validation.valid) {
-      setValidationError(validation.message);
-      toast({
-        variant: "destructive",
-        title: "Error de validación",
-        description: validation.message
-      });
-      
-      const alternatives = suggestAlternativeDates(
-        values.dateRange.from,
-        values.dateRange.to,
-        user,
-        requests
-      );
-      
-      if (alternatives.length > 0) {
-        setSuggestions(
-          alternatives.map(([from, to]) => ({ from, to }))
-        );
-      }
-      
-      setIsSubmitting(false);
-      return;
-    }
-
-    try {
-      toast({
-        title: "Solicitud enviada",
-        description: "Tu solicitud de vacaciones ha sido registrada exitosamente."
-      });
-      
-      setSuccess(true);
-      setTimeout(() => navigate("/historial"), 2000);
-      
-    } catch (error) {
-      console.error("Error al crear solicitud:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudo enviar la solicitud. Por favor, intenta de nuevo."
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const {
+    isSubmitting,
+    validationError,
+    suggestions,
+    success,
+    remainingDays,
+    availableBalance,
+    handleSubmit,
+    setSuggestions,
+    setValidationError
+  } = useVacationRequest(user, requests, balance);
 
   const applySuggestion = (suggestion: DateRange) => {
     setValidationError(null);
     setSuggestions([]);
-    
-    handleSubmit(
-      {
-        dateRange: suggestion,
-      },
-      null
-    );
+    handleSubmit({ dateRange: suggestion }, null);
   };
 
   return (
@@ -171,21 +79,11 @@ export default function VacationRequestPage() {
           <h1 className="text-3xl font-bold tracking-tight">Solicitud de vacaciones</h1>
         </div>
 
-        <div className="px-4 py-3 bg-primary/10 rounded-lg">
-          <p className="text-sm">
-            <strong>Tu grupo de trabajo:</strong> {user.workGroup}
-          </p>
-          <p className="text-sm">
-            <strong>Regla vacacional:</strong>{" "}
-            {getVacationRules(user.workGroup as WorkGroup)}
-          </p>
-          <p className="text-sm">
-            <strong>Días disponibles:</strong> {remainingDays} de {availableBalance.vacationDays} días 
-            {user.seniority > 0 && (
-              <span className="text-xs"> (incluye {Math.floor(user.seniority / 5)} días adicionales por antigüedad)</span>
-            )}
-          </p>
-        </div>
+        <VacationBalanceInfo
+          user={user}
+          remainingDays={remainingDays}
+          totalDays={availableBalance.vacationDays}
+        />
 
         {validationError && (
           <Alert variant="destructive">
@@ -194,24 +92,10 @@ export default function VacationRequestPage() {
           </Alert>
         )}
 
-        {suggestions.length > 0 && (
-          <div className="bg-warning/10 border border-warning/20 rounded-lg p-4 space-y-3">
-            <h3 className="font-medium">Fechas alternativas sugeridas:</h3>
-            <div className="grid gap-2 md:grid-cols-3">
-              {suggestions.map((suggestion, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className="text-xs justify-start font-normal"
-                  onClick={() => applySuggestion(suggestion)}
-                >
-                  {format(suggestion.from!, "PPP", { locale: es })} -{" "}
-                  {format(suggestion.to!, "PPP", { locale: es })}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
+        <VacationSuggestions
+          suggestions={suggestions}
+          onSelectSuggestion={applySuggestion}
+        />
 
         {success ? (
           <Alert className="bg-success/10 border-success/30">
