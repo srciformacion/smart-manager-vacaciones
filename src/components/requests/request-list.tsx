@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { Request, RequestStatus, RequestType, User } from "@/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +15,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Download, Search, FileX } from "lucide-react";
+import { Download, FileX } from "lucide-react";
+import Image from "next/image";
 
 interface RequestListProps {
   requests: Request[];
@@ -39,7 +39,6 @@ export function RequestList({
   const [statusFilter, setStatusFilter] = useState<RequestStatus | "all">("all");
   const [typeFilter, setTypeFilter] = useState<RequestType | "all">("all");
 
-  // Filtrar solicitudes según criterios de búsqueda
   const filteredRequests = requests.filter((request) => {
     const matchesSearch = searchTerm === "" || 
       (users && users.find(u => u.id === request.userId)?.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -52,7 +51,6 @@ export function RequestList({
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  // Función para obtener el nombre del usuario
   const getUserName = (userId: string) => {
     if (!users) return userId;
     const user = users.find((u) => u.id === userId);
@@ -74,10 +72,15 @@ export function RequestList({
             </CardDescription>
           </div>
           
-          {/* Búsqueda y filtros */}
           <div className="flex flex-col md:flex-row gap-2">
             <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Image 
+                src="/lovable-uploads/430ee6e3-abee-48b3-ad9b-9aec46685e6e.png" 
+                alt="Search" 
+                width={20} 
+                height={20} 
+                className="absolute left-2 top-2.5 text-muted-foreground" 
+              />
               <Input
                 placeholder="Buscar..."
                 value={searchTerm}

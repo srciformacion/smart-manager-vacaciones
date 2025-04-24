@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { User, WorkGroup, ShiftType, Balance } from "@/types";
 import {
   Table,
@@ -12,7 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, UserPlus, FileText, Edit, User as UserIcon } from "lucide-react";
+import { 
+  UserPlus, 
+  FileText, 
+  Edit, 
+  User as UserIcon 
+} from "lucide-react";
+import Image from "next/image";
 
 interface WorkerListProps {
   workers: User[];
@@ -36,7 +41,6 @@ export function WorkerList({
   const [groupFilter, setGroupFilter] = useState<WorkGroup | "all">("all");
   const [shiftFilter, setShiftFilter] = useState<ShiftType | "all">("all");
 
-  // Obtener valores únicos para los filtros
   const departments = Array.from(new Set(workers.map((w) => w.department)));
   const groups = Array.from(
     new Set(workers.map((w) => w.workGroup))
@@ -45,7 +49,6 @@ export function WorkerList({
     new Set(workers.map((w) => w.shift))
   ) as ShiftType[];
 
-  // Filtrar trabajadores
   const filteredWorkers = workers.filter((worker) => {
     const matchesSearch =
       searchTerm === "" ||
@@ -64,7 +67,6 @@ export function WorkerList({
     return matchesSearch && matchesDepartment && matchesGroup && matchesShift;
   });
 
-  // Obtener el saldo de un trabajador
   const getWorkerBalance = (workerId: string) => {
     if (!balances || !balances[workerId]) return { vacationDays: 0, personalDays: 0, leaveDays: 0 };
     return balances[workerId];
@@ -90,10 +92,15 @@ export function WorkerList({
         </div>
       </CardHeader>
       <CardContent>
-        {/* Filtros */}
         <div className="flex flex-col md:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Image 
+              src="/lovable-uploads/430ee6e3-abee-48b3-ad9b-9aec46685e6e.png" 
+              alt="Search" 
+              width={20} 
+              height={20} 
+              className="absolute left-2 top-2.5 text-muted-foreground" 
+            />
             <Input
               placeholder="Buscar trabajador..."
               value={searchTerm}
@@ -142,7 +149,6 @@ export function WorkerList({
           </select>
         </div>
 
-        {/* Tabla de trabajadores */}
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
