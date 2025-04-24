@@ -8,7 +8,7 @@ import { LoadingState } from "@/components/profile/LoadingState";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { MainLayout } from "@/components/layout/main-layout";
-import { User, Department } from "@/types";
+import { User } from "@/types";
 
 type Profile = {
   id: string;
@@ -17,6 +17,7 @@ type Profile = {
   email: string;
   dni: string;
   department: string;
+  start_date?: Date;
 };
 
 export default function ProfilePage() {
@@ -47,18 +48,15 @@ export default function ProfilePage() {
         }
 
         setUserId(user.id);
-
-        // Simplificado para propósitos de demo
-        // En una implementación real, debería obtener más datos del usuario de la sesión
         setUser({
           id: user.id,
           name: user.user_metadata?.name || "",
           email: user.email || "",
-          role: 'worker', // Valor por defecto
-          shift: 'Programado', // Valor por defecto
-          workGroup: 'Grupo Programado', // Valor por defecto
-          workday: 'Completa', // Valor por defecto
-          department: 'Administración' as Department, // Fixed: Using a valid Department value
+          role: 'worker',
+          shift: 'Programado',
+          workGroup: 'Grupo Programado',
+          workday: 'Completa',
+          department: 'Administración',
           seniority: 0,
         });
 
@@ -77,7 +75,8 @@ export default function ProfilePage() {
               surname: user.user_metadata?.surname || "",
               email: user.email || "",
               dni: "",
-              department: ""
+              department: "",
+              start_date: undefined,
             };
             setForm(initialForm);
             setEdit(true);
@@ -89,8 +88,13 @@ export default function ProfilePage() {
             });
           }
         } else {
-          setProfile(profileData);
-          setForm(profileData);
+          // Convertir la fecha de string a objeto Date si existe
+          const profileWithDate = {
+            ...profileData,
+            start_date: profileData.start_date ? new Date(profileData.start_date) : undefined
+          };
+          setProfile(profileWithDate);
+          setForm(profileWithDate);
         }
       } catch (error) {
         toast({ 
@@ -106,9 +110,14 @@ export default function ProfilePage() {
     fetchProfile();
   }, [navigate]);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement> | Date) {
     if (!form) return;
-    setForm({ ...form, [e.target.name]: e.target.value });
+    
+    if (e instanceof Date) {
+      setForm({ ...form, start_date: e });
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   }
 
   async function handleSave() {
@@ -132,7 +141,8 @@ export default function ProfilePage() {
             surname: form.surname,
             email: form.email,
             dni: form.dni,
-            department: form.department
+            department: form.department,
+            start_date: form.start_date?.toISOString().split('T')[0]
           }]);
 
         if (error) throw error;
@@ -149,7 +159,8 @@ export default function ProfilePage() {
             name: form.name,
             surname: form.surname,
             dni: form.dni,
-            department: form.department
+            department: form.department,
+            start_date: form.start_date?.toISOString().split('T')[0]
           })
           .eq("id", userId);
 

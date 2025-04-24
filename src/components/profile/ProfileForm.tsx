@@ -2,6 +2,12 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface Profile {
   id: string;
@@ -10,6 +16,7 @@ interface Profile {
   email: string;
   dni: string;
   department: string;
+  start_date?: Date;
 }
 
 interface ProfileFormProps {
@@ -20,7 +27,7 @@ interface ProfileFormProps {
   onSave: () => void;
   onCancel: () => void;
   onEdit: () => void;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement> | Date) => void;
 }
 
 export const ProfileForm = ({
@@ -89,6 +96,38 @@ export const ProfileForm = ({
             autoComplete="off"
             required
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Fecha de inicio</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !form.start_date && "text-muted-foreground"
+                )}
+                disabled={!edit}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {form.start_date ? (
+                  format(form.start_date, "PPP", { locale: es })
+                ) : (
+                  <span>Selecciona una fecha</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={form.start_date}
+                onSelect={(date) => onChange(date as Date)}
+                disabled={!edit}
+                initialFocus
+                locale={es}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
