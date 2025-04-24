@@ -79,7 +79,7 @@ export function RequestList({
                 alt="Search" 
                 width={20} 
                 height={20} 
-                className="absolute left-2 top-2.5 text-muted-foreground" 
+                className="absolute left-2 top-2.5 text-sidebar-foreground/70" 
               />
               <Input
                 placeholder="Buscar..."
