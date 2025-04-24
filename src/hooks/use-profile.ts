@@ -6,6 +6,8 @@ import { useProfileForm } from "./profile/useProfileForm";
 
 export const useProfile = () => {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const { userId, user, fetchAuthUser } = useProfileAuth();
   const { profile, form, createMode, setForm, setProfile, fetchProfile } = useProfileData();
   const { 
@@ -21,10 +23,14 @@ export const useProfile = () => {
     const initializeProfile = async () => {
       try {
         setLoading(true);
+        setError(null);
         const authUser = await fetchAuthUser();
         if (authUser) {
           await fetchProfile(authUser.id);
         }
+      } catch (err) {
+        setError("No se pudo cargar el perfil. Por favor, intenta de nuevo más tarde.");
+        console.error("Error loading profile:", err);
       } finally {
         setLoading(false);
       }
@@ -40,9 +46,11 @@ export const useProfile = () => {
     saving,
     createMode,
     user,
+    error,
     handleSave,
     handleCancel,
     handleChange,
     setEdit
   };
 };
+
