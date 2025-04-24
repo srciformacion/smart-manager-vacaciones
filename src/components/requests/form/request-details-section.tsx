@@ -60,4 +60,3 @@ export function RequestDetailsSection({ form, requestType, isSubmitting }: Reque
     </>
   );
 }
-

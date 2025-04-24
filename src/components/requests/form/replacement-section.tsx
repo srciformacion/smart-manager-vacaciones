@@ -49,4 +49,3 @@ export function ReplacementSection({ form, user, availableUsers, isSubmitting }:
     />
   );
 }
-
