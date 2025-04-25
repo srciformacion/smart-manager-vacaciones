@@ -3,8 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReportsGenerator } from "@/components/hr/reports/reports-generator";
 import { StaffAvailabilityCalendar } from "@/components/hr/calendar/staff-availability-calendar";
 import { RequestsTabContent } from "@/components/hr/requests-tab-content";
-import { Request, User } from "@/types";
-import { exampleUser } from "@/data/example-users";
+import { Request, User, Department } from "@/types";
 
 interface ManagementContentProps {
   activeTab: string;
@@ -26,7 +25,10 @@ export function ManagementContent({
   onDownloadAttachment,
 }: ManagementContentProps) {
   // Create a departments array from worker departments for the reports
-  const departments = Array.from(new Set(workers.map(worker => worker.department || ""))).filter(Boolean);
+  // Filter out empty strings and cast to Department type to fix the type error
+  const departments: Department[] = Array.from(
+    new Set(workers.map(worker => worker.department || ""))
+  ).filter((dept): dept is Department => dept !== "");
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>

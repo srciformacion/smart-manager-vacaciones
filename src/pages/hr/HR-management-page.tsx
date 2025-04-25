@@ -6,10 +6,11 @@ import { ManagementContent } from "@/components/hr/management/management-content
 import { useRequests } from "@/hooks/use-requests";
 import { useRequestManagement } from "@/hooks/hr/use-request-management";
 import { exampleUser, exampleWorkers } from "@/data/example-users";
+import { exampleRequests } from "@/data/example-requests"; // Import example requests
 
 export default function HRManagementPage() {
   const [activeTab, setActiveTab] = useState("solicitudes");
-  const { requests, handleStatusChange } = useRequests(exampleWorkers);
+  const { requests, handleStatusChange } = useRequests(exampleRequests, exampleWorkers); // Pass exampleRequests as first argument
   
   const {
     selectedRequest,

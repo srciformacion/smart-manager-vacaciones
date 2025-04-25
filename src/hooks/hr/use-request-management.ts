@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Request, User } from "@/types";
+import { Request, User, RequestStatus } from "@/types";
 import { toast } from "@/components/ui/use-toast";
 
 export function useRequestManagement(initialRequests: Request[], exampleWorkers: User[]) {
@@ -13,7 +13,7 @@ export function useRequestManagement(initialRequests: Request[], exampleWorkers:
     setSelectedRequest(request);
   };
 
-  const handleDetailStatusChange = (request: Request, newStatus: Request["status"]) => {
+  const handleDetailStatusChange = (request: Request, newStatus: RequestStatus) => {
     // Close the detail view after processing
     setTimeout(() => {
       setSelectedRequest(null);
