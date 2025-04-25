@@ -1,6 +1,12 @@
 
 import * as z from "zod";
-import { ShiftType, WorkdayType, Department, WorkGroup } from "@/types";
+import { ShiftType, WorkdayType, Department } from "@/types";
+
+const notificationChannelSchema = z.object({
+  channel: z.enum(["web", "email", "whatsapp"]),
+  enabled: z.boolean(),
+  contactValue: z.string().optional(),
+});
 
 export const formSchema = z.object({
   name: z.string().min(3, { message: "El nombre debe tener al menos 3 caracteres" }),
@@ -11,11 +17,10 @@ export const formSchema = z.object({
   seniorityYears: z.coerce.number().min(0, { message: "Los años no pueden ser negativos" }),
   seniorityMonths: z.coerce.number().min(0, { message: "Los meses no pueden ser negativos" }).max(11, { message: "Los meses deben ser entre 0 y 11" }),
   seniorityDays: z.coerce.number().min(0, { message: "Los días no pueden ser negativos" }).max(30, { message: "Los días deben ser entre 0 y 30" }),
-  preferredNotificationChannel: z.enum(["web", "email", "whatsapp"]),
+  notificationChannels: z.array(notificationChannelSchema),
   consentNotifications: z.boolean().refine(val => val === true, {
     message: "Debe aceptar el uso de notificaciones"
   }),
 });
 
 export type FormValues = z.infer<typeof formSchema>;
-
