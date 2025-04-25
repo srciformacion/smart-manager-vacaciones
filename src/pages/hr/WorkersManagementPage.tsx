@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { WorkerList } from "@/components/hr/worker-list";
-import { WorkerForm } from "@/components/hr/worker-form";
+import { WorkerForm } from "@/components/hr/worker-form/worker-form";
 import { BalanceForm } from "@/components/hr/balance-form";
 import { User, Balance, ShiftType, WorkdayType, Department, WorkGroup, UserRole } from "@/types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";

@@ -1,7 +1,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { User } from "@/types";
+import { User, Department, ShiftType, WorkdayType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,9 +18,26 @@ interface WorkerFormProps {
   isSubmitting: boolean;
 }
 
-const departments = ["Recursos Humanos", "Atención al cliente", "Operaciones", "Administración", "Personal de movimiento"];
-const shifts = ["Programado", "Urgente 24h", "Localizado"];
-const workdayTypes = ["Completa", "Parcial", "Reducida"];
+// Define the arrays with the correct types
+const departments: Department[] = [
+  "Recursos Humanos",
+  "Atención al cliente", 
+  "Operaciones", 
+  "Administración", 
+  "Personal de movimiento"
+];
+
+const shifts: ShiftType[] = [
+  "Programado",
+  "Urgente 24h", 
+  "Localizado"
+];
+
+const workdayTypes: WorkdayType[] = [
+  "Completa", 
+  "Parcial", 
+  "Reducida"
+];
 
 export function WorkerForm({ worker, onSubmit, onCancel, isSubmitting }: WorkerFormProps) {
   const form = useForm<FormValues>({
