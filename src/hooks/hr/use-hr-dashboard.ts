@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Request, User, Balance } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import SmartAssistant from "@/utils/smartAssistant";
+import { SmartAssistant } from "@/utils/hr/smart-assistant";
 import NocoDBAPI from "@/utils/nocodbApi";
 
 export function useHRDashboard(
