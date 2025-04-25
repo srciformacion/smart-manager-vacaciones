@@ -6,7 +6,7 @@ import { ChatMessages } from "./chat-messages";
 import { ChatInput } from "./chat-input";
 import { useChat } from "@/context/chat-context";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function ChatLayout() {
@@ -14,11 +14,9 @@ export function ChatLayout() {
   const navigate = useNavigate();
   
   const handleGoBack = () => {
-    // If there's an active conversation, deselect it
     if (activeConversation) {
       setActiveConversation(null);
     } else {
-      // If no active conversation, navigate to dashboard based on user role
       const userRole = localStorage.getItem('userRole');
       if (userRole === 'hr') {
         navigate('/rrhh/dashboard');
@@ -43,6 +41,14 @@ export function ChatLayout() {
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="mr-4 md:hidden"
+                onClick={() => {/* TODO: Implement menu toggle */}}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
               <h2 className="text-lg font-semibold">
                 Conversación actual
               </h2>
@@ -61,4 +67,3 @@ export function ChatLayout() {
     </div>
   );
 }
-
