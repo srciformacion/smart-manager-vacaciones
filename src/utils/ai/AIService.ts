@@ -1,3 +1,4 @@
+
 import { Request, User } from "@/types";
 import { Balance } from "@/types";
 import { VacationAnalysisService } from "./vacation-analysis.service";
@@ -11,7 +12,12 @@ import {
   AIQueryResponse 
 } from "./types";
 
-export { AIAnalysisResult, HoursCalculationResult, SimulationResult, AIQueryResponse } from "./types";
+export type { 
+  AIAnalysisResult, 
+  HoursCalculationResult, 
+  SimulationResult, 
+  AIQueryResponse 
+} from "./types";
 
 export class AIService {
   private vacationAnalysisService: VacationAnalysisService;
