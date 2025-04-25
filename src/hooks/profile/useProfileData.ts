@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Profile } from "@/components/profile/types";
+import { NotificationChannel } from "@/types";
 
 export const useProfileData = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -11,40 +12,42 @@ export const useProfileData = () => {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-      if (profileError) {
-        if (profileError.code === 'PGRST116') {
-          setCreateMode(true);
-          const initialForm = {
-            id: userId,
-            name: "",
-            surname: "",
-            email: "",
-            dni: "",
-            department: "",
-            start_date: undefined,
-          };
-          setForm(initialForm);
-          return { createMode: true, form: initialForm };
-        } else {
-          toast({ 
-            variant: "destructive",
-            title: "Error", 
-            description: "No se pudo cargar el perfil." 
-          });
-          return { createMode: false, form: null };
-        }
+      // En un entorno real, esto sería una llamada a la base de datos
+      const userJson = localStorage.getItem("user");
+      
+      if (!userJson) {
+        setCreateMode(true);
+        const initialForm = {
+          id: userId,
+          name: "",
+          surname: "",
+          email: "",
+          dni: "",
+          department: "",
+          start_date: undefined,
+          preferred_notification_channel: "web"
+        };
+        setForm(initialForm);
+        return { createMode: true, form: initialForm };
       }
-
+      
+      const userData = JSON.parse(userJson);
+      const profileData = {
+        id: userData.id,
+        name: userData.name || "",
+        surname: userData.surname || "",
+        email: userData.email || "",
+        dni: userData.dni || "",
+        department: userData.department || "",
+        start_date: userData.startDate ? new Date(userData.startDate) : undefined,
+        preferred_notification_channel: userData.preferredNotificationChannel || "web"
+      };
+      
       const profileWithDate = {
         ...profileData,
-        start_date: profileData.start_date ? new Date(profileData.start_date) : undefined
+        start_date: profileData.start_date
       };
+      
       setProfile(profileWithDate);
       setForm(profileWithDate);
       return { createMode: false, form: profileWithDate };

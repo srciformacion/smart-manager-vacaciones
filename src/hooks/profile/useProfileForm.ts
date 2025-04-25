@@ -27,37 +27,39 @@ export const useProfileForm = (
     setSaving(true);
     try {
       if (!profile) {
-        const { error } = await supabase
-          .from("profiles")
-          .insert([{
-            id: userId,
-            name: form.name,
-            surname: form.surname,
-            email: form.email,
-            dni: form.dni,
-            department: form.department,
-            start_date: form.start_date?.toISOString().split('T')[0]
-          }]);
-
-        if (error) throw error;
+        // En un entorno real, esto sería una llamada a la API para guardar en la base de datos
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        const updatedUser = {
+          ...userData,
+          name: form.name,
+          surname: form.surname,
+          email: form.email,
+          dni: form.dni,
+          department: form.department,
+          startDate: form.start_date?.toISOString().split('T')[0],
+          preferredNotificationChannel: form.preferred_notification_channel || 'web'
+        };
+        
+        localStorage.setItem('user', JSON.stringify(updatedUser));
         
         toast({ 
           title: "Perfil creado", 
           description: "Tu perfil ha sido creado exitosamente." 
         });
       } else {
-        const { error } = await supabase
-          .from("profiles")
-          .update({
-            name: form.name,
-            surname: form.surname,
-            dni: form.dni,
-            department: form.department,
-            start_date: form.start_date?.toISOString().split('T')[0]
-          })
-          .eq("id", userId);
-
-        if (error) throw error;
+        // En un entorno real, esto sería una llamada a la API para actualizar en la base de datos
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        const updatedUser = {
+          ...userData,
+          name: form.name,
+          surname: form.surname,
+          dni: form.dni,
+          department: form.department,
+          startDate: form.start_date?.toISOString().split('T')[0],
+          preferredNotificationChannel: form.preferred_notification_channel || 'web'
+        };
+        
+        localStorage.setItem('user', JSON.stringify(updatedUser));
         
         toast({ 
           title: "Perfil actualizado", 
@@ -78,7 +80,7 @@ export const useProfileForm = (
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | Date) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement> | Date) => {
     if (!form) return;
     
     if (e instanceof Date) {

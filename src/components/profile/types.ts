@@ -7,6 +7,7 @@ export interface Profile {
   dni: string;
   department: string;
   start_date?: Date;
+  preferred_notification_channel?: string;
 }
 
 export interface ProfileFormProps {

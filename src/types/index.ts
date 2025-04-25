@@ -1,6 +1,20 @@
 // Tipos de usuario
 export type UserRole = 'worker' | 'hr';
 
+// Tipos de notificación
+export type NotificationType = 
+  | 'requestCreated' 
+  | 'requestApproved' 
+  | 'requestRejected' 
+  | 'requestMoreInfo'
+  | 'shiftAssigned'
+  | 'calendarChanged'
+  | 'chatMessage'
+  | 'documentReminder';
+
+// Canal de notificación preferido
+export type NotificationChannel = 'web' | 'email' | 'whatsapp';
+
 // Tipos de turnos - Actualizado para incluir todos los tipos usados
 export type ShiftType = 
   | 'Turno 24h'
@@ -76,6 +90,7 @@ export interface User {
   shiftEndTime?: string;
   profileCreator?: 'trabajador' | 'empresa';
   phone?: string;
+  preferredNotificationChannel?: NotificationChannel;
 }
 
 // Solicitud
@@ -147,9 +162,29 @@ export interface ShiftChangeHistory {
   returnedAt?: Date;
 }
 
-// Tipo de notificación
-export type NotificationType = 
-  | 'requestCreated' 
-  | 'requestApproved' 
-  | 'requestRejected' 
-  | 'requestMoreInfo';
+// Estado de notificación
+export type NotificationStatus = 'pending' | 'sent' | 'read';
+
+// Notificación
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  channel: NotificationChannel;
+  status: NotificationStatus;
+  createdAt: Date;
+  updatedAt?: Date;
+  read: boolean;
+}
+
+// Payload para enviar notificaciones
+export interface NotificationPayload {
+  canal: NotificationChannel;
+  destino: string;
+  titulo: string;
+  mensaje: string;
+  tipo?: NotificationType;
+  userId?: string;
+}

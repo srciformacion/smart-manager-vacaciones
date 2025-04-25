@@ -29,6 +29,7 @@ import SmartAssistantPage from "./pages/hr/SmartAssistantPage";
 import HRManagementPage from "./pages/hr/HR-management-page";
 import CalendarManagementPage from "./pages/hr/CalendarManagementPage";
 import AIAssistantPage from "@/pages/hr/AIAssistantPage";
+import SendNotificationPage from "@/pages/hr/SendNotificationPage";
 
 // Additional pages
 import ProfilePage from "./pages/ProfilePage";
@@ -93,7 +94,8 @@ const App = () => (
             <Route path="/rrhh/solicitudes" element={<PrivateRoute><RequestsManagementPage /></PrivateRoute>} />
             <Route path="/rrhh/gestion" element={<PrivateRoute><HRManagementPage /></PrivateRoute>} />
             <Route path="/rrhh/calendarios" element={<PrivateRoute><CalendarManagementPage /></PrivateRoute>} />
-            <Route path="/rrhh/ai-assistant" element={<AIAssistantPage />} />
+            <Route path="/rrhh/ai-assistant" element={<PrivateRoute><AIAssistantPage /></PrivateRoute>} />
+            <Route path="/rrhh/notificaciones" element={<PrivateRoute><SendNotificationPage /></PrivateRoute>} />
             
             {/* Chat page - just one route */}
             <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
