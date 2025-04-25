@@ -11,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/auth/AuthPage";
-import RoleSelectorPage from "./pages/auth/RoleSelectorPage";
 
 // Páginas de trabajador
 import DashboardPage from "./pages/worker/DashboardPage";
@@ -73,7 +72,6 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
-            <Route path="/roles" element={<RoleSelectorPage />} />
             
             {/* Rutas de trabajador */}
             <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />

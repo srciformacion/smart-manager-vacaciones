@@ -4,11 +4,14 @@ import { VacationAnalysisService } from "./vacation-analysis.service";
 import { HoursCalculationService } from "./hours-calculation.service";
 import { SimulationService } from "./simulation.service";
 import { QueryService } from "./query.service";
+import { 
+  AIAnalysisResult, 
+  HoursCalculationResult, 
+  SimulationResult, 
+  AIQueryResponse 
+} from "./types";
 
-export type { AIAnalysisResult } from "./types";
-export type { HoursCalculationResult } from "./types";
-export type { SimulationResult } from "./types";
-export type { AIQueryResponse } from "./types";
+export { AIAnalysisResult, HoursCalculationResult, SimulationResult, AIQueryResponse } from "./types";
 
 export class AIService {
   private vacationAnalysisService: VacationAnalysisService;

@@ -15,6 +15,14 @@ import {
   Brain,
 } from "lucide-react";
 
+interface NavLink {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  onClick?: () => void;
+  role?: string;
+}
+
 interface SidebarNavigationProps {
   role?: UserRole;
   onLogout?: () => void;
@@ -28,7 +36,6 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
     return location.pathname === path;
   };
 
-  // Logout handler
   const handleLogout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -42,13 +49,10 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
         return;
       }
 
-      // Clear user role from localStorage
       localStorage.removeItem("userRole");
 
-      // Call onLogout prop if provided
       onLogout?.();
 
-      // Navigate to auth page
       window.location.href = "/auth";
     } catch (error) {
       toast({
@@ -59,8 +63,7 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
     }
   };
 
-  // Enlaces para trabajadores
-  const workerLinks = [
+  const workerLinks: NavLink[] = [
     {
       href: "/dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
@@ -103,8 +106,7 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
     },
   ];
   
-  // Enlaces para recursos humanos
-  const hrLinks = [
+  const hrLinks: NavLink[] = [
     {
       href: "/rrhh/dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
@@ -148,7 +150,7 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
     },
   ];
   
-  const commonLinks = [
+  const commonLinks: NavLink[] = [
     {
       href: "/chat",
       icon: <MessageSquare className="h-5 w-5" />,
