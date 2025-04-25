@@ -15,11 +15,11 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
   const { conversations, activeConversation, setActiveConversation } = useChat();
 
   return (
-    <div className={cn("border-r", className)}>
+    <div className={cn("h-full", className)}>
       <div className="p-4 border-b">
         <h2 className="font-semibold">Chats</h2>
       </div>
-      <ScrollArea className="h-[calc(100vh-8rem)]">
+      <ScrollArea className="h-[calc(100%-4rem)]">
         <div className="p-2">
           {conversations.map((conversation) => {
             const worker = exampleWorkers.find(w => 

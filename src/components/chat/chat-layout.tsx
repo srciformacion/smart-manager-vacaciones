@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatSidebar } from "./chat-sidebar";
 import { ChatMessages } from "./chat-messages";
@@ -8,10 +8,12 @@ import { useChat } from "@/context/chat-context";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export function ChatLayout() {
   const { activeConversation, setActiveConversation } = useChat();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const handleGoBack = () => {
     if (activeConversation) {
@@ -41,14 +43,20 @@ export function ChatLayout() {
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="mr-4 md:hidden"
-                onClick={() => {/* TODO: Implement menu toggle */}}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
+              <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+                <SheetTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="mr-4 md:hidden"
+                  >
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-[250px] sm:w-[300px]">
+                  <ChatSidebar className="border-0" />
+                </SheetContent>
+              </Sheet>
               <h2 className="text-lg font-semibold">
                 Conversación actual
               </h2>
