@@ -32,7 +32,7 @@ import AIAssistantPage from "@/pages/hr/AIAssistantPage";
 
 // Additional pages
 import ProfilePage from "./pages/ProfilePage";
-import ChatPage from "./pages/chat/index";
+import ChatPage from "./pages/chat";
 
 const queryClient = new QueryClient();
 
@@ -95,9 +95,11 @@ const App = () => (
             <Route path="/rrhh/calendarios" element={<PrivateRoute><CalendarManagementPage /></PrivateRoute>} />
             <Route path="/rrhh/ai-assistant" element={<AIAssistantPage />} />
             
+            {/* Chat page - just one route */}
+            <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
+            
             {/* Additional pages */}
             <Route path="/perfil" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
-            <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
