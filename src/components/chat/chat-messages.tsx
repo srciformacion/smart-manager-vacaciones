@@ -1,10 +1,10 @@
-
 import { useEffect, useRef } from "react";
 import { useChat } from "@/context/chat-context";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Paperclip } from "lucide-react";
 import { exampleUser, exampleWorkers } from "@/data/example-users";
+import { cn } from "@/lib/utils";
 
 export function ChatMessages() {
   const { messages, activeConversation } = useChat();
