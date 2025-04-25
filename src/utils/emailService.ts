@@ -1,4 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
 import { User, Request, NotificationType as AppNotificationType } from "@/types";
 
 // Tipos de notificación
@@ -200,24 +199,24 @@ export const sendEmailNotification = async (
   try {
     const { subject, html } = generateEmailContent(type, request, user);
     
-    const emailPayload = {
+    // En una implementación real, aquí conectarías con un servicio de envío de emails
+    // como Nodemailer, SendGrid, AWS SES, etc.
+    console.log("Simulando envío de email:", {
       to: recipientEmail || user.email,
       subject,
       html,
       whatsapp: sendWhatsApp,
       phone: user.phone
-    };
-
-    const { data, error } = await supabase.functions.invoke("send-email", {
-      body: emailPayload,
     });
 
-    if (error) {
-      console.error("Error al enviar notificaciones:", error);
-      return false;
+    // Usar la API de notificaciones locales para mostrar una notificación al usuario
+    // como forma de simular el envío de emails en esta versión sin backend
+    if (typeof window !== 'undefined' && window.Notification && Notification.permission === 'granted') {
+      new Notification(subject, { 
+        body: `Para: ${recipientEmail || user.email}\n${html.replace(/<[^>]*>/g, '')}` 
+      });
     }
-
-    console.log("Notificaciones enviadas correctamente:", data);
+    
     return true;
   } catch (error) {
     console.error("Error en sendEmailNotification:", error);
