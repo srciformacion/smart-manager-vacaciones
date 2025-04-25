@@ -1,3 +1,4 @@
+
 import { ReactNode, useState } from "react";
 import { SidebarNavigation } from "./sidebar-navigation";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { useNavigate } from "react-router-dom";
 
 interface MainLayoutMobileProps {
   children: ReactNode;
@@ -18,6 +20,7 @@ interface MainLayoutMobileProps {
 export function MainLayoutMobile({ children, user, className }: MainLayoutMobileProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   
   const handleLogout = () => {
     console.log("Logout");
@@ -50,7 +53,12 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
           )}
           <div className="flex flex-1 items-center justify-between space-x-2">
             <div className="flex items-center">
-              <span className="font-bold">La Rioja Cuida</span>
+              <span 
+                className="font-bold cursor-pointer" 
+                onClick={() => user ? navigate(user.role === "hr" ? "/rrhh/dashboard" : "/dashboard") : navigate("/")}
+              >
+                La Rioja Cuida
+              </span>
             </div>
             <div className="flex items-center gap-2">
               {user && <NotificationBell />}

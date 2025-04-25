@@ -1,3 +1,4 @@
+
 import { Menu } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -7,9 +8,11 @@ import { User } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MainLayoutMobile } from "./main-layout-mobile";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { useNavigate } from "react-router-dom";
 
 export function MainLayout({ user, children }: { user: User | null, children: React.ReactNode }) {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   if (isMobile) {
     return <MainLayoutMobile user={user}>{children}</MainLayoutMobile>;
@@ -20,7 +23,12 @@ export function MainLayout({ user, children }: { user: User | null, children: Re
       <div className="hidden md:fixed md:inset-y-0 md:z-50 md:flex md:w-72 md:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-background px-6 pb-4">
           <div className="h-16 flex items-center">
-            <h2 className="text-lg font-semibold">La Rioja Cuida</h2>
+            <h2 
+              className="text-lg font-semibold cursor-pointer" 
+              onClick={() => user ? navigate(user.role === "hr" ? "/rrhh/dashboard" : "/dashboard") : navigate("/")}
+            >
+              La Rioja Cuida
+            </h2>
           </div>
 
           <SidebarNavigation role={user?.role} />
