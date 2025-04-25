@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,12 +20,14 @@ export function RoleSelector({ onRoleSelect }: RoleSelectorProps) {
       onRoleSelect(selectedRole);
     }
 
-    // Store role in localStorage
+    // Almacenar el rol en localStorage
     localStorage.setItem("userRole", selectedRole);
 
-    // Redirect based on role
+    // Redirigir basado en el rol
     if (selectedRole === "rrhh") {
       navigate("/rrhh/dashboard");
+    } else if (selectedRole === "solicitante") {
+      navigate("/dashboard");
     } else {
       navigate("/dashboard");
     }
@@ -56,6 +59,10 @@ export function RoleSelector({ onRoleSelect }: RoleSelectorProps) {
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="rrhh" id="r2" />
             <Label htmlFor="r2" className="cursor-pointer">Recursos Humanos</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="solicitante" id="r3" />
+            <Label htmlFor="r3" className="cursor-pointer">Solicitante</Label>
           </div>
         </RadioGroup>
 
