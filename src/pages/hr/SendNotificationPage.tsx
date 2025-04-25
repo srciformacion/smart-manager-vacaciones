@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { NotificationPayload, NotificationType, User, NotificationChannel } from "@/types";
@@ -29,8 +30,8 @@ export default function SendNotificationPage() {
 
   const [form, setForm] = useState<FormState>({
     recipients: "",
-    notificationType: "requestApproved",
-    channel: "preferred",
+    notificationType: "requestApproved", 
+    channel: "web",  // Cambiado de "preferred" a "web"
     subject: "",
     message: ""
   });
@@ -39,7 +40,7 @@ export default function SendNotificationPage() {
   const [selectedWorker, setSelectedWorker] = useState<string>("");
 
   const handleFormChange = (field: keyof FormState, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value as any }));
+    setForm(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSendNotification = async () => {
@@ -68,40 +69,13 @@ export default function SendNotificationPage() {
       for (const recipient of recipients) {
         const worker = exampleWorkers.find(w => w.id === recipient);
         
-        if (!worker && recipient.includes('@')) {
-          await sendNotification({
-            canal: form.channel === 'preferred' ? 'email' : form.channel,
-            destino: recipient,
-            titulo: form.subject,
-            mensaje: form.message,
-            tipo: form.notificationType
-          });
-          continue;
-        }
-        
-        if (!worker) continue;
-        
-        let canal = form.channel;
-        let destino = recipient;
-        
-        if (canal === 'preferred') {
-          const userData = JSON.parse(localStorage.getItem('user') || '{}');
-          canal = userData.preferredNotificationChannel || 'web';
-        }
-        
-        if (canal === 'email') {
-          destino = worker.email;
-        } else if (canal === 'whatsapp') {
-          destino = worker.phone || '';
-        }
-        
         await sendNotification({
-          canal,
-          destino,
+          canal: form.channel,
+          destino: worker?.email || recipient,
           titulo: form.subject,
           mensaje: form.message,
           tipo: form.notificationType,
-          userId: worker.id
+          userId: worker?.id
         });
       }
       
@@ -110,10 +84,11 @@ export default function SendNotificationPage() {
         description: `Se han enviado ${recipients.length} notificaciones correctamente.`,
       });
       
+      // Resetear formulario después de enviar
       setForm({
         recipients: "",
         notificationType: "requestApproved",
-        channel: "preferred",
+        channel: "web",
         subject: "",
         message: ""
       });
@@ -185,7 +160,7 @@ export default function SendNotificationPage() {
               <Label>Tipo de notificación</Label>
               <Select 
                 value={form.notificationType} 
-                onValueChange={(value) => handleFormChange("notificationType", value as NotificationType)}
+                onValueChange={(value: NotificationType) => handleFormChange("notificationType", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar tipo" />
@@ -205,15 +180,9 @@ export default function SendNotificationPage() {
               <Label>Canal de envío</Label>
               <RadioGroup 
                 value={form.channel} 
-                onValueChange={(value) => handleFormChange("channel", value as NotificationChannel)}
+                onValueChange={(value: NotificationChannel) => handleFormChange("channel", value)}
                 className="flex gap-8"
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="preferred" id="preferred" />
-                  <Label htmlFor="preferred" className="flex items-center gap-1">
-                    Canal preferido del usuario
-                  </Label>
-                </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="web" id="web" />
                   <Label htmlFor="web" className="flex items-center gap-1">
