@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,6 +29,7 @@ import RequestsManagementPage from "./pages/hr/RequestsManagementPage";
 import SmartAssistantPage from "./pages/hr/SmartAssistantPage";
 import HRManagementPage from "./pages/hr/HR-management-page";
 import CalendarManagementPage from "./pages/hr/CalendarManagementPage";
+import AIAssistantPage from "@/pages/hr/AIAssistantPage";
 
 // Páginas adicionales
 import ProfilePage from "./pages/ProfilePage";
@@ -90,7 +90,7 @@ const App = () => (
             <Route path="/rrhh/solicitudes" element={<PrivateRoute><RequestsManagementPage /></PrivateRoute>} />
             <Route path="/rrhh/gestion" element={<PrivateRoute><HRManagementPage /></PrivateRoute>} />
             <Route path="/rrhh/calendarios" element={<PrivateRoute><CalendarManagementPage /></PrivateRoute>} />
-            <Route path="/rrhh/asistente" element={<PrivateRoute><SmartAssistantPage /></PrivateRoute>} />
+            <Route path="/rrhh/ai-assistant" element={<AIAssistantPage />} />
             
             {/* Páginas adicionales */}
             <Route path="/perfil" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />

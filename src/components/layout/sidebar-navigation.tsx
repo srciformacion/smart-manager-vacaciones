@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { UserRole } from "@/types";
@@ -10,6 +9,7 @@ import {
   PersonStanding,
   Settings,
   User,
+  Brain,
 } from "lucide-react";
 
 interface SidebarNavigationProps {
@@ -95,6 +95,12 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
       href: "/rrhh/asistente",
       icon: <MessageSquare className="h-5 w-5" />,
       label: "Asistente inteligente",
+    },
+    {
+      href: "/rrhh/ai-assistant",
+      icon: <Brain className="h-5 w-5" />,
+      label: "Asistente IA",
+      role: "hr",
     },
     {
       href: "/chat",
