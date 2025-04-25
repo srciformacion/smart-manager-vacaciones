@@ -6,11 +6,12 @@ import { ManagementContent } from "@/components/hr/management/management-content
 import { useRequests } from "@/hooks/use-requests";
 import { useRequestManagement } from "@/hooks/hr/use-request-management";
 import { exampleUser, exampleWorkers } from "@/data/example-users";
-import { exampleRequests } from "@/data/example-requests"; // Import example requests
+import { exampleRequests } from "@/data/example-requests";
+import { RequestStatus } from "@/types";
 
 export default function HRManagementPage() {
   const [activeTab, setActiveTab] = useState("solicitudes");
-  const { requests, handleStatusChange } = useRequests(exampleRequests, exampleWorkers); // Pass exampleRequests as first argument
+  const { requests, handleStatusChange } = useRequests(exampleRequests, exampleWorkers);
   
   const {
     selectedRequest,
@@ -28,7 +29,7 @@ export default function HRManagementPage() {
           request={selectedRequest}
           user={selectedWorker}
           onClose={closeRequestDetails}
-          onStatusChange={(status) => handleDetailStatusChange(selectedRequest, status)}
+          onStatusChange={(status: RequestStatus) => handleDetailStatusChange(selectedRequest, status)}
           onDownloadAttachment={() => handleDownloadAttachment(selectedRequest)}
         />
       ) : (

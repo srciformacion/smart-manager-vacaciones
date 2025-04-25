@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { LoginForm } from "@/components/auth/login-form";
 import { UserRole } from "@/types";
 import NocoDBAPI from "@/utils/nocodbApi";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +63,15 @@ export default function LoginPage() {
           isSubmitting={isSubmitting}
           error={error}
         />
+        
+        <div className="mt-6 text-center">
+          <p className="text-sm text-muted-foreground mb-2">
+            ¿Quieres probar la aplicación sin crear una cuenta?
+          </p>
+          <Button variant="outline" asChild>
+            <Link to="/roles">Acceder con rol de demostración</Link>
+          </Button>
+        </div>
       </div>
     </div>
   );

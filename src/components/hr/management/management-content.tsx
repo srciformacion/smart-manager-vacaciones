@@ -1,9 +1,13 @@
 
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ReportsGenerator } from "@/components/hr/reports/reports-generator";
+import { Card, CardContent } from "@/components/ui/card";
 import { StaffAvailabilityCalendar } from "@/components/hr/calendar/staff-availability-calendar";
 import { RequestsTabContent } from "@/components/hr/requests-tab-content";
-import { Request, User, Department } from "@/types";
+import { ReportsGenerator } from "@/components/hr/reports/reports-generator";
+import { NotificationSender } from "@/components/hr/notification-sender";
+import { SearchInput } from "@/components/hr/search-input";
+import { RequestStatus, Request, User, Department } from "@/types";
 
 interface ManagementContentProps {
   activeTab: string;
@@ -11,7 +15,7 @@ interface ManagementContentProps {
   requests: Request[];
   workers: User[];
   onViewDetails: (request: Request) => void;
-  onStatusChange: (request: Request, newStatus: Request["status"]) => void;
+  onStatusChange: (request: Request, newStatus: RequestStatus) => void;
   onDownloadAttachment: (request: Request) => void;
 }
 
@@ -24,43 +28,85 @@ export function ManagementContent({
   onStatusChange,
   onDownloadAttachment,
 }: ManagementContentProps) {
-  // Create a departments array from worker departments for the reports
-  // Filter out empty strings and cast to Department type to fix the type error
-  const departments: Department[] = Array.from(
-    new Set(workers.map(worker => worker.department || ""))
-  ).filter((dept): dept is Department => dept !== "");
+  // Estado para búsqueda y filtros
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<RequestStatus | "all">("all");
+  const [departmentFilter, setDepartmentFilter] = useState<Department | "all">("all");
+
+  // Obtener departamentos únicos
+  const departments = workers.reduce<Department[]>((acc, worker) => {
+    if (!acc.includes(worker.department)) {
+      acc.push(worker.department);
+    }
+    return acc;
+  }, []);
+
+  // Filtrar solicitudes
+  const filteredRequests = requests.filter((request) => {
+    const matchesStatus = statusFilter === "all" || request.status === statusFilter;
+    const worker = workers.find((w) => w.id === request.userId);
+    const matchesDepartment = departmentFilter === "all" || (worker && worker.department === departmentFilter);
+    return matchesStatus && matchesDepartment;
+  });
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab}>
-      <TabsList className="grid grid-cols-3 w-full md:w-auto">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <TabsList className="grid grid-cols-4 md:w-[600px]">
         <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
-        <TabsTrigger value="informes">Informes</TabsTrigger>
         <TabsTrigger value="calendario">Calendario</TabsTrigger>
+        <TabsTrigger value="informes">Informes</TabsTrigger>
+        <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
       </TabsList>
       
-      <TabsContent value="solicitudes" className="mt-6">
-        <RequestsTabContent
-          requests={requests}
-          workers={workers}
-          onViewDetails={onViewDetails}
-          onStatusChange={onStatusChange}
-          onDownloadAttachment={onDownloadAttachment}
-        />
+      <TabsContent value="solicitudes">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="mb-4">
+              <SearchInput 
+                placeholder="Buscar solicitudes..." 
+                value={searchQuery}
+                onChange={(value) => setSearchQuery(value)}
+              />
+            </div>
+            
+            <RequestsTabContent 
+              requests={filteredRequests}
+              users={workers}
+              onViewDetails={onViewDetails}
+              onStatusChange={onStatusChange}
+              onDownloadAttachment={onDownloadAttachment}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              departmentFilter={departmentFilter}
+              setDepartmentFilter={setDepartmentFilter}
+              departments={departments}
+            />
+          </CardContent>
+        </Card>
       </TabsContent>
       
-      <TabsContent value="informes" className="mt-6">
-        <ReportsGenerator 
-          requests={requests}
-          users={workers}
-          departments={departments}
-        />
+      <TabsContent value="calendario">
+        <Card>
+          <CardContent className="pt-6">
+            <StaffAvailabilityCalendar />
+          </CardContent>
+        </Card>
       </TabsContent>
       
-      <TabsContent value="calendario" className="mt-6">
-        <StaffAvailabilityCalendar 
-          requests={requests}
-          users={workers}
-        />
+      <TabsContent value="informes">
+        <Card>
+          <CardContent className="pt-6">
+            <ReportsGenerator />
+          </CardContent>
+        </Card>
+      </TabsContent>
+      
+      <TabsContent value="notificaciones">
+        <Card>
+          <CardContent className="pt-6">
+            <NotificationSender />
+          </CardContent>
+        </Card>
       </TabsContent>
     </Tabs>
   );

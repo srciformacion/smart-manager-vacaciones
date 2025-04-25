@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,12 +7,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { User } from "@/types";
 
 // Páginas
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/auth/AuthPage";
+import RoleSelectorPage from "./pages/auth/RoleSelectorPage";
 
 // Páginas de trabajador
 import DashboardPage from "./pages/worker/DashboardPage";
@@ -20,16 +21,19 @@ import PersonalDayRequestPage from "./pages/worker/PersonalDayRequestPage";
 import LeaveRequestPage from "./pages/worker/LeaveRequestPage";
 import ShiftProfilePage from "./pages/worker/ShiftProfilePage";
 import HistoryPage from "./pages/worker/HistoryPage";
+import ShiftChangeRequestPage from "./pages/worker/ShiftChangeRequestPage";
 
 // Páginas de RRHH
 import HRDashboardPage from "./pages/hr/HRDashboardPage";
 import WorkersManagementPage from "./pages/hr/WorkersManagementPage";
 import RequestsManagementPage from "./pages/hr/RequestsManagementPage";
 import SmartAssistantPage from "./pages/hr/SmartAssistantPage";
+import HRManagementPage from "./pages/hr/HR-management-page";
+import CalendarManagementPage from "./pages/hr/CalendarManagementPage";
 
 // Páginas adicionales
 import ProfilePage from "./pages/ProfilePage";
-import ChatPage from "./pages/chat/ChatPage";
+import ChatPage from "./pages/chat/index";
 
 const queryClient = new QueryClient();
 
@@ -41,9 +45,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
       setSession(!!session);
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(!!session);
     });
 
@@ -71,24 +73,29 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/roles" element={<RoleSelectorPage />} />
             
-            {/* Rutas protegidas de trabajador */}
+            {/* Rutas de trabajador */}
             <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
             <Route path="/solicitudes/vacaciones" element={<PrivateRoute><VacationRequestPage /></PrivateRoute>} />
             <Route path="/solicitudes/asuntos-propios" element={<PrivateRoute><PersonalDayRequestPage /></PrivateRoute>} />
             <Route path="/solicitudes/permisos" element={<PrivateRoute><LeaveRequestPage /></PrivateRoute>} />
+            <Route path="/solicitudes/cambio-turno" element={<PrivateRoute><ShiftChangeRequestPage /></PrivateRoute>} />
             <Route path="/perfiles-turno" element={<PrivateRoute><ShiftProfilePage /></PrivateRoute>} />
             <Route path="/historial" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
             
-            {/* Rutas protegidas de RRHH */}
+            {/* Rutas de RRHH */}
             <Route path="/rrhh/dashboard" element={<PrivateRoute><HRDashboardPage /></PrivateRoute>} />
             <Route path="/rrhh/trabajadores" element={<PrivateRoute><WorkersManagementPage /></PrivateRoute>} />
             <Route path="/rrhh/solicitudes" element={<PrivateRoute><RequestsManagementPage /></PrivateRoute>} />
+            <Route path="/rrhh/gestion" element={<PrivateRoute><HRManagementPage /></PrivateRoute>} />
+            <Route path="/rrhh/calendarios" element={<PrivateRoute><CalendarManagementPage /></PrivateRoute>} />
             <Route path="/rrhh/asistente" element={<PrivateRoute><SmartAssistantPage /></PrivateRoute>} />
             
-            {/* Ruta protegida de perfil */}
+            {/* Páginas adicionales */}
             <Route path="/perfil" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
             <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

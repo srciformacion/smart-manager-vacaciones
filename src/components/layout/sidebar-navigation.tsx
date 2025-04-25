@@ -1,213 +1,128 @@
-import { useState } from "react";
+
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { UserRole } from "@/types";
 import {
-  Calendar,
+  Calendar, 
   Clock,
-  FileCheck,
-  Home,
-  User,
-  Users,
-  Settings,
-  Mail,
-  LogOut,
-  Menu,
-  X,
+  LayoutDashboard,
   MessageSquare,
+  PersonStanding,
+  Settings,
+  User,
 } from "lucide-react";
 
-interface NavItemProps {
-  to: string;
-  icon: React.ElementType;
-  label: string;
-  active?: boolean;
-  onClick?: () => void;
-}
-
-function NavItem({ to, icon: Icon, label, active, onClick }: NavItemProps) {
-  return (
-    <Link to={to} onClick={onClick} className="w-full">
-      <Button
-        variant="ghost"
-        className={cn(
-          "w-full justify-start gap-2 font-normal text-sm tracking-tight",
-          active && "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-        )}
-      >
-        <Icon className="h-4 w-4" />
-        <span className="font-medium">{label}</span>
-      </Button>
-    </Link>
-  );
-}
-
 interface SidebarNavigationProps {
-  userRole: UserRole;
-  onLogout: () => void;
-  onNavigate?: () => void;
+  role: UserRole;
 }
 
-export function SidebarNavigation({ userRole, onLogout, onNavigate }: SidebarNavigationProps) {
+export function SidebarNavigation({ role = "worker" }: SidebarNavigationProps) {
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
+  
+  const isActive = (path: string) => {
+    return location.pathname === path;
   };
 
-  const closeSidebar = () => {
-    if (isOpen) setIsOpen(false);
-    if (onNavigate) onNavigate();
-  };
-
-  const isActive = (path: string) => location.pathname === path;
+  // Enlaces para trabajadores
+  const workerLinks = [
+    {
+      href: "/dashboard",
+      icon: <LayoutDashboard className="h-5 w-5" />,
+      label: "Dashboard",
+    },
+    {
+      href: "/solicitudes/vacaciones",
+      icon: <Calendar className="h-5 w-5" />,
+      label: "Solicitud de vacaciones",
+    },
+    {
+      href: "/solicitudes/asuntos-propios",
+      icon: <Clock className="h-5 w-5" />,
+      label: "Asuntos propios",
+    },
+    {
+      href: "/solicitudes/permisos",
+      icon: <Clock className="h-5 w-5" />,
+      label: "Permisos",
+    },
+    {
+      href: "/perfiles-turno",
+      icon: <Settings className="h-5 w-5" />,
+      label: "Perfiles de turno",
+    },
+    {
+      href: "/historial",
+      icon: <Clock className="h-5 w-5" />,
+      label: "Historial",
+    },
+    {
+      href: "/chat",
+      icon: <MessageSquare className="h-5 w-5" />,
+      label: "Chat",
+    },
+    {
+      href: "/perfil",
+      icon: <User className="h-5 w-5" />,
+      label: "Perfil",
+    },
+  ];
+  
+  // Enlaces para recursos humanos
+  const hrLinks = [
+    {
+      href: "/rrhh/dashboard",
+      icon: <LayoutDashboard className="h-5 w-5" />,
+      label: "Dashboard",
+    },
+    {
+      href: "/rrhh/solicitudes",
+      icon: <Calendar className="h-5 w-5" />,
+      label: "Gestión de solicitudes",
+    },
+    {
+      href: "/rrhh/trabajadores",
+      icon: <PersonStanding className="h-5 w-5" />,
+      label: "Gestión de trabajadores",
+    },
+    {
+      href: "/rrhh/calendarios",
+      icon: <Calendar className="h-5 w-5" />,
+      label: "Calendarios y turnos",
+    },
+    {
+      href: "/rrhh/asistente",
+      icon: <MessageSquare className="h-5 w-5" />,
+      label: "Asistente inteligente",
+    },
+    {
+      href: "/chat",
+      icon: <MessageSquare className="h-5 w-5" />,
+      label: "Chat",
+    },
+    {
+      href: "/perfil",
+      icon: <User className="h-5 w-5" />,
+      label: "Perfil",
+    },
+  ];
+  
+  const links = role === "hr" ? hrLinks : workerLinks;
 
   return (
-    <>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={toggleSidebar}
-        className="fixed top-4 left-4 z-50 lg:hidden"
-      >
-        {isOpen ? <X /> : <Menu />}
-      </Button>
-
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={closeSidebar}
-        />
-      )}
-
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar transition-transform duration-300 ease-in-out transform lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        <div className="flex flex-col h-full p-4">
-          <div className="flex flex-col items-center justify-center py-4 border-b border-sidebar-border">
-            <h2 className="text-xl font-bold text-sidebar-foreground text-center tracking-tight">
-              La Rioja Cuida
-            </h2>
-          </div>
-
-          <nav className="flex-1 mt-6 space-y-1">
-            <NavItem
-              to="/"
-              icon={Home}
-              label="Inicio"
-              active={isActive("/")}
-              onClick={closeSidebar}
-            />
-
-            <div className="py-2">
-              <h3 className="px-3 text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider">
-                Solicitudes
-              </h3>
-              <div className="mt-2 space-y-1">
-                <NavItem
-                  to="/solicitudes/vacaciones"
-                  icon={Calendar}
-                  label="Vacaciones"
-                  active={isActive("/solicitudes/vacaciones")}
-                  onClick={closeSidebar}
-                />
-                <NavItem
-                  to="/solicitudes/asuntos-propios"
-                  icon={Clock}
-                  label="Asuntos propios"
-                  active={isActive("/solicitudes/asuntos-propios")}
-                  onClick={closeSidebar}
-                />
-                <NavItem
-                  to="/solicitudes/permisos"
-                  icon={FileCheck}
-                  label="Permisos justificados"
-                  active={isActive("/solicitudes/permisos")}
-                  onClick={closeSidebar}
-                />
-                <NavItem
-                  to="/historial"
-                  icon={Mail}
-                  label="Historial"
-                  active={isActive("/historial")}
-                  onClick={closeSidebar}
-                />
-              </div>
-            </div>
-
-            {userRole === "hr" && (
-              <div className="py-2">
-                <h3 className="px-3 text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider">
-                  RRHH
-                </h3>
-                <div className="mt-2 space-y-1">
-                  <NavItem
-                    to="/rrhh/trabajadores"
-                    icon={Users}
-                    label="Trabajadores"
-                    active={isActive("/rrhh/trabajadores")}
-                    onClick={closeSidebar}
-                  />
-                  <NavItem
-                    to="/rrhh/solicitudes"
-                    icon={Mail}
-                    label="Solicitudes"
-                    active={isActive("/rrhh/solicitudes")}
-                    onClick={closeSidebar}
-                  />
-                  <NavItem
-                    to="/rrhh/asistente"
-                    icon={User}
-                    label="Asistente Inteligente"
-                    active={isActive("/rrhh/asistente")}
-                    onClick={closeSidebar}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="py-2">
-              <div className="mt-2 space-y-1">
-                <NavItem
-                  to="/perfil"
-                  icon={Settings}
-                  label="Mi perfil"
-                  active={isActive("/perfil")}
-                  onClick={closeSidebar}
-                />
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-2 font-normal text-sm tracking-tight"
-                  onClick={() => {
-                    onLogout();
-                    closeSidebar();
-                  }}
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="font-medium">Cerrar sesión</span>
-                </Button>
-              </div>
-            </div>
-
-            <div className="py-2">
-              <div className="mt-2 space-y-1">
-                <NavItem
-                  to="/chat"
-                  icon={MessageSquare}
-                  label="Chat"
-                  active={isActive("/chat")}
-                  onClick={closeSidebar}
-                />
-              </div>
-            </div>
-          </nav>
-        </div>
-      </aside>
-    </>
+    <div className="space-y-1">
+      {links.map((link) => (
+        <Link
+          key={link.href}
+          to={link.href}
+          className={cn(
+            "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+            isActive(link.href) ? "bg-accent text-accent-foreground" : "transparent"
+          )}
+        >
+          {link.icon}
+          <span className="ml-3">{link.label}</span>
+        </Link>
+      ))}
+    </div>
   );
 }
