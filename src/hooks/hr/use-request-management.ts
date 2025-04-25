@@ -14,6 +14,9 @@ export function useRequestManagement(initialRequests: Request[], exampleWorkers:
   };
 
   const handleDetailStatusChange = (request: Request, newStatus: RequestStatus, observations?: string) => {
+    // In a real app, we would update the request in the backend here
+    console.log("Updating request status:", request.id, newStatus, observations);
+    
     // Close the detail view after processing
     setTimeout(() => {
       setSelectedRequest(null);

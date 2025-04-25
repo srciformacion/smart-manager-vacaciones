@@ -29,10 +29,8 @@ export default function HRManagementPage() {
           request={selectedRequest}
           user={selectedWorker}
           onClose={closeRequestDetails}
-          onStatusChange={(status: RequestStatus) => {
-            if (selectedRequest) {
-              handleDetailStatusChange(selectedRequest, status);
-            }
+          onStatusChange={(request, newStatus, observations) => {
+            handleDetailStatusChange(request, newStatus, observations);
           }}
           onDownloadAttachment={() => handleDownloadAttachment(selectedRequest)}
         />
