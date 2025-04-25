@@ -1,13 +1,19 @@
 
-import { Request, User } from "@/types";
+import { Request, User, RequestStatus, Department } from "@/types";
 import { RequestList } from "@/components/requests/request-list";
+import { useState } from "react";
 
 interface RequestsTabContentProps {
   requests: Request[];
   workers: User[];
   onViewDetails: (request: Request) => void;
-  onStatusChange: (request: Request, newStatus: string) => void;
+  onStatusChange: (request: Request, newStatus: RequestStatus) => void;
   onDownloadAttachment: (request: Request) => void;
+  statusFilter?: RequestStatus | "all";
+  setStatusFilter?: (status: RequestStatus | "all") => void;
+  departmentFilter?: Department | "all";
+  setDepartmentFilter?: (department: Department | "all") => void;
+  departments?: Department[];
 }
 
 export function RequestsTabContent({
@@ -16,6 +22,11 @@ export function RequestsTabContent({
   onViewDetails,
   onStatusChange,
   onDownloadAttachment,
+  statusFilter = "all",
+  setStatusFilter,
+  departmentFilter = "all",
+  setDepartmentFilter,
+  departments = []
 }: RequestsTabContentProps) {
   return (
     <RequestList

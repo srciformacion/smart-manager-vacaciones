@@ -35,7 +35,7 @@ export function ManagementContent({
 
   // Obtener departamentos únicos
   const departments = workers.reduce<Department[]>((acc, worker) => {
-    if (!acc.includes(worker.department)) {
+    if (worker.department && !acc.includes(worker.department)) {
       acc.push(worker.department);
     }
     return acc;
@@ -71,7 +71,7 @@ export function ManagementContent({
             
             <RequestsTabContent 
               requests={filteredRequests}
-              users={workers}
+              workers={workers}
               onViewDetails={onViewDetails}
               onStatusChange={onStatusChange}
               onDownloadAttachment={onDownloadAttachment}
@@ -96,7 +96,11 @@ export function ManagementContent({
       <TabsContent value="informes">
         <Card>
           <CardContent className="pt-6">
-            <ReportsGenerator />
+            <ReportsGenerator 
+              requests={requests}
+              users={workers}
+              departments={departments}
+            />
           </CardContent>
         </Card>
       </TabsContent>

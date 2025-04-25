@@ -1,3 +1,4 @@
+
 import { ReactNode } from "react";
 import { SidebarNavigation } from "./sidebar-navigation";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -29,7 +30,7 @@ export function MainLayout({ children, user, className }: MainLayoutProps) {
     <div className="min-h-screen flex bg-background">
       {user && (
         <SidebarNavigation 
-          userRole={user.role as UserRole} 
+          role={user.role as UserRole} 
           onLogout={handleLogout} 
         />
       )}

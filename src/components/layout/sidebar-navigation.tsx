@@ -13,10 +13,12 @@ import {
 } from "lucide-react";
 
 interface SidebarNavigationProps {
-  role: UserRole;
+  role?: UserRole;
+  onLogout?: () => void;
+  onNavigate?: () => void;
 }
 
-export function SidebarNavigation({ role = "worker" }: SidebarNavigationProps) {
+export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: SidebarNavigationProps) {
   const location = useLocation();
   
   const isActive = (path: string) => {
@@ -118,6 +120,7 @@ export function SidebarNavigation({ role = "worker" }: SidebarNavigationProps) {
             "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
             isActive(link.href) ? "bg-accent text-accent-foreground" : "transparent"
           )}
+          onClick={onNavigate}
         >
           {link.icon}
           <span className="ml-3">{link.label}</span>

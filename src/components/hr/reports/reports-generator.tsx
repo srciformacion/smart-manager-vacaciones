@@ -14,7 +14,7 @@ interface ReportsGeneratorProps {
   departments: Department[];
 }
 
-export function ReportsGenerator({ requests, users, departments }: ReportsGeneratorProps) {
+export function ReportsGenerator({ requests = [], users = [], departments = [] }: ReportsGeneratorProps) {
   const [reportType, setReportType] = useState<"vacations" | "absences" | "department" | "status">("vacations");
   const [department, setDepartment] = useState<Department | "all">("all");
   const [dateFrom, setDateFrom] = useState<Date | undefined>(new Date());

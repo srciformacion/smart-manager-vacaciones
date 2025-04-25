@@ -13,7 +13,7 @@ export function useRequestManagement(initialRequests: Request[], exampleWorkers:
     setSelectedRequest(request);
   };
 
-  const handleDetailStatusChange = (request: Request, newStatus: RequestStatus) => {
+  const handleDetailStatusChange = (request: Request, newStatus: RequestStatus, observations?: string) => {
     // Close the detail view after processing
     setTimeout(() => {
       setSelectedRequest(null);

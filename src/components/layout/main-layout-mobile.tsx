@@ -1,3 +1,4 @@
+
 import { ReactNode, useState } from "react";
 import { SidebarNavigation } from "./sidebar-navigation";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -41,7 +42,7 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
               </SheetTrigger>
               <SheetContent side="left" className="p-0">
                 <SidebarNavigation 
-                  userRole={user.role as UserRole} 
+                  role={user.role as UserRole} 
                   onLogout={handleLogout}
                   onNavigate={() => setSidebarOpen(false)}
                 />
