@@ -1,44 +1,19 @@
 
-import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { SmartAssistantPanel } from "@/components/hr/smart-assistant-panel";
 import { Button } from "@/components/ui/button";
 import { RefreshCcw } from "lucide-react";
-import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
-import { useNavigate } from "react-router-dom";
+import { useSmartAssistant } from "@/hooks/hr/use-smart-assistant";
 
 export default function SmartAssistantPage() {
-  const { user, fetchAuthUser } = useProfileAuth();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Temporary mock data (this should be replaced with real data fetching)
-  const requests = [];
-  const workers = [];
-  const balances = {};
-
-  const handleRefresh = async () => {
-    setIsLoading(true);
-    try {
-      const authUser = await fetchAuthUser();
-      if (!authUser) {
-        navigate('/auth');
-        return;
-      }
-      
-      const role = authUser.user_metadata?.role || localStorage.getItem('userRole');
-      if (role !== 'hr') {
-        navigate('/dashboard');
-      }
-      
-      // Simulate data refresh
-      await new Promise(resolve => setTimeout(resolve, 1500));
-    } catch (error) {
-      console.error("Error refreshing data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    user,
+    isLoading,
+    requests,
+    workers,
+    balances,
+    handleRefresh
+  } = useSmartAssistant();
 
   return (
     <MainLayout user={user}>
