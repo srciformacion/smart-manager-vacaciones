@@ -1,9 +1,10 @@
 
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Department, ShiftType, WorkdayType } from "@/types";
 import { UseFormReturn } from "react-hook-form";
 import { FormValues } from "./schema";
+import { DepartmentSelect } from "./work-info/DepartmentSelect";
+import { ShiftSelect } from "./work-info/ShiftSelect";
+import { WorkdaySelect } from "./work-info/WorkdaySelect";
 
 interface WorkInfoSectionProps {
   form: UseFormReturn<FormValues>;
@@ -16,96 +17,21 @@ interface WorkInfoSectionProps {
 export function WorkInfoSection({ form, isSubmitting, departments, shifts, workdayTypes }: WorkInfoSectionProps) {
   return (
     <div className="space-y-4">
-      <FormField
-        control={form.control}
-        name="department"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Departamento</FormLabel>
-            <Select
-              disabled={isSubmitting}
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccione un departamento" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {departments.map((dept) => (
-                  <SelectItem key={dept} value={dept}>
-                    {dept}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
+      <DepartmentSelect 
+        form={form} 
+        departments={departments} 
+        isSubmitting={isSubmitting} 
       />
-
-      <FormField
-        control={form.control}
-        name="shift"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Turno</FormLabel>
-            <Select
-              disabled={isSubmitting}
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccione un turno" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {shifts.map((shift) => (
-                  <SelectItem key={shift} value={shift}>
-                    {shift}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormDescription>
-              El turno determinará el grupo de trabajo vacacional
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
+      <ShiftSelect 
+        form={form} 
+        shifts={shifts} 
+        isSubmitting={isSubmitting} 
       />
-
-      <FormField
-        control={form.control}
-        name="workday"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Tipo de jornada</FormLabel>
-            <Select
-              disabled={isSubmitting}
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccione un tipo de jornada" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {workdayTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
+      <WorkdaySelect 
+        form={form} 
+        workdayTypes={workdayTypes} 
+        isSubmitting={isSubmitting} 
       />
     </div>
   );
 }
-
