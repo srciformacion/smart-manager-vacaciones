@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface Notification {
@@ -18,83 +17,72 @@ export function useNotifications() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Fetch existing notifications
-    const fetchNotifications = async () => {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching notifications:', error);
-        return;
+    // Load notifications from localStorage
+    const loadNotifications = () => {
+      const stored = localStorage.getItem('notifications');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setNotifications(parsed);
+        setUnreadCount(parsed.filter((n: Notification) => !n.read).length);
       }
-
-      // Cast the data to ensure type safety
-      const typedData = data?.map(item => ({
-        ...item,
-        type: item.type as 'info' | 'warning' | 'error' | 'success'
-      })) || [];
-      
-      setNotifications(typedData);
-      setUnreadCount(typedData.filter(n => !n.read).length);
     };
 
-    fetchNotifications();
-
-    // Subscribe to real-time notifications
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications'
-        },
-        (payload) => {
-          const newNotification = {
-            ...payload.new as Omit<Notification, 'type'> & { type: string },
-            type: payload.new.type as 'info' | 'warning' | 'error' | 'success'
-          };
-          
-          setNotifications(prev => [newNotification, ...prev]);
-          setUnreadCount(prev => prev + 1);
-          
-          toast({
-            title: newNotification.title,
-            description: newNotification.message,
-            variant: newNotification.type === 'error' ? 'destructive' : 'default',
-          });
-        }
-      )
-      .subscribe();
-
+    loadNotifications();
+    
+    // Listen for storage events from other tabs
+    window.addEventListener('storage', loadNotifications);
+    
     return () => {
-      supabase.removeChannel(channel);
+      window.removeEventListener('storage', loadNotifications);
     };
   }, []);
 
-  const markAsRead = async (id: string) => {
-    const { error } = await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('id', id);
+  const saveNotifications = (newNotifications: Notification[]) => {
+    localStorage.setItem('notifications', JSON.stringify(newNotifications));
+    setNotifications(newNotifications);
+    setUnreadCount(newNotifications.filter(n => !n.read).length);
+  };
 
-    if (error) {
-      console.error('Error marking notification as read:', error);
-      return;
-    }
+  const addNotification = (notification: Omit<Notification, 'id' | 'created_at' | 'read'>) => {
+    const newNotification = {
+      ...notification,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      read: false,
+    };
+    
+    const updatedNotifications = [newNotification, ...notifications];
+    saveNotifications(updatedNotifications);
+  };
 
-    setNotifications(prev =>
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
+  const markAsRead = (id: string) => {
+    const updatedNotifications = notifications.map(n =>
+      n.id === id ? { ...n, read: true } : n
     );
-    setUnreadCount(prev => Math.max(0, prev - 1));
+    saveNotifications(updatedNotifications);
+  };
+
+  const markAllAsRead = () => {
+    const updatedNotifications = notifications.map(n => ({ ...n, read: true }));
+    saveNotifications(updatedNotifications);
+  };
+
+  const deleteNotification = (id: string) => {
+    const updatedNotifications = notifications.filter(n => n.id !== id);
+    saveNotifications(updatedNotifications);
+  };
+
+  const deleteAll = () => {
+    saveNotifications([]);
   };
 
   return {
     notifications,
     unreadCount,
+    addNotification,
     markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    deleteAll,
   };
 }

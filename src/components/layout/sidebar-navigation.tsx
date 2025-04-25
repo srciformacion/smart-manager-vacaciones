@@ -1,9 +1,6 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { UserRole } from "@/types";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/use-toast";
 import { LogOut } from "lucide-react";
 import {
   Calendar, 
@@ -16,6 +13,7 @@ import {
   Brain,
   Bell,
 } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface NavLink {
   href: string;
