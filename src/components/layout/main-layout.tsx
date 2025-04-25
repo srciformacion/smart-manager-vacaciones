@@ -1,15 +1,15 @@
 import { Menu } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { SidebarNavigation } from "./sidebar-navigation";
 import { User } from "@/types";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { MainLayoutMobile } from "./main-layout-mobile";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 
 export function MainLayout({ user, children }: { user: User | null, children: React.ReactNode }) {
-  const { isMobile } = useMobile();
+  const { isMobile } = useIsMobile();
 
   if (isMobile) {
     return <MainLayoutMobile user={user}>{children}</MainLayoutMobile>;

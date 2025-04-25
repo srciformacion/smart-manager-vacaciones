@@ -12,7 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 
 export function NotificationTester() {
   const { toast } = useToast();
-  const [notificationType, setNotificationType] = useState<NotificationType>("requestCreated");
+  // Only use the notification types that are available in emailService.NotificationType
+  const [notificationType, setNotificationType] = useState<"requestCreated" | "requestApproved" | "requestRejected" | "requestMoreInfo">("requestCreated");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [sendWhatsApp, setSendWhatsApp] = useState(false);

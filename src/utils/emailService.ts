@@ -1,12 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
-import { User, Request } from "@/types";
+import { User, Request, NotificationType as AppNotificationType } from "@/types";
 
 // Tipos de notificación
 export type NotificationType = 
   | "requestCreated" 
   | "requestApproved" 
   | "requestRejected" 
-  | "requestMoreInfo";
+  | "requestMoreInfo"
+  | "shiftAssigned"
+  | "calendarChanged"
+  | "chatMessage"
+  | "documentReminder";
 
 interface EmailPayload {
   to: string;
@@ -99,6 +103,70 @@ const generateEmailContent = (
               ${request.observations ? `<li><strong>Información solicitada:</strong> ${request.observations}</li>` : ''}
             </ul>
             <p>Por favor, ponte en contacto con el departamento de RRHH lo antes posible para proporcionar esta información.</p>
+          </div>
+        `,
+      };
+    case "shiftAssigned":
+      return {
+        subject: `Tarea asignada`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Tarea asignada</h2>
+            <p>Se ha asignado una tarea a ti:</p>
+            <ul>
+              <li><strong>Tipo:</strong> ${requestTypeName}</li>
+              <li><strong>Fecha inicio:</strong> ${startDate}</li>
+              <li><strong>Fecha fin:</strong> ${endDate}</li>
+            </ul>
+            <p>Por favor, ponte en contacto con el departamento de RRHH para más información.</p>
+          </div>
+        `,
+      };
+    case "calendarChanged":
+      return {
+        subject: `Cambio en el calendario`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Cambio en el calendario</h2>
+            <p>Se ha realizado un cambio en el calendario:</p>
+            <ul>
+              <li><strong>Tipo:</strong> ${requestTypeName}</li>
+              <li><strong>Fecha inicio:</strong> ${startDate}</li>
+              <li><strong>Fecha fin:</strong> ${endDate}</li>
+            </ul>
+            <p>Por favor, ponte en contacto con el departamento de RRHH para más información.</p>
+          </div>
+        `,
+      };
+    case "chatMessage":
+      return {
+        subject: `Mensaje en chat`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Mensaje en chat</h2>
+            <p>Se ha recibido un mensaje en el chat:</p>
+            <ul>
+              <li><strong>Tipo:</strong> ${requestTypeName}</li>
+              <li><strong>Fecha inicio:</strong> ${startDate}</li>
+              <li><strong>Fecha fin:</strong> ${endDate}</li>
+            </ul>
+            <p>Por favor, ponte en contacto con el departamento de RRHH para más información.</p>
+          </div>
+        `,
+      };
+    case "documentReminder":
+      return {
+        subject: `Recordatorio de documento`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Recordatorio de documento</h2>
+            <p>Se ha recibido un recordatorio de documento:</p>
+            <ul>
+              <li><strong>Tipo:</strong> ${requestTypeName}</li>
+              <li><strong>Fecha inicio:</strong> ${startDate}</li>
+              <li><strong>Fecha fin:</strong> ${endDate}</li>
+            </ul>
+            <p>Por favor, ponte en contacto con el departamento de RRHH para más información.</p>
           </div>
         `,
       };

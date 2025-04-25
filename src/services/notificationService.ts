@@ -1,5 +1,5 @@
 
-import { NotificationPayload } from "@/types";
+import { NotificationPayload, NotificationType } from "@/types";
 import { toast } from "@/hooks/use-toast";
 
 /**

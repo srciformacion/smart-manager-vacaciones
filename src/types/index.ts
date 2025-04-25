@@ -13,7 +13,7 @@ export type NotificationType =
   | 'documentReminder';
 
 // Canal de notificación preferido
-export type NotificationChannel = 'web' | 'email' | 'whatsapp';
+export type NotificationChannel = 'web' | 'email' | 'whatsapp' | 'preferred';
 
 // Tipos de turnos - Actualizado para incluir todos los tipos usados
 export type ShiftType = 

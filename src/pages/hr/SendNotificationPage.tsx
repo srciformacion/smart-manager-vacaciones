@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { NotificationPayload, NotificationType, User } from "@/types";
@@ -14,11 +13,10 @@ import { sendNotification } from "@/services/notificationService";
 import { exampleWorkers } from "@/data/example-users";
 import { toast } from "@/hooks/use-toast";
 
-// Tipos para esta página
 interface FormState {
   recipients: string;
   notificationType: NotificationType;
-  channel: 'web' | 'email' | 'whatsapp' | 'preferred';
+  channel: NotificationChannel;
   subject: string;
   message: string;
 }
@@ -41,7 +39,7 @@ export default function SendNotificationPage() {
   const [selectedWorker, setSelectedWorker] = useState<string>("");
 
   const handleFormChange = (field: keyof FormState, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm(prev => ({ ...prev, [field]: value as any }));
   };
 
   const handleSendNotification = async () => {
@@ -59,7 +57,6 @@ export default function SendNotificationPage() {
     try {
       let recipients: string[] = [];
       
-      // Determinar los destinatarios
       if (selectedWorker === "all") {
         recipients = exampleWorkers.map(worker => worker.id);
       } else if (selectedWorker) {
@@ -68,12 +65,9 @@ export default function SendNotificationPage() {
         recipients = form.recipients.split(",").map(email => email.trim());
       }
 
-      // Enviar notificaciones a cada destinatario
       for (const recipient of recipients) {
-        // Buscar el trabajador en los datos de ejemplo (en un entorno real sería de la base de datos)
         const worker = exampleWorkers.find(w => w.id === recipient);
         
-        // Si no encontramos al trabajador pero tenemos un email, asumimos que es un email externo
         if (!worker && recipient.includes('@')) {
           await sendNotification({
             canal: form.channel === 'preferred' ? 'email' : form.channel,
@@ -87,12 +81,10 @@ export default function SendNotificationPage() {
         
         if (!worker) continue;
         
-        // Determinar el canal y destino según las preferencias
         let canal = form.channel;
         let destino = recipient;
         
         if (canal === 'preferred') {
-          // Consultar el canal preferido del trabajador (simulado)
           const userData = JSON.parse(localStorage.getItem('user') || '{}');
           canal = userData.preferredNotificationChannel || 'web';
         }
@@ -118,7 +110,6 @@ export default function SendNotificationPage() {
         description: `Se han enviado ${recipients.length} notificaciones correctamente.`,
       });
       
-      // Resetear formulario
       setForm({
         recipients: "",
         notificationType: "requestApproved",
@@ -160,7 +151,6 @@ export default function SendNotificationPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Selección de destinatarios */}
             <div className="space-y-2">
               <Label>Destinatarios</Label>
               <Select 
@@ -191,7 +181,6 @@ export default function SendNotificationPage() {
               />
             </div>
 
-            {/* Tipo de notificación */}
             <div className="space-y-2">
               <Label>Tipo de notificación</Label>
               <Select 
@@ -212,7 +201,6 @@ export default function SendNotificationPage() {
               </Select>
             </div>
 
-            {/* Canal de envío */}
             <div className="space-y-2">
               <Label>Canal de envío</Label>
               <RadioGroup 
@@ -247,7 +235,6 @@ export default function SendNotificationPage() {
               </RadioGroup>
             </div>
 
-            {/* Asunto y mensaje */}
             <div className="space-y-2">
               <Label htmlFor="subject">Asunto</Label>
               <Input
