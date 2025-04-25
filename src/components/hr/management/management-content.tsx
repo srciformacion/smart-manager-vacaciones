@@ -4,6 +4,7 @@ import { ReportsGenerator } from "@/components/hr/reports/reports-generator";
 import { StaffAvailabilityCalendar } from "@/components/hr/calendar/staff-availability-calendar";
 import { RequestsTabContent } from "@/components/hr/requests-tab-content";
 import { Request, User } from "@/types";
+import { exampleUser } from "@/data/example-users";
 
 interface ManagementContentProps {
   activeTab: string;
@@ -24,6 +25,9 @@ export function ManagementContent({
   onStatusChange,
   onDownloadAttachment,
 }: ManagementContentProps) {
+  // Create a departments array from worker departments for the reports
+  const departments = Array.from(new Set(workers.map(worker => worker.department || ""))).filter(Boolean);
+
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
       <TabsList className="grid grid-cols-3 w-full md:w-auto">
@@ -46,6 +50,7 @@ export function ManagementContent({
         <ReportsGenerator 
           requests={requests}
           users={workers}
+          departments={departments}
         />
       </TabsContent>
       

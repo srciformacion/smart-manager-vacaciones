@@ -29,7 +29,7 @@ import SmartAssistantPage from "./pages/hr/SmartAssistantPage";
 
 // Páginas adicionales
 import ProfilePage from "./pages/ProfilePage";
-import ChatPage from "./pages/ChatPage";
+import ChatPage from "./pages/chat/ChatPage";
 
 const queryClient = new QueryClient();
 

@@ -29,7 +29,6 @@ export default function HRManagementPage() {
           onClose={closeRequestDetails}
           onStatusChange={(status) => handleDetailStatusChange(selectedRequest, status)}
           onDownloadAttachment={() => handleDownloadAttachment(selectedRequest)}
-          isHRView={true}
         />
       ) : (
         <div className="space-y-8">
