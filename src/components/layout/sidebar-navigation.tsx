@@ -40,23 +40,27 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error al cerrar sesión",
-          description: error.message,
-        });
-        return;
-      }
-
+      localStorage.removeItem("user");
       localStorage.removeItem("userRole");
+      
+      // Dispatch storage event to notify other tabs
+      window.dispatchEvent(new Event("storage"));
+      
+      // Notify user
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión correctamente",
+      });
 
-      onLogout?.();
-
+      // Use onLogout callback if provided
+      if (onLogout) {
+        onLogout();
+      }
+      
+      // Navigate to auth page (using window.location to ensure full page reload)
       window.location.href = "/auth";
     } catch (error) {
+      console.error("Error al cerrar sesión:", error);
       toast({
         variant: "destructive",
         title: "Error al cerrar sesión",
