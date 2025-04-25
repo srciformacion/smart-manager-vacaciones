@@ -5,7 +5,7 @@ import { CalendarManagement } from "@/components/hr/calendar/calendar-management
 import { CalendarExcelImport } from "@/components/hr/calendar/calendar-excel-import";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { exampleUser, exampleWorkers } from "@/data/example-users";
-import { exampleShifts, generateMonthlyShifts } from "@/data/example-calendar";
+import { exampleShifts, generateMonthlyShifts } from "@/data/calendar/shifts";
 
 export default function CalendarManagementPage() {
   const [user] = useState(exampleUser);

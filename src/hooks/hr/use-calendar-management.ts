@@ -4,10 +4,10 @@ import { User } from "@/types";
 import { CalendarShift, ShiftType, AnnualHours } from "@/types/calendar";
 import { 
   exampleShifts, 
-  exampleAnnualHours, 
   generateMonthlyShifts, 
-  calculateWorkedHours
-} from "@/data/example-calendar";
+  calculateWorkedHours 
+} from "@/data/calendar/shifts";
+import { exampleAnnualHours } from "@/data/calendar/hours";
 import { v4 as uuidv4 } from "uuid";
 import { startOfMonth, endOfMonth, format, addMonths, subMonths, addDays } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
