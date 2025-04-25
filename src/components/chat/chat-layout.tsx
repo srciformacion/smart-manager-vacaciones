@@ -18,8 +18,13 @@ export function ChatLayout() {
     if (activeConversation) {
       setActiveConversation(null);
     } else {
-      // If no active conversation, navigate back to previous page
-      navigate(-1);
+      // If no active conversation, navigate to dashboard based on user role
+      const userRole = localStorage.getItem('userRole');
+      if (userRole === 'hr') {
+        navigate('/rrhh/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 
@@ -56,3 +61,4 @@ export function ChatLayout() {
     </div>
   );
 }
+
