@@ -3,12 +3,17 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { UserRole } from "@/types";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "@/components/ui/use-toast";
+
+// Demo users for testing
+const DEMO_USERS = [
+  { email: "usuario@example.com", password: "password", role: "worker" },
+  { email: "rrhh@example.com", password: "password", role: "hr" }
+];
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
@@ -20,10 +25,10 @@ export default function AuthPage() {
 
   // Check for existing session on component mount
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    const checkSession = () => {
+      const user = localStorage.getItem("user");
       
-      if (session) {
+      if (user) {
         // If there's an active session, redirect based on stored role
         const storedRole = localStorage.getItem("userRole") as UserRole || "worker";
         if (storedRole === "hr") {
@@ -36,24 +41,7 @@ export default function AuthPage() {
       setLoading(false);
     };
 
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        const storedRole = localStorage.getItem("userRole") as UserRole || "worker";
-        if (storedRole === "hr") {
-          navigate("/rrhh/dashboard");
-        } else {
-          navigate("/dashboard");
-        }
-      }
-    });
-
     checkSession();
-
-    // Clean up the subscription when component unmounts
-    return () => {
-      subscription.unsubscribe();
-    };
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,18 +49,25 @@ export default function AuthPage() {
     setIsSubmitting(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      // Find the user in our demo users array
+      const user = DEMO_USERS.find(u => u.email === email && u.password === password);
+      
+      if (!user) {
+        throw new Error("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
+      }
 
-      if (error) throw error;
-
-      // Store user role in localStorage
-      localStorage.setItem("userRole", userRole);
+      // Set user role based on match or selection
+      const selectedRole = user.role as UserRole || userRole;
+      
+      // Store auth info in localStorage
+      localStorage.setItem("user", JSON.stringify({ email, id: `user-${Date.now()}` }));
+      localStorage.setItem("userRole", selectedRole);
+      
+      // Dispatch storage event to notify other tabs
+      window.dispatchEvent(new Event("storage"));
       
       // Redirect based on role
-      if (userRole === "hr") {
+      if (selectedRole === "hr") {
         navigate("/rrhh/dashboard");
       } else {
         navigate("/dashboard");
@@ -171,6 +166,12 @@ export default function AuthPage() {
             </Link>
           </div>
         </form>
+        
+        <div className="mt-6 text-sm text-center text-muted-foreground">
+          <p>Credenciales de demo:</p>
+          <p>Usuario: usuario@example.com / Contraseña: password</p>
+          <p>RRHH: rrhh@example.com / Contraseña: password</p>
+        </div>
       </div>
     </div>
   );

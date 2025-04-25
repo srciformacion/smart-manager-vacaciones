@@ -1,7 +1,6 @@
 
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
 export default function Index() {
@@ -11,10 +10,15 @@ export default function Index() {
     checkUser();
   }, []);
 
-  const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      navigate("/dashboard");
+  const checkUser = () => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      const userRole = localStorage.getItem("userRole");
+      if (userRole === "hr") {
+        navigate("/rrhh/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     }
   };
 

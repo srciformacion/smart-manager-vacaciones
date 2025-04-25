@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
@@ -11,9 +10,9 @@ export const useProfileAuth = () => {
   const navigate = useNavigate();
 
   const fetchAuthUser = async () => {
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const userJson = localStorage.getItem("user");
     
-    if (userError || !user) {
+    if (!userJson) {
       toast({ 
         variant: "destructive",
         title: "Error de autenticación", 
@@ -23,14 +22,14 @@ export const useProfileAuth = () => {
       return null;
     }
 
-    // Get role from user metadata or localStorage (fallback)
-    const userRole = user.user_metadata?.role || localStorage.getItem('userRole') || 'worker';
+    const userData = JSON.parse(userJson);
+    const userRole = localStorage.getItem('userRole') || 'worker';
     
-    setUserId(user.id);
+    setUserId(userData.id);
     setUser({
-      id: user.id,
-      name: user.user_metadata?.name || "",
-      email: user.email || "",
+      id: userData.id,
+      name: userData.name || "Usuario",
+      email: userData.email || "",
       role: userRole === 'hr' ? 'hr' : 'worker',
       shift: 'Programado',
       workGroup: 'Grupo Programado',
@@ -39,7 +38,7 @@ export const useProfileAuth = () => {
       seniority: 0,
     });
 
-    return user;
+    return userData;
   };
 
   return { userId, user, fetchAuthUser };
