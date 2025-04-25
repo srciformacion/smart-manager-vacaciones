@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -16,6 +15,7 @@ import {
   LogOut,
   Menu,
   X,
+  MessageSquare,
 } from "lucide-react";
 
 interface NavItemProps {
@@ -191,6 +191,18 @@ export function SidebarNavigation({ userRole, onLogout, onNavigate }: SidebarNav
                   <LogOut className="h-4 w-4" />
                   <span className="font-medium">Cerrar sesión</span>
                 </Button>
+              </div>
+            </div>
+
+            <div className="py-2">
+              <div className="mt-2 space-y-1">
+                <NavItem
+                  to="/chat"
+                  icon={MessageSquare}
+                  label="Chat"
+                  active={isActive("/chat")}
+                  onClick={closeSidebar}
+                />
               </div>
             </div>
           </nav>

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,6 +29,7 @@ import SmartAssistantPage from "./pages/hr/SmartAssistantPage";
 
 // Páginas adicionales
 import ProfilePage from "./pages/ProfilePage";
+import ChatPage from "./pages/ChatPage";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +88,7 @@ const App = () => (
             
             {/* Ruta protegida de perfil */}
             <Route path="/perfil" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+            <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
