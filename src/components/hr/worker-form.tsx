@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -32,14 +31,16 @@ const formSchema = z.object({
   department: z.string().min(1, { message: "Seleccione un departamento" }),
   shift: z.string().min(1, { message: "Seleccione un turno" }),
   workday: z.string().min(1, { message: "Seleccione un tipo de jornada" }),
-  seniority: z.coerce.number().min(0, { message: "La antigüedad no puede ser negativa" }),
+  seniorityYears: z.coerce.number().min(0, { message: "Los años no pueden ser negativos" }),
+  seniorityMonths: z.coerce.number().min(0, { message: "Los meses no pueden ser negativos" }).max(11, { message: "Los meses deben ser entre 0 y 11" }),
+  seniorityDays: z.coerce.number().min(0, { message: "Los días no pueden ser negativos" }).max(30, { message: "Los días deben ser entre 0 y 30" }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 interface WorkerFormProps {
   worker?: User;
-  onSubmit: (values: FormValues & { workGroup: WorkGroup }) => void;
+  onSubmit: (values: FormValues & { seniority: number, workGroup: WorkGroup }) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
 }
@@ -89,7 +90,9 @@ export function WorkerForm({
       department: worker?.department || "",
       shift: worker?.shift || "",
       workday: worker?.workday || "",
-      seniority: worker?.seniority || 0,
+      seniorityYears: Math.floor(worker?.seniority || 0),
+      seniorityMonths: Math.floor(((worker?.seniority || 0) % 1) * 12),
+      seniorityDays: Math.floor(((((worker?.seniority || 0) % 1) * 12) % 1) * 30),
     },
   });
 
@@ -109,9 +112,11 @@ export function WorkerForm({
   }, [department, shift, workday]);
 
   const handleSubmit = (values: FormValues) => {
+    const totalSeniority = values.seniorityYears + (values.seniorityMonths / 12) + (values.seniorityDays / 365);
     if (calculatedWorkGroup) {
       onSubmit({
         ...values,
+        seniority: totalSeniority,
         workGroup: calculatedWorkGroup,
       });
     }
@@ -259,22 +264,61 @@ export function WorkerForm({
 
             <FormField
               control={form.control}
-              name="seniority"
+              name="seniorityYears"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Antigüedad (años)</FormLabel>
+                  <FormLabel>Antigüedad - Años</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       min="0"
-                      step="1"
+                      placeholder="Años"
                       disabled={isSubmitting}
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Se utilizará para calcular ajustes en los días disponibles
-                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="seniorityMonths"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Antigüedad - Meses</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="11"
+                      placeholder="Meses"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="seniorityDays"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Antigüedad - Días</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="30"
+                      placeholder="Días"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
