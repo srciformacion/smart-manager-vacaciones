@@ -20,7 +20,12 @@ export function MainLayout({ user, children }: { user: User | null, children: Re
     <div className="h-full">
       <div className="hidden md:fixed md:inset-y-0 md:z-50 md:flex md:w-72 md:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-background px-6 pb-4">
-          <div className="h-16 flex items-center">
+          <div className="h-16 flex items-center space-x-2">
+            <img 
+              src="/lovable-uploads/2eb47bcd-d397-4481-8100-7b5cf589bbff.png" 
+              alt="Logo" 
+              className="h-10 w-10"
+            />
             <h2 className="text-lg font-semibold">La Rioja Cuida</h2>
           </div>
 

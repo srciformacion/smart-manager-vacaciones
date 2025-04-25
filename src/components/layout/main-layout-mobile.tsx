@@ -50,7 +50,14 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
             </Sheet>
           )}
           <div className="flex flex-1 items-center justify-between space-x-2">
-            <span className="font-bold">La Rioja Cuida</span>
+            <div className="flex items-center space-x-2">
+              <img 
+                src="/lovable-uploads/2eb47bcd-d397-4481-8100-7b5cf589bbff.png" 
+                alt="Logo" 
+                className="h-8 w-8"
+              />
+              <span className="font-bold">La Rioja Cuida</span>
+            </div>
             <div className="flex items-center gap-2">
               {user && <NotificationBell />}
               <ThemeToggle />
