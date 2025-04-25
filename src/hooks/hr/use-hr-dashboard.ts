@@ -17,7 +17,7 @@ export function useHRDashboard(
   const [selectedWorker, setSelectedWorker] = useState<User | null>(null);
   const { toast } = useToast();
 
-  const smartAnalysis = SmartAssistant.analyzeAll(
+  const smartAnalysis = SmartAssistant.analyze(
     requests,
     workers,
     Object.values(balances)
