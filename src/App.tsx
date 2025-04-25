@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -40,11 +41,13 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<boolean | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // First set up the auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(!!session);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Then check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(!!session);
     });
 
@@ -52,7 +55,11 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (session === null) {
-    return null; // Loading state
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#003366]"></div>
+      </div>
+    ); // Loading state
   }
 
   if (!session) {

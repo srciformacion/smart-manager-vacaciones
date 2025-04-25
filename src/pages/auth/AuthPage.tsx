@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { UserRole } from "@/types";
@@ -15,7 +15,46 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>("worker");
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Check for existing session on component mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        // If there's an active session, redirect based on stored role
+        const storedRole = localStorage.getItem("userRole") as UserRole || "worker";
+        if (storedRole === "hr") {
+          navigate("/rrhh/dashboard");
+        } else {
+          navigate("/dashboard");
+        }
+      }
+      
+      setLoading(false);
+    };
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        const storedRole = localStorage.getItem("userRole") as UserRole || "worker";
+        if (storedRole === "hr") {
+          navigate("/rrhh/dashboard");
+        } else {
+          navigate("/dashboard");
+        }
+      }
+    });
+
+    checkSession();
+
+    // Clean up the subscription when component unmounts
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +68,10 @@ export default function AuthPage() {
 
       if (error) throw error;
 
+      // Store user role in localStorage
       localStorage.setItem("userRole", userRole);
       
+      // Redirect based on role
       if (userRole === "hr") {
         navigate("/rrhh/dashboard");
       } else {
@@ -40,12 +81,21 @@ export default function AuthPage() {
       toast({
         variant: "destructive",
         title: "Error al iniciar sesión",
-        description: error.message,
+        description: error.message || "Ha ocurrido un error durante el inicio de sesión",
       });
+      console.error("Auth error:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#003366]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
