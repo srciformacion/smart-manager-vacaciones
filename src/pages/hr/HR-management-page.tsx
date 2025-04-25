@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { DetailedRequestView } from "@/components/hr/detailed-request-view";
@@ -198,7 +197,6 @@ export default function HRManagementPage() {
               <StaffAvailabilityCalendar 
                 requests={requests}
                 users={exampleWorkers}
-                departments={uniqueDepartments}
               />
             </TabsContent>
           </Tabs>

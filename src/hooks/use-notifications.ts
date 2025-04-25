@@ -30,8 +30,14 @@ export function useNotifications() {
         return;
       }
 
-      setNotifications(data || []);
-      setUnreadCount((data || []).filter(n => !n.read).length);
+      // Cast the data to ensure type safety
+      const typedData = data?.map(item => ({
+        ...item,
+        type: item.type as 'info' | 'warning' | 'error' | 'success'
+      })) || [];
+      
+      setNotifications(typedData);
+      setUnreadCount(typedData.filter(n => !n.read).length);
     };
 
     fetchNotifications();
@@ -47,7 +53,11 @@ export function useNotifications() {
           table: 'notifications'
         },
         (payload) => {
-          const newNotification = payload.new as Notification;
+          const newNotification = {
+            ...payload.new as Omit<Notification, 'type'> & { type: string },
+            type: payload.new.type as 'info' | 'warning' | 'error' | 'success'
+          };
+          
           setNotifications(prev => [newNotification, ...prev]);
           setUnreadCount(prev => prev + 1);
           
