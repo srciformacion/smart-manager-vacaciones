@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 type AuthMode = "login" | "signup" | "passwordReset" | "passwordResetSent";
 
@@ -17,6 +17,7 @@ export default function AuthPage() {
   const [surname, setSurname] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const [userRole, setUserRole] = useState<"worker" | "hr">("worker");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,6 +33,7 @@ export default function AuthPage() {
             data: {
               name,
               surname,
+              role: userRole,
             },
           },
         });
@@ -42,12 +44,19 @@ export default function AuthPage() {
         });
         setAuthMode("login");
       } else if (authMode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        navigate("/dashboard");
+        
+        localStorage.setItem('userRole', userRole);
+        
+        if (userRole === "hr") {
+          navigate("/rrhh/dashboard");
+        } else {
+          navigate("/dashboard");
+        }
       } else if (authMode === "passwordReset") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/auth?mode=updatePassword`,
@@ -70,8 +79,30 @@ export default function AuthPage() {
     }
   };
 
+  const renderRoleSelector = () => (
+    <div className="space-y-2 mb-4">
+      <Label>Tipo de usuario</Label>
+      <RadioGroup 
+        value={userRole} 
+        onValueChange={(value) => setUserRole(value as "worker" | "hr")}
+        className="flex space-x-4"
+      >
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="worker" id="worker" />
+          <Label htmlFor="worker">Trabajador</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="hr" id="hr" />
+          <Label htmlFor="hr">RRHH</Label>
+        </div>
+      </RadioGroup>
+    </div>
+  );
+
   const renderLoginForm = () => (
     <>
+      {renderRoleSelector()}
+      
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -121,6 +152,8 @@ export default function AuthPage() {
 
   const renderSignUpForm = () => (
     <>
+      {renderRoleSelector()}
+      
       <div className="space-y-2">
         <Label htmlFor="signup-email">Email</Label>
         <Input

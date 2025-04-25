@@ -6,10 +6,13 @@ import { UserRole } from "@/types";
 import NocoDBAPI from "@/utils/nocodbApi";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const [userRole, setUserRole] = useState<UserRole>("worker");
   const navigate = useNavigate();
 
   const handleSubmit = async (values: { email: string; password: string }) => {
@@ -23,16 +26,14 @@ export default function LoginPage() {
       // Simulación para demostración
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simulamos un usuario de ejemplo según el email
-      if (values.email.includes("hr") || values.email.includes("rrhh")) {
-        // Usuario de RRHH
-        localStorage.setItem("userRole", "hr");
-        localStorage.setItem("userEmail", values.email);
+      // Set the selected role
+      localStorage.setItem("userRole", userRole);
+      localStorage.setItem("userEmail", values.email);
+      
+      // Navigate based on selected role
+      if (userRole === "hr") {
         navigate("/rrhh/dashboard");
       } else {
-        // Usuario trabajador
-        localStorage.setItem("userRole", "worker");
-        localStorage.setItem("userEmail", values.email);
         navigate("/dashboard");
       }
     } catch (err) {
@@ -56,6 +57,24 @@ export default function LoginPage() {
           <p className="mt-2 text-muted-foreground">
             Sistema inteligente de gestión de vacaciones y permisos
           </p>
+        </div>
+        
+        <div className="mb-6">
+          <Label className="text-center block mb-2">Seleccione su rol</Label>
+          <RadioGroup 
+            value={userRole} 
+            onValueChange={(value) => setUserRole(value as UserRole)}
+            className="flex justify-center space-x-8"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="worker" id="worker" />
+              <Label htmlFor="worker">Trabajador</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="hr" id="hr" />
+              <Label htmlFor="hr">RRHH</Label>
+            </div>
+          </RadioGroup>
         </div>
         
         <LoginForm

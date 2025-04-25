@@ -19,16 +19,19 @@ export const useProfileAuth = () => {
         title: "Error de autenticación", 
         description: "Por favor inicia sesión para acceder a tu perfil." 
       });
-      navigate("/login");
+      navigate("/auth");
       return null;
     }
 
+    // Get role from user metadata or localStorage (fallback)
+    const userRole = user.user_metadata?.role || localStorage.getItem('userRole') || 'worker';
+    
     setUserId(user.id);
     setUser({
       id: user.id,
       name: user.user_metadata?.name || "",
       email: user.email || "",
-      role: 'worker',
+      role: userRole === 'hr' ? 'hr' : 'worker',
       shift: 'Programado',
       workGroup: 'Grupo Programado',
       workday: 'Completa',
