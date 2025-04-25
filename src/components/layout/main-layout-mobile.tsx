@@ -6,10 +6,11 @@ import { User, UserRole } from "@/types";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
 
 interface MainLayoutMobileProps {
   children: ReactNode;
@@ -23,8 +24,29 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
   const navigate = useNavigate();
   
   const handleLogout = () => {
-    console.log("Logout");
-    window.location.href = "/login";
+    try {
+      localStorage.removeItem("user");
+      localStorage.removeItem("userRole");
+      
+      // Dispatch storage event to notify other tabs
+      window.dispatchEvent(new Event("storage"));
+      
+      // Notify user
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión correctamente",
+      });
+      
+      // Navigate to auth page (using window.location to ensure full page reload)
+      window.location.href = "/auth";
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      toast({
+        variant: "destructive",
+        title: "Error al cerrar sesión",
+        description: "Ocurrió un error inesperado",
+      });
+    }
   };
 
   if (!isMobile) {
@@ -63,6 +85,17 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
             <div className="flex items-center gap-2">
               {user && <NotificationBell />}
               <ThemeToggle />
+              {user && (
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={handleLogout}
+                  className="text-muted-foreground hover:text-foreground"
+                  aria-label="Cerrar sesión"
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              )}
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 
-import { Menu } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -9,10 +9,37 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { MainLayoutMobile } from "./main-layout-mobile";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
 
 export function MainLayout({ user, children }: { user: User | null, children: React.ReactNode }) {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      localStorage.removeItem("user");
+      localStorage.removeItem("userRole");
+      
+      // Dispatch storage event to notify other tabs
+      window.dispatchEvent(new Event("storage"));
+      
+      // Notify user
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión correctamente",
+      });
+      
+      // Navigate to auth page (using window.location to ensure full page reload)
+      window.location.href = "/auth";
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      toast({
+        variant: "destructive",
+        title: "Error al cerrar sesión",
+        description: "Ocurrió un error inesperado",
+      });
+    }
+  };
 
   if (isMobile) {
     return <MainLayoutMobile user={user}>{children}</MainLayoutMobile>;
@@ -31,7 +58,7 @@ export function MainLayout({ user, children }: { user: User | null, children: Re
             </h2>
           </div>
 
-          <SidebarNavigation role={user?.role} />
+          <SidebarNavigation role={user?.role} onLogout={handleLogout} />
         </div>
       </div>
 
@@ -72,6 +99,15 @@ export function MainLayout({ user, children }: { user: User | null, children: Re
                   </p>
                 </div>
               </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleLogout}
+                className="text-muted-foreground hover:text-foreground hover:bg-accent"
+                aria-label="Cerrar sesión"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
             </div>
           </div>
         </div>
