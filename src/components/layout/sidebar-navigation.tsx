@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { UserRole } from "@/types";
@@ -13,6 +14,7 @@ import {
   Settings,
   User,
   Brain,
+  Bell,
 } from "lucide-react";
 
 interface NavLink {
@@ -139,6 +141,12 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
       role: "hr",
     },
     {
+      href: "/rrhh/notificaciones",
+      icon: <Bell className="h-5 w-5" />,
+      label: "Envío de notificaciones",
+      role: "hr",
+    },
+    {
       href: "/chat",
       icon: <MessageSquare className="h-5 w-5" />,
       label: "Chat",
@@ -150,28 +158,14 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
     },
   ];
   
-  const commonLinks: NavLink[] = [
-    {
-      href: "/chat",
-      icon: <MessageSquare className="h-5 w-5" />,
-      label: "Chat",
-    },
-    {
-      href: "/perfil",
-      icon: <User className="h-5 w-5" />,
-      label: "Perfil",
-    },
+  const links = [
+    ...(role === "hr" ? hrLinks : workerLinks),
     {
       href: "#",
       icon: <LogOut className="h-5 w-5" />,
       label: "Cerrar sesión",
       onClick: handleLogout,
     },
-  ];
-
-  const links = [
-    ...(role === "hr" ? hrLinks : workerLinks),
-    ...commonLinks,
   ];
 
   return (

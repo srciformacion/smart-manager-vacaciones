@@ -10,10 +10,12 @@ import { sendEmailNotification } from "@/utils/emailService";
 import { NotificationType, User, Request } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 
+// Tipos de notificaciones disponibles para el tester
+type TestNotificationType = "requestCreated" | "requestApproved" | "requestRejected" | "requestMoreInfo";
+
 export function NotificationTester() {
   const { toast } = useToast();
-  // Only use the notification types that are available in emailService.NotificationType
-  const [notificationType, setNotificationType] = useState<"requestCreated" | "requestApproved" | "requestRejected" | "requestMoreInfo">("requestCreated");
+  const [notificationType, setNotificationType] = useState<TestNotificationType>("requestCreated");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [sendWhatsApp, setSendWhatsApp] = useState(false);
@@ -53,7 +55,7 @@ export function NotificationTester() {
     setIsSending(true);
     try {
       const success = await sendEmailNotification(
-        notificationType,
+        notificationType as any,
         testRequest,
         testUser,
         email || undefined,
@@ -97,7 +99,7 @@ export function NotificationTester() {
           <Label htmlFor="notification-type">Tipo de notificación</Label>
           <Select 
             value={notificationType} 
-            onValueChange={(value: "requestCreated" | "requestApproved" | "requestRejected" | "requestMoreInfo") => setNotificationType(value)}
+            onValueChange={(value: TestNotificationType) => setNotificationType(value)}
           >
             <SelectTrigger id="notification-type">
               <SelectValue placeholder="Seleccionar tipo" />

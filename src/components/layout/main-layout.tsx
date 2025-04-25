@@ -24,7 +24,7 @@ export function MainLayout({ user, children }: { user: User | null, children: Re
             <h2 className="text-lg font-semibold">La Rioja Cuida</h2>
           </div>
 
-          <SidebarNavigation />
+          <SidebarNavigation role={user?.role} />
         </div>
       </div>
 
