@@ -1,3 +1,4 @@
+
 # Vacaciones y Permisos
 
 ## Project info
@@ -59,6 +60,34 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+
+## Excel Import/Export de Calendarios
+
+### Formato de la plantilla Excel
+
+La plantilla Excel para importar calendarios debe contener al menos las siguientes columnas:
+
+- **ID Trabajador** o **Nombre del Trabajador**: Identificador único del trabajador.
+- **Fecha**: En formato DD/MM/YYYY.
+- **Turno**: Tipo de turno (Mañana, Tarde, Noche, 24h, Libre, Guardia, etc.).
+- **Hora Inicio** (opcional): Hora de inicio del turno.
+- **Hora Fin** (opcional): Hora de finalización del turno.
+- **Horas** (opcional): Número de horas del turno.
+- **Notas** (opcional): Comentarios o información adicional.
+
+### Cómo usar el módulo de importación
+
+1. En la sección de "Gestión de calendarios", selecciona la pestaña "Importar/Exportar Excel".
+2. Haz clic en "Seleccionar archivo Excel" y elige tu archivo .xlsx o .xls.
+3. Revisa los datos en la vista previa y edita cualquier dato incorrecto si es necesario.
+4. Utiliza los filtros de trabajador y mes para visualizar subconjuntos de datos.
+5. Haz clic en "Guardar Cambios" para confirmar la importación.
+
+### Cómo usar el módulo de exportación
+
+1. En la sección de "Importar/Exportar Excel", utiliza los filtros para seleccionar los datos que deseas exportar.
+2. Haz clic en "Exportar a Excel".
+3. El archivo se descargará automáticamente con el nombre "calendario_turnos_FECHA.xlsx".
 
 ## How can I deploy this project?
 
