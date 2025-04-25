@@ -97,7 +97,7 @@ export function NotificationTester() {
           <Label htmlFor="notification-type">Tipo de notificación</Label>
           <Select 
             value={notificationType} 
-            onValueChange={(value) => setNotificationType(value as NotificationType)}
+            onValueChange={(value: "requestCreated" | "requestApproved" | "requestRejected" | "requestMoreInfo") => setNotificationType(value)}
           >
             <SelectTrigger id="notification-type">
               <SelectValue placeholder="Seleccionar tipo" />

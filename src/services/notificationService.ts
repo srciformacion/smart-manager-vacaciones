@@ -1,5 +1,5 @@
 
-import { NotificationPayload, NotificationType } from "@/types";
+import { NotificationPayload, NotificationType, NotificationChannel } from "@/types";
 import { toast } from "@/hooks/use-toast";
 
 /**
@@ -119,7 +119,7 @@ export class NotificationService {
   /**
    * Obtiene el canal preferido de notificación de un usuario
    */
-  static async getPreferredChannel(userId: string): Promise<'web' | 'email' | 'whatsapp'> {
+  static async getPreferredChannel(userId: string): Promise<NotificationChannel> {
     // En un entorno real, esto sería una consulta a la base de datos
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');

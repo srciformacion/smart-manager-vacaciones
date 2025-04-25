@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
-import { NotificationPayload, NotificationType, User } from "@/types";
+import { NotificationPayload, NotificationType, User, NotificationChannel } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -205,7 +205,7 @@ export default function SendNotificationPage() {
               <Label>Canal de envío</Label>
               <RadioGroup 
                 value={form.channel} 
-                onValueChange={(value) => handleFormChange("channel", value as 'web' | 'email' | 'whatsapp' | 'preferred')}
+                onValueChange={(value) => handleFormChange("channel", value as NotificationChannel)}
                 className="flex gap-8"
               >
                 <div className="flex items-center space-x-2">
