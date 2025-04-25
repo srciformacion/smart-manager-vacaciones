@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 import { SidebarNavigation } from "./sidebar-navigation";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -6,6 +5,7 @@ import { User, UserRole } from "@/types";
 import { cn } from "@/lib/utils";
 import { MainLayoutMobile } from "./main-layout-mobile";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -42,7 +42,8 @@ export function MainLayout({ children, user, className }: MainLayoutProps) {
           className
         )}
       >
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end items-center gap-4 mb-4">
+          {user && <NotificationBell />}
           <ThemeToggle />
         </div>
         <div className="container mx-auto max-w-7xl">

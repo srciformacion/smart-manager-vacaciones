@@ -1,4 +1,3 @@
-
 import { ReactNode, useState } from "react";
 import { SidebarNavigation } from "./sidebar-navigation";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -8,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 interface MainLayoutMobileProps {
   children: ReactNode;
@@ -30,7 +30,6 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Header móvil */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
           {user && (
@@ -51,12 +50,14 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
           )}
           <div className="flex flex-1 items-center justify-between space-x-2">
             <span className="font-bold">La Rioja Cuida</span>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              {user && <NotificationBell />}
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Contenido principal */}
       <main className={cn(
         "flex-1 container py-4",
         "max-w-full overflow-x-hidden",
