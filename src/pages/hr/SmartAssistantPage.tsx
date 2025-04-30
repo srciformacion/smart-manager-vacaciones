@@ -35,8 +35,14 @@ export default function SmartAssistantPage() {
     workers,
     balances,
     handleRefresh,
-    exportData
+    exportData,
+    initializeWithExamples
   } = useSmartAssistant();
+  
+  // Inicializar con datos de ejemplo al cargar el componente
+  useState(() => {
+    initializeWithExamples(exampleRequests, exampleWorkers, exampleBalances);
+  });
   
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);

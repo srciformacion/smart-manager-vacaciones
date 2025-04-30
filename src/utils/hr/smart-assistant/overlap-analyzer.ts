@@ -31,9 +31,17 @@ export class OverlapAnalyzer {
         if (currentEnd >= nextStart) {
           const user = users.find(u => u.id === userId);
           const userName = user ? user.name : 'Usuario';
+          const department = user ? user.department : 'Sin departamento';
           
           alerts.push({
             userId,
+            userName,
+            department,
+            requestId: current.id,
+            startDate: new Date(current.startDate),
+            endDate: new Date(current.endDate),
+            overlapType: `${current.type} - ${next.type}`,
+            description: `Solapamiento entre solicitudes ${current.id} y ${next.id}`,
             message: `Solapamiento detectado para ${userName}: La solicitud ${current.id} (${current.type}) 
                      se solapa con la solicitud ${next.id} (${next.type}).`
           });

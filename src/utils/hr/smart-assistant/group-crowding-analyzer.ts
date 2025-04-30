@@ -53,12 +53,48 @@ export class GroupCrowdingAnalyzer {
           const date = new Date(dateStr);
           let startDate = new Date(date);
           let endDate = new Date(date);
+
+          // Determinar el departamento (tomando el más común en el grupo)
+          const departmentCounts: Record<string, number> = {};
+          groupUsers.forEach(user => {
+            if (!departmentCounts[user.department]) {
+              departmentCounts[user.department] = 0;
+            }
+            departmentCounts[user.department]++;
+          });
+
+          let department = "Varios";
+          let maxCount = 0;
+          Object.entries(departmentCounts).forEach(([dept, count]) => {
+            if (count > maxCount) {
+              department = dept;
+              maxCount = count;
+            }
+          });
+
+          const absenceCount = count;
+          const totalWorkers = groupUsers.length;
+          const absencePercentage = (absenceCount / totalWorkers) * 100;
+
+          // Determinar nivel de riesgo
+          let riskLevel = "bajo";
+          if (absencePercentage > 75) {
+            riskLevel = "alto";
+          } else if (absencePercentage > 50) {
+            riskLevel = "medio";
+          }
           
           alerts.push({
             workGroup,
+            department,
             startDate,
             endDate,
+            date,
             count,
+            absenceCount,
+            totalWorkers,
+            absencePercentage,
+            riskLevel,
             message: `Demasiados trabajadores (${count} de ${groupUsers.length}) del grupo ${workGroup} 
                      han solicitado vacaciones entre ${startDate.toLocaleDateString()} y ${endDate.toLocaleDateString()}.`
           });
