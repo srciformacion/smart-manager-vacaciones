@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileDown, Search, Send, Brain, Calendar, Clock, CheckCircle, AlertCircle, HelpCircle } from "lucide-react";
 import { AIService, AIAnalysisResult, HoursCalculationResult, AIQueryResponse } from "@/utils/ai/AIService";
 import { toast } from "@/hooks/use-toast";
-import { VacationAnalysisTable } from "@/components/hr/ai-assistant/vacation-analysis-table";
+import { VacationAnalysisTable } from "@/components/hr/ai-assistant/vacation-analysis";
 import { HoursCalculationTable } from "@/components/hr/ai-assistant/hours-calculation-table";
 import { AISimulationPanel } from "@/components/hr/ai-assistant/ai-simulation-panel";
 import { useRequests } from "@/hooks/use-requests";
