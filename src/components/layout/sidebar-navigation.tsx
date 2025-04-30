@@ -133,7 +133,7 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
     },
     {
       href: "/rrhh/asistente",
-      icon: <MessageSquare className="h-5 w-5" />,
+      icon: <Brain className="h-5 w-5" />,
       label: "Asistente inteligente",
     },
     {

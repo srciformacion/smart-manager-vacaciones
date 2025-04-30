@@ -92,6 +92,7 @@ const App = () => (
             <Route path="/rrhh/dashboard" element={<PrivateRoute><HRDashboardPage /></PrivateRoute>} />
             <Route path="/rrhh/trabajadores" element={<PrivateRoute><WorkersManagementPage /></PrivateRoute>} />
             <Route path="/rrhh/solicitudes" element={<PrivateRoute><RequestsManagementPage /></PrivateRoute>} />
+            <Route path="/rrhh/asistente" element={<PrivateRoute><SmartAssistantPage /></PrivateRoute>} />
             <Route path="/rrhh/gestion" element={<PrivateRoute><HRManagementPage /></PrivateRoute>} />
             <Route path="/rrhh/calendarios" element={<PrivateRoute><CalendarManagementPage /></PrivateRoute>} />
             <Route path="/rrhh/ai-assistant" element={<PrivateRoute><AIAssistantPage /></PrivateRoute>} />
