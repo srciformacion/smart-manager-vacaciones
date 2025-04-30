@@ -4,6 +4,12 @@ import { SmartAssistantPanel } from "@/components/hr/smart-assistant-panel";
 import { Button } from "@/components/ui/button";
 import { RefreshCcw } from "lucide-react";
 import { useSmartAssistant } from "@/hooks/hr/use-smart-assistant";
+import { exampleRequests } from "@/data/example-requests";
+import { exampleWorkers } from "@/data/example-users";
+import { exampleBalances } from "@/data/example-balances";
+import { SmartAssistant } from "@/utils/hr/smart-assistant";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function SmartAssistantPage() {
   const {
@@ -14,6 +20,13 @@ export default function SmartAssistantPage() {
     balances,
     handleRefresh
   } = useSmartAssistant();
+
+  // Asegúrese de tener datos de análisis
+  const smartAnalysis = SmartAssistant.analyze(
+    exampleRequests, 
+    exampleWorkers, 
+    Object.values(exampleBalances)
+  );
 
   return (
     <MainLayout user={user}>
@@ -32,12 +45,25 @@ export default function SmartAssistantPage() {
           </Button>
         </div>
 
-        <SmartAssistantPanel
-          overlaps={[]}
-          groupCrowding={[]}
-          permissionAccumulation={[]}
-          vacationLimit={[]}
-        />
+        {smartAnalysis.overlaps.length === 0 && 
+         smartAnalysis.groupCrowding.length === 0 && 
+         smartAnalysis.permissionAccumulation.length === 0 && 
+         smartAnalysis.vacationLimit.length === 0 ? (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>No hay alertas actualmente</AlertTitle>
+            <AlertDescription>
+              El sistema no ha detectado ninguna situación que requiera atención en este momento.
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <SmartAssistantPanel
+            overlaps={smartAnalysis.overlaps}
+            groupCrowding={smartAnalysis.groupCrowding}
+            permissionAccumulation={smartAnalysis.permissionAccumulation}
+            vacationLimit={smartAnalysis.vacationLimit}
+          />
+        )}
       </div>
     </MainLayout>
   );

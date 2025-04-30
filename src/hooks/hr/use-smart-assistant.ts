@@ -2,18 +2,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
-import { User } from "@/types";
 import { toast } from "@/components/ui/use-toast";
+import { exampleRequests } from "@/data/example-requests";
+import { exampleWorkers } from "@/data/example-users";
+import { exampleBalances } from "@/data/example-balances";
+import { Request, User, Balance } from "@/types";
 
 export function useSmartAssistant() {
   const { user, fetchAuthUser } = useProfileAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-
-  // These would be replaced with real data fetching in a production environment
-  const requests = [];
-  const workers = [];
-  const balances = {};
+  const [requests, setRequests] = useState<Request[]>(exampleRequests);
+  const [workers, setWorkers] = useState<User[]>(exampleWorkers);
+  const [balances, setBalances] = useState<Record<string, Balance>>(exampleBalances);
 
   const handleRefresh = async () => {
     setIsLoading(true);
@@ -32,6 +33,15 @@ export function useSmartAssistant() {
       
       // Simulate data refresh
       await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // En un entorno real, aquí se cargarían los datos actuales
+      // Por ahora, simplemente actualizamos el estado con los mismos datos de ejemplo
+      setRequests([...exampleRequests]);
+      
+      toast({
+        title: "Datos actualizados",
+        description: "Los datos del asistente inteligente han sido actualizados"
+      });
       
     } catch (error) {
       console.error("Error refreshing data:", error);
