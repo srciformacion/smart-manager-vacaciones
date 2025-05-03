@@ -1,10 +1,12 @@
 
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Toaster } from "@/components/ui/sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AuthProvider } from "@/hooks/use-auth.tsx";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { UpdateNotification } from "@/components/pwa/update-notification";
+import { supabase } from '@/integrations/supabase/client';
 
 // Páginas principales
 const Index = lazy(() => import('@/pages/Index'));
@@ -46,10 +48,61 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Componente para la sincronización de datos en segundo plano
+const BackgroundSync = () => {
+  useEffect(() => {
+    // Función para sincronizar datos pendientes cuando se recupera la conexión
+    const syncPendingData = async () => {
+      const pendingData = localStorage.getItem('pendingRequests');
+      
+      if (pendingData) {
+        try {
+          const requests = JSON.parse(pendingData);
+          console.log('Intentando sincronizar datos pendientes:', requests);
+          
+          // Procesar cada solicitud pendiente
+          for (const request of requests) {
+            const { error } = await supabase
+              .from('requests')
+              .insert(request);
+              
+            if (!error) {
+              console.log('Solicitud sincronizada exitosamente:', request);
+            } else {
+              console.error('Error al sincronizar solicitud:', error);
+            }
+          }
+          
+          // Limpiar datos pendientes después de sincronizar
+          localStorage.removeItem('pendingRequests');
+        } catch (error) {
+          console.error('Error al sincronizar datos pendientes:', error);
+        }
+      }
+    };
+    
+    // Comprobar estado de la conexión y sincronizar cuando vuelva online
+    window.addEventListener('online', syncPendingData);
+    
+    // Si estamos online al cargar, intentar sincronizar
+    if (navigator.onLine) {
+      syncPendingData();
+    }
+    
+    return () => {
+      window.removeEventListener('online', syncPendingData);
+    };
+  }, []);
+  
+  return null; // Este componente no renderiza nada
+};
+
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <BackgroundSync />
+        <UpdateNotification />
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
             {/* Rutas públicas */}

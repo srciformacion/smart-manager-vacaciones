@@ -1,72 +1,85 @@
 
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
-import { RequestDetails } from "@/components/requests/request-details";
-import { Request, User } from "@/types";
-import { useRequests } from "@/hooks/use-requests";
-import { exampleUser, exampleWorkers } from "@/data/example-users";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { exampleRequests } from "@/data/example-requests";
-import { RequestsManagementHeader } from "@/components/hr/requests-management/header";
-import { RequestsManagementTabs } from "@/components/hr/requests-management/tabs-content";
+import { exampleUsers } from "@/data/example-users";
+import { RequestStatus, Request, User } from "@/types";
+import { useRequestManagement } from "@/hooks/hr/use-request-management";
+import { DetailedRequestView } from "@/components/hr/detailed-request-view";
+import { Header } from "@/components/hr/requests-management/header";
+import { TabsContent } from "@/components/hr/requests-management/tabs-content";
+import { RealtimeRequests } from "@/components/hr/requests-management/realtime-requests";
+import { Tabs, TabsContent as RadixTabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function RequestsManagementPage() {
-  const [user] = useState<User | null>(exampleUser);
-  const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
-  const [selectedWorker, setSelectedWorker] = useState<User | null>(null);
-  const [activeTab, setActiveTab] = useState("solicitudes");
-  
-  const { requests, handleStatusChange } = useRequests(exampleRequests, exampleWorkers);
+  const [activeTab, setActiveTab] = useState("normal");
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
-  const handleViewRequestDetails = (request: Request) => {
-    const worker = exampleWorkers.find(w => w.id === request.userId) || null;
-    setSelectedWorker(worker);
-    setSelectedRequest(request);
-  };
+  const {
+    selectedRequest,
+    selectedWorker,
+    handleViewRequestDetails,
+    handleDetailStatusChange,
+    handleDownloadAttachment,
+    closeRequestDetails,
+  } = useRequestManagement(exampleRequests, exampleUsers);
 
-  const handleDetailStatusChange = (status: Request["status"]) => {
-    if (selectedRequest) {
-      handleStatusChange(selectedRequest, status);
-    }
-  };
-
-  const handleDownloadAttachment = () => {
-    if (selectedRequest?.attachmentUrl) {
-      console.log("Descargando adjunto:", selectedRequest.attachmentUrl);
-      alert("Descargando archivo justificante...");
-    }
-  };
+  // En un entorno de producción, estas serían solicitudes reales de la base de datos
+  const requests: Request[] = exampleRequests;
+  const workers: User[] = exampleUsers;
 
   return (
-    <MainLayout user={user}>
-      {selectedRequest ? (
-        <RequestDetails
+    <MainLayout>
+      <Header 
+        viewMode={viewMode} 
+        setViewMode={setViewMode} 
+      />
+
+      <div className="p-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Gestión de Solicitudes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Tabs para elegir entre vista normal o tiempo real */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="normal">Vista Normal</TabsTrigger>
+                <TabsTrigger value="realtime">Tiempo Real</TabsTrigger>
+              </TabsList>
+              
+              <RadixTabsContent value="normal">
+                <TabsContent 
+                  requests={requests}
+                  workers={workers}
+                  onViewDetails={handleViewRequestDetails}
+                  onStatusChange={handleDetailStatusChange}
+                  onDownloadAttachment={handleDownloadAttachment}
+                />
+              </RadixTabsContent>
+              
+              <RadixTabsContent value="realtime">
+                <RealtimeRequests 
+                  users={workers}
+                  onViewDetails={handleViewRequestDetails}
+                  onStatusChange={handleDetailStatusChange}
+                  onDownloadAttachment={handleDownloadAttachment}
+                />
+              </RadixTabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+
+      {selectedRequest && selectedWorker && (
+        <DetailedRequestView
           request={selectedRequest}
-          user={selectedWorker}
-          onClose={() => {
-            setSelectedRequest(null);
-            setSelectedWorker(null);
-          }}
+          worker={selectedWorker}
+          onClose={closeRequestDetails}
           onStatusChange={handleDetailStatusChange}
           onDownloadAttachment={handleDownloadAttachment}
-          isHRView={true}
         />
-      ) : (
-        <div className="space-y-8">
-          <RequestsManagementHeader 
-            title="Gestión de solicitudes"
-            description="Administre todas las solicitudes de los trabajadores"
-          />
-
-          <RequestsManagementTabs
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            requests={requests}
-            workers={exampleWorkers}
-            onViewDetails={handleViewRequestDetails}
-            onStatusChange={handleStatusChange}
-            onDownloadAttachment={handleViewRequestDetails}
-          />
-        </div>
       )}
     </MainLayout>
   );
