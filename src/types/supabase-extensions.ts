@@ -16,4 +16,4 @@ export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"];
 export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 // Export convenience types from the generated file to use throughout the application
-export { Database } from "@/integrations/supabase/types";
+export type { Database } from "@/integrations/supabase/types";
