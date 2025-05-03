@@ -23,6 +23,6 @@ export interface ProfileFormProps {
   onSave: () => void;
   onCancel: () => void;
   onEdit: () => void;
-  onChange: (e: React.ChangeEvent<HTMLInputElement> | Date) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement> | Date | { target: { name: string; value: any } }) => void;
   onPhotoChange?: (photoUrl: string) => void;
 }

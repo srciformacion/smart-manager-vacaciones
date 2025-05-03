@@ -28,27 +28,25 @@ export const ProfileForm = ({
   };
 
   const handleNotificationChannelChange = (channels: string[]) => {
-    // Create a properly typed event by casting to unknown first
-    const event = {
+    // Usar un enfoque diferente para la creación del evento simulado
+    // En lugar de intentar simular un evento React completo, proporcionamos
+    // un objeto parcial con la misma estructura que necesita la función onChange
+    onChange({
       target: {
         name: "notification_channels",
         value: channels,
-      },
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
-    
-    onChange(event);
+      }
+    } as unknown as React.ChangeEvent<HTMLInputElement>);
   };
 
   const handleNotificationConsent = (value: boolean) => {
-    // Create a properly typed event by casting to unknown first
-    const event = {
+    // Usar el mismo enfoque que con los canales de notificación
+    onChange({
       target: {
         name: "notification_consent",
         value,
-      },
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
-    
-    onChange(event);
+      }
+    } as unknown as React.ChangeEvent<HTMLInputElement>);
   };
 
   return (

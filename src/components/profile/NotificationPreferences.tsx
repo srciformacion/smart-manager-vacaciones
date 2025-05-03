@@ -3,6 +3,7 @@ import React from 'react';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Mail, MessageSquare, Bell } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface NotificationPreferencesProps {
   selectedChannels: string[];
@@ -34,55 +35,76 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5 rounded-lg border p-5">
       <div className="flex items-center justify-between">
-        <Label className="text-base">Canales de notificación</Label>
+        <Label className="text-base font-medium">Canales de notificación</Label>
       </div>
       
-      <div className="space-y-2">
-        <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
-          <div className="flex items-center space-x-2 rounded-md border p-2">
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="flex items-center space-x-2 rounded-md border p-3 transition-colors hover:bg-muted/50">
             <Checkbox 
               id="web" 
               checked={selectedChannels.includes('web')}
               onCheckedChange={(checked) => handleChannelChange('web', checked === true)}
               disabled={disabled}
+              className="h-5 w-5"
             />
-            <Label htmlFor="web" className="flex items-center gap-1 cursor-pointer">
-              Web <Bell className="h-4 w-4 text-purple-600" />
-            </Label>
+            <div className="flex-1">
+              <Label htmlFor="web" className="flex items-center gap-2 cursor-pointer">
+                <Bell className="h-5 w-5 text-purple-600" />
+                <span className="font-medium">Web</span>
+              </Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Notificaciones dentro de la aplicación
+              </p>
+            </div>
           </div>
           
-          <div className="flex items-center space-x-2 rounded-md border p-2">
+          <div className="flex items-center space-x-2 rounded-md border p-3 transition-colors hover:bg-muted/50">
             <Checkbox 
               id="email" 
               checked={selectedChannels.includes('email')}
               onCheckedChange={(checked) => handleChannelChange('email', checked === true)}
               disabled={disabled}
+              className="h-5 w-5"
             />
-            <Label htmlFor="email" className="flex items-center gap-1 cursor-pointer">
-              Email <Mail className="h-4 w-4 text-blue-600" />
-            </Label>
+            <div className="flex-1">
+              <Label htmlFor="email" className="flex items-center gap-2 cursor-pointer">
+                <Mail className="h-5 w-5 text-blue-600" />
+                <span className="font-medium">Email</span>
+              </Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Notificaciones por correo electrónico
+              </p>
+            </div>
           </div>
           
-          <div className="flex items-center space-x-2 rounded-md border p-2">
+          <div className="flex items-center space-x-2 rounded-md border p-3 transition-colors hover:bg-muted/50">
             <Checkbox 
               id="whatsapp" 
               checked={selectedChannels.includes('whatsapp')}
               onCheckedChange={(checked) => handleChannelChange('whatsapp', checked === true)}
               disabled={disabled}
+              className="h-5 w-5"
             />
-            <Label htmlFor="whatsapp" className="flex items-center gap-1 cursor-pointer">
-              WhatsApp <MessageSquare className="h-4 w-4 text-green-600" />
-            </Label>
+            <div className="flex-1">
+              <Label htmlFor="whatsapp" className="flex items-center gap-2 cursor-pointer">
+                <MessageSquare className="h-5 w-5 text-green-600" />
+                <span className="font-medium">WhatsApp</span>
+              </Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Mensajes directos por WhatsApp
+              </p>
+            </div>
           </div>
         </div>
         
-        <div className="mt-4 flex items-start space-x-2">
-          <Checkbox 
-            id="consent" 
+        <div className="mt-4 flex items-start space-x-4 rounded-md border p-4">
+          <Switch
+            id="consent"
             checked={hasConsent}
-            onCheckedChange={(checked) => onConsentChange(checked === true)}
+            onCheckedChange={onConsentChange}
             disabled={disabled || selectedChannels.length === 0}
           />
           <div>

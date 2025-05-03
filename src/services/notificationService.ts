@@ -1,4 +1,3 @@
-
 import { NotificationPayload, NotificationType, NotificationChannel } from "@/types";
 import { toast } from "@/hooks/use-toast";
 
@@ -213,6 +212,9 @@ export class NotificationService {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       const preferredChannel = user.preferredNotificationChannel || 'web';
       // Asegurar que el valor devuelto es de tipo NotificationChannel
+      if (preferredChannel !== 'web' && preferredChannel !== 'email' && preferredChannel !== 'whatsapp') {
+        return 'web'; // Devolvemos un valor por defecto si no es un tipo válido
+      }
       return preferredChannel as NotificationChannel;
     } catch (error) {
       console.error('Error al obtener canal de notificación preferido:', error);
