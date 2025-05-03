@@ -10,7 +10,7 @@ import { Menu, LogOut } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useNavigate } from "react-router-dom";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { InstallPWAButton } from "@/components/pwa/install-pwa-button";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -29,16 +29,10 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
   const handleLogout = async () => {
     try {
       await signOut();
-      
-      // Force navigation to auth page and reload to ensure clean state
-      window.location.href = "/auth";
+      // No necesitamos redirigir aquí, ya que signOut() ya lo hace
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
-      toast({
-        variant: "destructive",
-        title: "Error al cerrar sesión",
-        description: "Ocurrió un error inesperado",
-      });
+      toast.error("Error al cerrar sesión");
     }
   };
 
