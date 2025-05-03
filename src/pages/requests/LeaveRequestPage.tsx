@@ -64,8 +64,13 @@ export default function LeaveRequestPage() {
           
         if (uploadError) throw uploadError;
         
-        // Get public URL
-        attachmentUrl = `${supabase.supabaseUrl}/storage/v1/object/public/attachments/${filename}`;
+        // Get public URL - Using the getPublicUrl method instead of directly accessing supabaseUrl
+        const { data } = supabase
+          .storage
+          .from('attachments')
+          .getPublicUrl(filename);
+          
+        attachmentUrl = data.publicUrl;
       }
       
       // Create the request in the database
