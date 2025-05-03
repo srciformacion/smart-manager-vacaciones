@@ -4,6 +4,7 @@ import { useProfileAuth } from "./profile/useProfileAuth";
 import { useProfileData } from "./profile/useProfileData";
 import { useProfileForm } from "./profile/useProfileForm";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useProfile = () => {
   const [loading, setLoading] = useState(true);
@@ -34,7 +35,45 @@ export const useProfile = () => {
         setLoading(true);
         setError(null);
         const authUser = await fetchAuthUser();
+        
         if (authUser) {
+          // Check if profile exists in Supabase
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authUser.id)
+            .single();
+            
+          if (profileError && profileError.code !== 'PGRST116') {
+            console.error("Error fetching profile:", profileError);
+            setError("Error al cargar el perfil desde la base de datos.");
+            setLoading(false);
+            return;
+          }
+          
+          // If profile exists in Supabase, use it
+          if (profileData) {
+            const profile = {
+              id: profileData.id,
+              name: profileData.name || "",
+              surname: profileData.surname || "",
+              email: profileData.email || "",
+              dni: profileData.dni || "",
+              department: profileData.department || "",
+              start_date: profileData.start_date ? new Date(profileData.start_date) : undefined,
+              profilePhoto: undefined, // Implementación de fotos vendrá después
+              preferred_notification_channel: "web",
+              notification_channels: [],
+              notification_consent: false
+            };
+            
+            setProfile(profile);
+            setForm(profile);
+            setLoading(false);
+            return;
+          }
+          
+          // If not, use local data or create new
           await fetchProfile(authUser.id);
         }
       } catch (err) {

@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 // Esquema de validación para el formulario
 const formSchema = z.object({
@@ -30,10 +31,13 @@ interface LoginFormProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting?: boolean;
   error?: string;
+  mode: "login" | "register";
+  onToggleMode: () => void;
 }
 
-export function LoginForm({ onSubmit, isSubmitting = false, error }: LoginFormProps) {
+export function LoginForm({ onSubmit, isSubmitting = false, error, mode, onToggleMode }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast();
 
   // Inicializar formulario
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,17 +48,35 @@ export function LoginForm({ onSubmit, isSubmitting = false, error }: LoginFormPr
     },
   });
 
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await onSubmit(values);
+    } catch (error) {
+      if (error instanceof Error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message
+        });
+      }
+    }
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg animate-in fade-in-50 duration-300">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Vacaciones y Permisos</CardTitle>
+        <CardTitle className="text-2xl font-bold">
+          {mode === "login" ? "Iniciar sesión" : "Crear cuenta"}
+        </CardTitle>
         <CardDescription>
-          Inicia sesión para acceder a la plataforma de gestión de vacaciones
+          {mode === "login" 
+            ? "Inicia sesión para acceder a la plataforma de gestión de vacaciones" 
+            : "Crea una cuenta para comenzar a usar la plataforma"}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             {error && (
               <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm mb-4 animate-in slide-in-from-top duration-200">
                 {error}
@@ -121,18 +143,27 @@ export function LoginForm({ onSubmit, isSubmitting = false, error }: LoginFormPr
               {isSubmitting ? (
                 <>
                   <span className="animate-pulse mr-2">●</span> 
-                  Iniciando sesión...
+                  {mode === "login" ? "Iniciando sesión..." : "Creando cuenta..."}
                 </>
               ) : (
-                "Iniciar sesión"
+                mode === "login" ? "Iniciar sesión" : "Crear cuenta"
               )}
             </Button>
           </form>
         </Form>
+        <div className="mt-4 text-center">
+          <Button
+            variant="link"
+            onClick={onToggleMode}
+            className="text-sm text-primary"
+          >
+            {mode === "login" ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
+          </Button>
+        </div>
       </CardContent>
       <CardFooter className="flex flex-col space-y-2">
         <p className="text-sm text-muted-foreground">
-          Si tiene problemas para acceder, contacte con el administrador
+          Si tienes problemas para acceder, contacta con el administrador
         </p>
         <div className="text-xs text-muted-foreground mt-2">
           Versión 1.0.0 • La Rioja Cuida © 2025

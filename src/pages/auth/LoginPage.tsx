@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoginForm } from "@/components/auth/login-form";
 import { UserRole } from "@/types";
@@ -9,35 +9,58 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "@/components/ui/use-toast";
 
 export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [userRole, setUserRole] = useState<UserRole>("worker");
+  const [mode, setMode] = useState<"login" | "register">("login");
   const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
 
-  // Comprobar si ya hay una sesión
-  useEffect(() => {
-    const storedRole = localStorage.getItem("userRole");
-    if (storedRole) {
-      navigate(storedRole === "hr" ? "/rrhh/dashboard" : "/dashboard");
-    }
-  }, [navigate]);
+  const toggleMode = () => {
+    setMode(mode === "login" ? "register" : "login");
+    setError(undefined);
+  };
 
   const handleSubmit = async (values: { email: string; password: string }) => {
     setIsSubmitting(true);
     setError(undefined);
 
     try {
-      // En una implementación real, usaríamos la autenticación de NocoDB
-      // const response = await NocoDBAPI.loginUser(values.email, values.password);
-      
-      // Simulación para demostración
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (mode === "login") {
+        await signIn(values.email, values.password);
+      } else {
+        await signUp(values.email, values.password, {
+          name: "",
+          surname: "",
+          role: userRole,
+        });
+        
+        toast({
+          title: "Cuenta creada con éxito",
+          description: "Ya puedes iniciar sesión con tus credenciales.",
+        });
+        
+        setMode("login");
+        setIsSubmitting(false);
+        return;
+      }
       
       // Set the selected role
       localStorage.setItem("userRole", userRole);
       localStorage.setItem("userEmail", values.email);
+      
+      // Create a default user object for localStorage if it doesn't exist
+      const userData = {
+        id: Date.now().toString(),
+        name: "Usuario",
+        email: values.email,
+        role: userRole,
+      };
+      localStorage.setItem("user", JSON.stringify(userData));
       
       // Navigate based on selected role
       if (userRole === "hr") {
@@ -46,8 +69,8 @@ export default function LoginPage() {
         navigate("/dashboard");
       }
     } catch (err) {
-      console.error("Error de inicio de sesión:", err);
-      setError("Credenciales incorrectas. Por favor, inténtelo de nuevo.");
+      console.error("Error de autenticación:", err);
+      setError(err instanceof Error ? err.message : "Credenciales incorrectas. Por favor, inténtelo de nuevo.");
     } finally {
       setIsSubmitting(false);
     }
@@ -55,7 +78,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-secondary/20 p-4">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 flex gap-2">
         <ThemeToggle />
       </div>
       
@@ -97,6 +120,8 @@ export default function LoginPage() {
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}
             error={error}
+            mode={mode}
+            onToggleMode={toggleMode}
           />
         </div>
         

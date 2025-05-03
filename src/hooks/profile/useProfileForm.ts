@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Profile } from "@/components/profile/types";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UseProfileFormProps {
   userId: string | null;
@@ -22,7 +23,7 @@ export const useProfileForm = (
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
-    if (!form) return;
+    if (!form || !userId) return;
     
     // Check if notification consent is given when notification channels are selected
     if (form.notification_channels && form.notification_channels.length > 0 && !form.notification_consent) {
@@ -36,14 +37,31 @@ export const useProfileForm = (
     
     setSaving(true);
     try {
-      // En un entorno real, aquí harías una llamada a la API para guardar los datos
-      // Por ahora, simulamos un retardo y actualizamos el estado
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Preparamos los datos para guardar en Supabase
+      const profileData = {
+        id: userId,
+        name: form.name,
+        surname: form.surname,
+        email: form.email,
+        dni: form.dni,
+        department: form.department,
+        start_date: form.start_date,
+        // No guardamos profilePhoto, notification_channels, notification_consent por ahora
+      };
       
+      // Intentamos actualizar el perfil en Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .upsert(profileData)
+        .select();
+      
+      if (error) throw error;
+      
+      // Guardamos el perfil actualizado en el estado local
       setProfile(form);
       setEdit(false);
       
-      // Guardamos también en localStorage para simular persistencia
+      // También guardamos en localStorage como respaldo
       localStorage.setItem(`profile-${userId}`, JSON.stringify(form));
       
       toast({
@@ -55,14 +73,14 @@ export const useProfileForm = (
       toast({
         variant: "destructive",
         title: "Error",
-        description: "No se pudo guardar los cambios. Intentalo de nuevo más tarde.",
+        description: "No se pudo guardar los cambios. Inténtalo de nuevo más tarde.",
       });
     } finally {
       setSaving(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | Date) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | Date | { target: { name: string; value: any } }) => {
     if (!form) return;
     
     if (e instanceof Date) {
@@ -84,13 +102,17 @@ export const useProfileForm = (
     setEdit(false);
   };
 
-  const handleProfilePhotoChange = (photoUrl: string) => {
-    if (!form) return;
+  const handleProfilePhotoChange = async (photoUrl: string) => {
+    if (!form || !userId) return;
     
+    // Actualizamos localmente la foto de perfil
     setForm({
       ...form,
       profilePhoto: photoUrl,
     });
+    
+    // En una implementación real, aquí subiríamos la imagen a Supabase Storage
+    // y guardaríamos la URL resultante
   };
 
   return {
