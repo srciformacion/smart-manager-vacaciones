@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 // Demo users for testing - Asegurando que el usuario RRHH (admin) funcione correctamente
 const DEMO_USERS = [
@@ -67,10 +67,7 @@ export default function AuthPage() {
       window.dispatchEvent(new Event("storage"));
       
       // Mostramos el rol con el que se ha iniciado sesión
-      toast({
-        title: "Sesión iniciada",
-        description: `Has iniciado sesión como ${role === "hr" ? "RRHH" : "Trabajador"}`,
-      });
+      toast.success(`Has iniciado sesión como ${role === "hr" ? "RRHH" : "Trabajador"}`);
       
       // Redirect based on role
       if (role === "hr") {
@@ -79,11 +76,7 @@ export default function AuthPage() {
         navigate("/dashboard");
       }
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error al iniciar sesión",
-        description: error.message || "Ha ocurrido un error durante el inicio de sesión",
-      });
+      toast.error(`Error al iniciar sesión: ${error.message || "Ha ocurrido un error durante el inicio de sesión"}`);
       console.error("Auth error:", error);
     } finally {
       setIsSubmitting(false);

@@ -66,23 +66,22 @@ export function useRealtimeData<T>(
     // Crear un canal para actualizaciones en tiempo real
     const channelName = `realtime:${subscription.tableName}`;
     
-    // Configuración para los cambios de Postgres
-    const changes = {
+    // Configuramos los parámetros para la suscripción
+    const params: any = {
       event: subscription.event || '*',
       schema: subscription.schema || 'public',
       table: subscription.tableName,
     };
     
-    // Si hay un filtro, lo añadimos a la configuración
+    // Si hay un filtro, lo añadimos a los parámetros
     if (subscription.filter) {
-      // @ts-ignore - Necesario para manejar el filtro opcional
-      changes.filter = subscription.filter;
+      params.filter = subscription.filter;
     }
     
     // Crear el canal y suscribirse a los cambios con la sintaxis correcta
     const channel = supabase
       .channel(channelName)
-      .on('postgres_changes', changes, async (payload) => {
+      .on('postgres_changes' as any, params, async (payload: any) => {
         console.log('Cambio en tiempo real recibido:', payload);
         
         // Refrescar datos después de un cambio
