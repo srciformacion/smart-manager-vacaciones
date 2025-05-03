@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { User as AppUser } from "@/types";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth.tsx";
 
 export const useProfileAuth = () => {
   const [userId, setUserId] = useState<string | null>(null);
