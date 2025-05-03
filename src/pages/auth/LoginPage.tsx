@@ -63,17 +63,28 @@ export default function LoginPage() {
 
   // Function to handle demo login
   const handleDemoLogin = () => {
-    // Create a default user object for localStorage
+    // Create a default user object for localStorage with more detailed information
     const userData = {
       id: `demo-${Date.now().toString()}`,
-      name: "Usuario Demo",
+      name: userRole === "hr" ? "Administrador RRHH" : "Usuario Demo",
       email: "demo@example.com",
       role: userRole,
+      // Add additional fields that might be expected by the application
+      department: userRole === "hr" ? "Recursos Humanos" : "General",
     };
     
+    // Clear any previous data to avoid conflicts
+    localStorage.removeItem("user");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userEmail");
+    
+    // Set new data
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("userRole", userRole);
     localStorage.setItem("userEmail", "demo@example.com");
+    
+    console.log("Demo login - Setting role:", userRole);
+    console.log("Demo user data:", userData);
     
     toast("Acceso en modo demo", {
       description: `Has accedido como ${userRole === "hr" ? "RRHH" : "Trabajador"} en modo demostración`,
@@ -81,10 +92,12 @@ export default function LoginPage() {
     
     // Add a slight delay to ensure localStorage is updated
     setTimeout(() => {
-      // Navigate based on selected role
+      // Navigate based on selected role with replace:true to prevent going back
       if (userRole === "hr") {
+        console.log("Navigating to RRHH dashboard");
         navigate("/rrhh/dashboard", { replace: true });
       } else {
+        console.log("Navigating to worker dashboard");
         navigate("/dashboard", { replace: true });
       }
     }, 100);

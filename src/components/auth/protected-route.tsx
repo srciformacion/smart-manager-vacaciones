@@ -26,6 +26,13 @@ export const ProtectedRoute = ({
     }
   }, [loading]);
 
+  // For debugging
+  useEffect(() => {
+    console.log("ProtectedRoute - User:", user);
+    console.log("ProtectedRoute - Role:", userRole);
+    console.log("ProtectedRoute - Required Role:", requiredRole);
+  }, [user, userRole, requiredRole]);
+
   // While we're checking authentication status, show loading
   if (loading || initialLoad) {
     return (
@@ -40,13 +47,35 @@ export const ProtectedRoute = ({
     );
   }
 
-  // If not authenticated, redirect to login
+  // Check for localStorage user in demo mode if no authenticated user
   if (!user) {
+    const userJson = localStorage.getItem("user");
+    const storedRole = localStorage.getItem("userRole");
+    
+    if (userJson && storedRole) {
+      console.log("Demo user found in localStorage:", storedRole);
+      
+      // Check if user is trying to access a route that requires a specific role
+      if (requiredRole && storedRole !== requiredRole) {
+        console.log("Demo user role mismatch:", storedRole, "vs required:", requiredRole);
+        if (storedRole === 'hr') {
+          return <Navigate to="/rrhh/dashboard" replace />;
+        } else {
+          return <Navigate to="/dashboard" replace />;
+        }
+      }
+      
+      // User is in demo mode and has correct role
+      return <>{children}</>;
+    }
+    
+    // No user found, redirect to login
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
   // If role check is required and user doesn't have the required role
   if (requiredRole && userRole !== requiredRole) {
+    console.log("Authenticated user role mismatch:", userRole, "vs required:", requiredRole);
     if (userRole === 'hr') {
       return <Navigate to="/rrhh/dashboard" replace />;
     } else {
