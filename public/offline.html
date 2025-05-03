@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>La Rioja Cuida - Sin conexión</title>
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f9fafb;
+        color: #1f2937;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        padding: 16px;
+        text-align: center;
+      }
+      .container {
+        max-width: 500px;
+        padding: 32px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      .logo {
+        width: 80px;
+        margin-bottom: 20px;
+      }
+      h1 {
+        margin-bottom: 16px;
+      }
+      p {
+        margin-bottom: 24px;
+        color: #6b7280;
+      }
+      .dark-mode {
+        background-color: #0f172a;
+        color: #f9fafb;
+      }
+      .dark-mode .container {
+        background-color: #1e293b;
+        color: #f9fafb;
+      }
+      .dark-mode p {
+        color: #d1d5db;
+      }
+      button {
+        background-color: #0f172a;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .dark-mode button {
+        background-color: #6366f1;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #0f172a;
+          color: #f9fafb;
+        }
+        .container {
+          background-color: #1e293b;
+          color: #f9fafb;
+        }
+        p {
+          color: #d1d5db;
+        }
+        button {
+          background-color: #6366f1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img src="/lovable-uploads/a4799124-8538-46ae-9f04-366618a71181.png" alt="Logo" class="logo" />
+      <h1>Sin conexión</h1>
+      <p>No tienes conexión a internet. Algunas funciones pueden no estar disponibles hasta que recuperes la conexión.</p>
+      <p>La aplicación funcionará con datos que han sido previamente guardados en caché.</p>
+      <button onclick="window.location.reload()">Intentar reconectar</button>
+    </div>
+    <script>
+      // Detectar tema oscuro
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) {
+        document.body.classList.add('dark-mode');
+      }
+    </script>
+  </body>
+</html>
