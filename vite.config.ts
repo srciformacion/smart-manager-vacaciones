@@ -37,53 +37,11 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       strategies: 'injectManifest',
-      filename: 'sw.js',
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg}'],
-        navigateFallback: '/offline.html',
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 días
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
-          {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // <== 30 días
-              }
-            }
-          },
-          {
-            urlPattern: ({ url }) => {
-              return url.pathname.startsWith('/api');
-            },
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 // <== 1 hora
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          }
-        ]
+      srcDir: './', 
+      filename: 'public/sw.js',
+      outDir: 'dist',
+      injectManifest: {
+        injectionPoint: 'self.__WB_MANIFEST',
       }
     })
   ].filter(Boolean),

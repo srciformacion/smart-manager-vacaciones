@@ -2,6 +2,9 @@
 // Nombre del caché
 const CACHE_NAME = 'la-rioja-cuida-v1';
 
+// This will be replaced by the precache manifest during build
+self.__WB_MANIFEST;
+
 // Recursos que queremos cachear para uso offline
 const INITIAL_CACHED_RESOURCES = [
   '/',
