@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -8,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Separator } from "@/components/ui/separator";
 import { LoginForm } from "@/components/auth/login-form";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth.tsx";
 
 export default function LoginPage() {
@@ -74,17 +75,19 @@ export default function LoginPage() {
     localStorage.setItem("userRole", userRole);
     localStorage.setItem("userEmail", "demo@example.com");
     
-    toast({
-      title: "Acceso en modo demo",
+    toast("Acceso en modo demo", {
       description: `Has accedido como ${userRole === "hr" ? "RRHH" : "Trabajador"} en modo demostración`,
     });
     
-    // Navigate based on selected role
-    if (userRole === "hr") {
-      navigate("/rrhh/dashboard");
-    } else {
-      navigate("/dashboard");
-    }
+    // Add a slight delay to ensure localStorage is updated
+    setTimeout(() => {
+      // Navigate based on selected role
+      if (userRole === "hr") {
+        navigate("/rrhh/dashboard", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
+    }, 100);
   };
 
   return (
@@ -147,7 +150,7 @@ export default function LoginPage() {
           
           <div className="mt-6 text-xs text-muted-foreground">
             <p>Credenciales de prueba:</p>
-            <p>Email: usuario@example.com | Contraseña: password</p>
+            <p>Email: rrhh@example.com | Contraseña: password</p>
           </div>
         </div>
       </div>
