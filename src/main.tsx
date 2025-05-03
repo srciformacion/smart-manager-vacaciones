@@ -7,7 +7,6 @@ import { UpdateNotification } from './components/pwa/update-notification.tsx'
 
 // Register Service Worker
 if ('serviceWorker' in navigator) {
-  // Register the service worker
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then(registration => {

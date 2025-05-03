@@ -39,8 +39,6 @@ export default defineConfig(({ mode }) => ({
         start_url: '/',
         background_color: '#ffffff'
       },
-      // Use generateSW strategy
-      strategies: 'generateSW',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,webp}'],
         runtimeCaching: [
