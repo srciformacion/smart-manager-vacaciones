@@ -65,45 +65,46 @@ export function useRealtimeData<T>(
 
     // Crear un canal para actualizaciones en tiempo real
     const channelName = `realtime:${subscription.tableName}`;
-    const channel = supabase.channel(channelName);
+    const channel = supabase
+      .channel(channelName);
     
     // La sintaxis correcta para suscribirse a cambios de postgres
-    // Es necesario usar .on() con los parámetros adecuados para 'postgres_changes'
-    channel.on(
-      'postgres_changes', 
-      {
-        event: subscription.event || '*',
-        schema: subscription.schema || 'public',
-        table: subscription.tableName,
-        filter: subscription.filter || undefined,
-      },
-      async (payload) => {
-        console.log('Cambio en tiempo real recibido:', payload);
-        
-        // Refrescar datos después de un cambio
-        await fetchInitialData();
-        
-        // Notificar al usuario sobre el cambio
-        const eventType = payload.eventType;
-        if (eventType === 'INSERT') {
-          toast.info('Se ha recibido una nueva solicitud');
-        } else if (eventType === 'UPDATE') {
-          toast.info('Una solicitud ha sido actualizada');
-        } else if (eventType === 'DELETE') {
-          toast.info('Una solicitud ha sido eliminada');
+    channel
+      .on(
+        'postgres_changes', 
+        {
+          event: subscription.event || '*',
+          schema: subscription.schema || 'public',
+          table: subscription.tableName,
+          filter: subscription.filter || undefined,
+        },
+        async (payload) => {
+          console.log('Cambio en tiempo real recibido:', payload);
+          
+          // Refrescar datos después de un cambio
+          await fetchInitialData();
+          
+          // Notificar al usuario sobre el cambio
+          const eventType = payload.eventType;
+          if (eventType === 'INSERT') {
+            toast.info('Se ha recibido una nueva solicitud');
+          } else if (eventType === 'UPDATE') {
+            toast.info('Una solicitud ha sido actualizada');
+          } else if (eventType === 'DELETE') {
+            toast.info('Una solicitud ha sido eliminada');
+          }
         }
-      }
-    )
-    .subscribe((status) => {
-      console.log(`Estado de la suscripción a ${subscription.tableName}:`, status);
-      
-      if (status === 'SUBSCRIBED') {
-        console.log(`Suscripción exitosa a cambios en ${subscription.tableName}`);
-      } else if (status === 'CHANNEL_ERROR') {
-        console.error(`Error en el canal para ${subscription.tableName}`);
-        toast.error(`Error en la conexión en tiempo real`);
-      }
-    });
+      )
+      .subscribe((status) => {
+        console.log(`Estado de la suscripción a ${subscription.tableName}:`, status);
+        
+        if (status === 'SUBSCRIBED') {
+          console.log(`Suscripción exitosa a cambios en ${subscription.tableName}`);
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error(`Error en el canal para ${subscription.tableName}`);
+          toast.error(`Error en la conexión en tiempo real`);
+        }
+      });
 
     // Limpieza al desmontar
     return () => {
