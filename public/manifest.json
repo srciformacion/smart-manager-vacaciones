@@ -1,0 +1,24 @@
+
+{
+  "name": "La Rioja Cuida",
+  "short_name": "LR Cuida",
+  "description": "Sistema inteligente de gestión de vacaciones y permisos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/lovable-uploads/a4799124-8538-46ae-9f04-366618a71181.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/a4799124-8538-46ae-9f04-366618a71181.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
+import { InstallPWAButton } from "@/components/pwa/install-pwa-button";
 
 interface MainLayoutMobileProps {
   children: ReactNode;
@@ -83,6 +84,7 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
               </span>
             </div>
             <div className="flex items-center gap-2">
+              <InstallPWAButton />
               {user && <NotificationBell />}
               <ThemeToggle />
               {user && (
