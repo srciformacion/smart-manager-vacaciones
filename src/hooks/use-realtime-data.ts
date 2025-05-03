@@ -49,39 +49,34 @@ export function useRealtimeData<T>(
     // Cargar datos iniciales
     fetchInitialData();
 
-    // The correct way to subscribe to postgres changes is to create a channel
-    // and then use the `.on('postgres_changes', handlers)` pattern
-    const channel = supabase.channel('table-changes');
+    // Create a channel for real-time updates
+    const channel = supabase.channel(`realtime:${subscription.tableName}`);
     
-    // Add the postgres_changes listener to the channel
-    channel.on(
-      'postgres_changes',
-      {
-        event: subscription.event || '*',
-        schema: subscription.schema || 'public',
-        table: subscription.tableName,
-        filter: subscription.filter || undefined,
-      },
-      async (payload) => {
-        console.log('Cambio en tiempo real recibido:', payload);
-        
-        // Refrescar datos después de un cambio
-        await fetchInitialData();
-        
-        // Notificar al usuario sobre el cambio
-        const eventType = payload.eventType;
-        if (eventType === 'INSERT') {
-          toast.info('Se ha recibido una nueva solicitud');
-        } else if (eventType === 'UPDATE') {
-          toast.info('Una solicitud ha sido actualizada');
-        } else if (eventType === 'DELETE') {
-          toast.info('Una solicitud ha sido eliminada');
-        }
+    // Configure the channel with postgres changes
+    const configuredChannel = channel.on('postgres_changes', {
+      event: subscription.event || '*',
+      schema: subscription.schema || 'public',
+      table: subscription.tableName,
+      filter: subscription.filter || undefined,
+    }, async (payload) => {
+      console.log('Cambio en tiempo real recibido:', payload);
+      
+      // Refrescar datos después de un cambio
+      await fetchInitialData();
+      
+      // Notificar al usuario sobre el cambio
+      const eventType = payload.eventType;
+      if (eventType === 'INSERT') {
+        toast.info('Se ha recibido una nueva solicitud');
+      } else if (eventType === 'UPDATE') {
+        toast.info('Una solicitud ha sido actualizada');
+      } else if (eventType === 'DELETE') {
+        toast.info('Una solicitud ha sido eliminada');
       }
-    );
+    });
     
-    // Subscribe to the channel after setting up all listeners
-    channel.subscribe();
+    // Subscribe to the configured channel
+    configuredChannel.subscribe();
 
     // Limpieza al desmontar
     return () => {
