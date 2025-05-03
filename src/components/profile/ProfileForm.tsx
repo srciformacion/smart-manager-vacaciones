@@ -38,6 +38,17 @@ export const ProfileForm = ({
     onChange(event);
   };
 
+  const handleNotificationConsent = (value: boolean) => {
+    const event = {
+      target: {
+        name: "notification_consent",
+        value,
+      },
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    onChange(event);
+  };
+
   return (
     <div className="space-y-6">
       {onPhotoChange && (

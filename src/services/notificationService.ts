@@ -1,4 +1,3 @@
-
 import { NotificationPayload, NotificationType, NotificationChannel } from "@/types";
 import { toast } from "@/hooks/use-toast";
 
@@ -113,6 +112,91 @@ export class NotificationService {
     } catch (error) {
       console.error('Error al enviar WhatsApp:', error);
       return false;
+    }
+  }
+
+  /**
+   * Obtiene los canales de notificación de un usuario
+   */
+  static async getNotificationChannels(userId: string): Promise<string[]> {
+    // En un entorno real, esto sería una consulta a la base de datos
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user.notification_channels || [user.preferredNotificationChannel || 'web'];
+    } catch (error) {
+      console.error('Error al obtener canales de notificación:', error);
+      return ['web']; // Por defecto
+    }
+  }
+
+  /**
+   * Verifica si el usuario ha dado consentimiento para notificaciones
+   */
+  static async hasNotificationConsent(userId: string): Promise<boolean> {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user.notification_consent === true;
+    } catch (error) {
+      console.error('Error al verificar consentimiento:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Envía notificaciones por todos los canales autorizados del usuario
+   */
+  static async sendToAllAuthorizedChannels(userId: string, title: string, message: string, type?: NotificationType): Promise<boolean[]> {
+    try {
+      // Verificar consentimiento
+      const hasConsent = await this.hasNotificationConsent(userId);
+      if (!hasConsent) {
+        console.warn('El usuario no ha dado consentimiento para notificaciones');
+        return [false];
+      }
+      
+      // Obtener los datos del usuario
+      const userJson = localStorage.getItem('user');
+      if (!userJson) {
+        console.error('Usuario no encontrado');
+        return [false];
+      }
+      
+      const user = JSON.parse(userJson);
+      const channels = user.notification_channels || [user.preferredNotificationChannel || 'web'];
+      
+      // Enviar notificaciones por cada canal
+      const results = await Promise.all(channels.map(async (channel: string) => {
+        let destination = '';
+        
+        // Determinar el destino según el canal
+        if (channel === 'email') {
+          destination = user.email || '';
+        } else if (channel === 'whatsapp') {
+          destination = user.phone || '';
+        } else {
+          destination = user.id || '';
+        }
+        
+        if (!destination) {
+          console.error(`No se pudo determinar el destino para el canal ${channel}`);
+          return false;
+        }
+        
+        // Enviar la notificación por el canal
+        return await this.sendNotification({
+          canal: channel,
+          destino: destination,
+          titulo: title,
+          mensaje: message,
+          tipo: type,
+          userId: user.id
+        });
+      }));
+      
+      return results;
+    } catch (error) {
+      console.error('Error al enviar notificaciones:', error);
+      return [false];
     }
   }
 

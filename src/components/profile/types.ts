@@ -1,14 +1,18 @@
 
+import React from "react";
+
 export interface Profile {
-  id: string;
+  id?: string;
   name: string;
   surname: string;
-  email: string;
   dni: string;
+  email: string;
   department: string;
+  profilePhoto?: string;
   start_date?: Date;
   preferred_notification_channel?: string;
-  profilePhoto?: string;
+  notification_channels?: string[];
+  notification_consent?: boolean;
 }
 
 export interface ProfileFormProps {

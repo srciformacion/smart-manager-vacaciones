@@ -24,6 +24,16 @@ export const useProfileForm = (
   const handleSave = async () => {
     if (!form) return;
     
+    // Check if notification consent is given when notification channels are selected
+    if (form.notification_channels && form.notification_channels.length > 0 && !form.notification_consent) {
+      toast({
+        variant: "destructive",
+        title: "Consentimiento requerido",
+        description: "Debe autorizar el uso de canales de notificación seleccionados.",
+      });
+      return;
+    }
+    
     setSaving(true);
     try {
       // En un entorno real, aquí harías una llamada a la API para guardar los datos
