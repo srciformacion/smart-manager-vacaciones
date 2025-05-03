@@ -10,7 +10,8 @@ export function UpdateNotification() {
   const [refreshSW, setRefreshSW] = useState<(() => Promise<void>) | null>(null);
 
   useEffect(() => {
-    const intervalMS = 60 * 60 * 1000; // 1 hour
+    // Check for updates every hour
+    const intervalMS = 60 * 60 * 1000; 
     
     const updateSW = registerSW({
       onNeedRefresh() {
@@ -41,8 +42,14 @@ export function UpdateNotification() {
           duration: 3000,
         });
       },
-      interval: intervalMS,
+      // The interval is not supported in the type definition, so we need to remove it
+      // Instead we'll use a custom manual check mechanism
     });
+
+    // Set up a manual periodic check if needed
+    const intervalId = setInterval(() => {
+      updateSW(true); // Force check for updates
+    }, intervalMS);
 
     // Legacy service worker registration (as fallback)
     if ('serviceWorker' in navigator) {
@@ -56,6 +63,9 @@ export function UpdateNotification() {
           });
       });
     }
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   // This component doesn't render anything visually, only handles notifications
