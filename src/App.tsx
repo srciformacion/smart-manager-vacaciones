@@ -1,12 +1,11 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "@/components/ui/toaster";
 
 // Import authentication pages
-import AuthPage from './pages/AuthPage';
-import LoginPage from './pages/LoginPage';
+import LoginPage from './pages/auth/LoginPage';
 
 // Import worker pages
 import Index from './pages/Index';
@@ -42,8 +41,8 @@ const App = () => {
       <Router>
         <Routes>
           {/* Auth Routes */}
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth" element={<LoginPage />} />
+          <Route path="/login" element={<Navigate to="/auth" replace />} />
 
           {/* Worker Routes */}
           <Route path="/" element={<Index />} />

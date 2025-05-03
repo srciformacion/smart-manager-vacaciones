@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Eye, EyeOff } from "lucide-react";
 
 // Esquema de validación para el formulario
 const formSchema = z.object({
@@ -44,7 +45,7 @@ export function LoginForm({ onSubmit, isSubmitting = false, error }: LoginFormPr
   });
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto shadow-lg animate-in fade-in-50 duration-300">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold">Vacaciones y Permisos</CardTitle>
         <CardDescription>
@@ -55,7 +56,7 @@ export function LoginForm({ onSubmit, isSubmitting = false, error }: LoginFormPr
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="p-3 rounded-md bg-danger/10 text-danger text-sm mb-4">
+              <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm mb-4 animate-in slide-in-from-top duration-200">
                 {error}
               </div>
             )}
@@ -71,6 +72,7 @@ export function LoginForm({ onSubmit, isSubmitting = false, error }: LoginFormPr
                       placeholder="ejemplo@empresa.com"
                       type="email"
                       disabled={isSubmitting}
+                      className="transition-all duration-200 focus:ring-2"
                       {...field}
                     />
                   </FormControl>
@@ -91,16 +93,18 @@ export function LoginForm({ onSubmit, isSubmitting = false, error }: LoginFormPr
                         placeholder="Contraseña"
                         type={showPassword ? "text" : "password"}
                         disabled={isSubmitting}
+                        className="pr-10 transition-all duration-200 focus:ring-2"
                         {...field}
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground"
+                        className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       >
-                        {showPassword ? "Ocultar" : "Mostrar"}
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </Button>
                     </div>
                   </FormControl>
@@ -109,16 +113,30 @@ export function LoginForm({ onSubmit, isSubmitting = false, error }: LoginFormPr
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
+            <Button 
+              type="submit" 
+              className="w-full transition-all duration-200 hover:opacity-90" 
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="animate-pulse mr-2">●</span> 
+                  Iniciando sesión...
+                </>
+              ) : (
+                "Iniciar sesión"
+              )}
             </Button>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex justify-center">
+      <CardFooter className="flex flex-col space-y-2">
         <p className="text-sm text-muted-foreground">
           Si tiene problemas para acceder, contacte con el administrador
         </p>
+        <div className="text-xs text-muted-foreground mt-2">
+          Versión 1.0.0 • La Rioja Cuida © 2025
+        </div>
       </CardFooter>
     </Card>
   );
