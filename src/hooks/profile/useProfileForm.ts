@@ -36,7 +36,8 @@ export const useProfileForm = (
           dni: form.dni,
           department: form.department,
           startDate: form.start_date?.toISOString().split('T')[0],
-          preferredNotificationChannel: form.preferred_notification_channel || 'web'
+          preferredNotificationChannel: form.preferred_notification_channel || 'web',
+          profilePhoto: form.profilePhoto || null
         };
         
         localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -55,7 +56,8 @@ export const useProfileForm = (
           dni: form.dni,
           department: form.department,
           startDate: form.start_date?.toISOString().split('T')[0],
-          preferredNotificationChannel: form.preferred_notification_channel || 'web'
+          preferredNotificationChannel: form.preferred_notification_channel || 'web',
+          profilePhoto: form.profilePhoto || userData.profilePhoto || null
         };
         
         localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -89,6 +91,11 @@ export const useProfileForm = (
     }
   };
 
+  const handleProfilePhotoChange = (photoUrl: string) => {
+    if (!form) return;
+    setForm({ ...form, profilePhoto: photoUrl });
+  };
+
   const handleCancel = () => {
     if (!profile) {
       toast({ 
@@ -109,5 +116,6 @@ export const useProfileForm = (
     handleSave,
     handleChange,
     handleCancel,
+    handleProfilePhotoChange
   };
 };

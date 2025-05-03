@@ -12,6 +12,7 @@ interface ProfileContainerProps {
   onCancel: () => void;
   onEdit: () => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement> | Date) => void;
+  onPhotoChange?: (photoUrl: string) => void;
 }
 
 export const ProfileContainer = ({
@@ -23,6 +24,7 @@ export const ProfileContainer = ({
   onCancel,
   onEdit,
   onChange,
+  onPhotoChange,
 }: ProfileContainerProps) => {
   return (
     <div className="max-w-xl mx-auto mt-8">
@@ -38,6 +40,7 @@ export const ProfileContainer = ({
             onCancel={onCancel}
             onEdit={onEdit}
             onChange={onChange}
+            onPhotoChange={onPhotoChange}
           />
         )}
       </Card>

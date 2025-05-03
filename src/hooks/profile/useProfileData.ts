@@ -24,7 +24,8 @@ export const useProfileData = () => {
           dni: "",
           department: "",
           start_date: undefined,
-          preferred_notification_channel: "web"
+          preferred_notification_channel: "web",
+          profilePhoto: undefined
         };
         setForm(initialForm);
         return { createMode: true, form: initialForm };
@@ -39,7 +40,8 @@ export const useProfileData = () => {
         dni: userData.dni || "",
         department: userData.department || "",
         start_date: userData.startDate ? new Date(userData.startDate) : undefined,
-        preferred_notification_channel: userData.preferredNotificationChannel || "web"
+        preferred_notification_channel: userData.preferredNotificationChannel || "web",
+        profilePhoto: userData.profilePhoto
       };
       
       const profileWithDate = {

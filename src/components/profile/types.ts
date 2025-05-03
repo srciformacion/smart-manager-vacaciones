@@ -8,6 +8,7 @@ export interface Profile {
   department: string;
   start_date?: Date;
   preferred_notification_channel?: string;
+  profilePhoto?: string;
 }
 
 export interface ProfileFormProps {
@@ -19,4 +20,5 @@ export interface ProfileFormProps {
   onCancel: () => void;
   onEdit: () => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement> | Date) => void;
+  onPhotoChange?: (photoUrl: string) => void;
 }

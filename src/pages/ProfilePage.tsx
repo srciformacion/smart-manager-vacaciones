@@ -5,7 +5,8 @@ import { LoadingProfile } from "@/components/profile/LoadingProfile";
 import { ProfileContainer } from "@/components/profile/ProfileContainer";
 import { ErrorBoundary } from "@/components/profile/ErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info } from "lucide-react";
+import { AlertTriangle, Info, RefreshCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function ProfilePage() {
   const {
@@ -19,7 +20,9 @@ export default function ProfilePage() {
     handleCancel,
     handleChange,
     setEdit,
-    error
+    error,
+    retryFetch,
+    handleProfilePhotoChange
   } = useProfile();
 
   const renderContent = () => {
@@ -30,8 +33,18 @@ export default function ProfilePage() {
     if (error) {
       return (
         <Alert className="max-w-xl mx-auto mt-8">
-          <Info className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            <span>{error}</span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={retryFetch}
+              className="ml-2"
+            >
+              <RefreshCcw className="h-3 w-3 mr-1" /> Reintentar
+            </Button>
+          </AlertDescription>
         </Alert>
       );
     }
@@ -47,6 +60,7 @@ export default function ProfilePage() {
           onCancel={handleCancel}
           onEdit={() => setEdit(true)}
           onChange={handleChange}
+          onPhotoChange={handleProfilePhotoChange}
         />
       </ErrorBoundary>
     );
@@ -58,4 +72,3 @@ export default function ProfilePage() {
     </MainLayout>
   );
 }
-

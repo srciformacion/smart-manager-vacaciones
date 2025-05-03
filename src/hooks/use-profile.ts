@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import { useProfileAuth } from "./profile/useProfileAuth";
 import { useProfileData } from "./profile/useProfileData";
 import { useProfileForm } from "./profile/useProfileForm";
+import { toast } from "@/components/ui/use-toast";
 
 export const useProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   
   const { userId, user, fetchAuthUser } = useProfileAuth();
   const { profile, form, createMode, setForm, setProfile, fetchProfile } = useProfileData();
@@ -16,8 +18,15 @@ export const useProfile = () => {
     setEdit, 
     handleSave, 
     handleChange, 
-    handleCancel 
+    handleCancel,
+    handleProfilePhotoChange
   } = useProfileForm(userId, profile, setProfile, form, setForm);
+
+  // Function to retry fetching profile
+  const retryFetch = () => {
+    setRetryCount(prev => prev + 1);
+    setError(null);
+  };
 
   useEffect(() => {
     const initializeProfile = async () => {
@@ -37,7 +46,7 @@ export const useProfile = () => {
     };
 
     initializeProfile();
-  }, []);
+  }, [retryCount]);
 
   return {
     edit,
@@ -50,7 +59,8 @@ export const useProfile = () => {
     handleSave,
     handleCancel,
     handleChange,
-    setEdit
+    setEdit,
+    retryFetch,
+    handleProfilePhotoChange
   };
 };
-

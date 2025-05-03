@@ -3,6 +3,7 @@ import { ProfileFormProps } from "./types";
 import { FormField } from "./FormField";
 import { FormActions } from "./FormActions";
 import { DatePickerField } from "./DatePickerField";
+import { ProfilePhotoUpload } from "./ProfilePhotoUpload";
 import { 
   Select,
   SelectContent,
@@ -21,9 +22,18 @@ export const ProfileForm = ({
   onCancel,
   onEdit,
   onChange,
+  onPhotoChange,
 }: ProfileFormProps) => {
   return (
     <div className="space-y-6">
+      {onPhotoChange && (
+        <ProfilePhotoUpload 
+          photoUrl={form.profilePhoto} 
+          disabled={!edit} 
+          onChange={onPhotoChange} 
+        />
+      )}
+      
       <FormField
         name="name"
         label="Nombre"
