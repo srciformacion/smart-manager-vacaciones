@@ -12,6 +12,7 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { InstallPWAButton } from "@/components/pwa/install-pwa-button";
+import { useAuth } from "@/hooks/use-auth";
 
 interface MainLayoutMobileProps {
   children: ReactNode;
@@ -23,23 +24,12 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   
-  const handleLogout = () => {
+  const handleLogout = async () => {
     try {
-      localStorage.removeItem("user");
-      localStorage.removeItem("userRole");
-      
-      // Dispatch storage event to notify other tabs
-      window.dispatchEvent(new Event("storage"));
-      
-      // Notify user
-      toast({
-        title: "Sesión cerrada",
-        description: "Has cerrado sesión correctamente",
-      });
-      
-      // Navigate to auth page (using window.location to ensure full page reload)
-      window.location.href = "/auth";
+      await signOut();
+      // Note: The navigation will happen in the useAuth hook
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       toast({
