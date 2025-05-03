@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RequestType, User, ShiftProfile } from "@/types";
@@ -13,6 +13,8 @@ import { ReplacementSection } from "./form/replacement-section";
 import { RequestDetailsSection } from "./form/request-details-section";
 import { FileUploadSection } from "./form/file-upload-section";
 import { getVacationRules } from "@/utils/vacationLogic";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface RequestFormProps {
   requestType: RequestType;
@@ -33,8 +35,10 @@ export function RequestForm({
 }: RequestFormProps) {
   const [file, setFile] = useState<File | null>(null);
   const [showTimeSelectors] = useState(requestType === 'personalDay');
+  const [localIsSubmitting, setLocalIsSubmitting] = useState(false);
+  const [profiles, setProfiles] = useState<ShiftProfile[]>(shiftProfiles);
   
-  const defaultProfile = shiftProfiles.find(profile => profile.isDefault);
+  const defaultProfile = profiles.find(profile => profile.isDefault);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -50,6 +54,36 @@ export function RequestForm({
       endTime: defaultProfile?.endTime || "15:00",
     },
   });
+
+  // Cargar perfiles de turno desde Supabase
+  useEffect(() => {
+    const loadShiftProfiles = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('calendar_templates')
+          .select('*');
+          
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          // Transformar los datos al formato de ShiftProfile
+          const profilesData = data.map(template => ({
+            id: template.id,
+            name: template.name,
+            startTime: "08:00", // Valores por defecto si no se especifican en el template
+            endTime: "15:00",
+            isDefault: template.is_default || false
+          }));
+          
+          setProfiles(profilesData);
+        }
+      } catch (error) {
+        console.error("Error al cargar perfiles de turno:", error);
+      }
+    };
+    
+    loadShiftProfiles();
+  }, []);
 
   const getRequestTypeTitle = () => {
     switch (requestType) {
@@ -82,8 +116,75 @@ export function RequestForm({
     }
   };
 
-  const handleSubmit = (values: FormValues) => {
-    onSubmit(values, file);
+  const handleSubmit = async (values: FormValues) => {
+    setLocalIsSubmitting(true);
+    
+    try {
+      let attachmentUrl = null;
+      
+      // Si hay un archivo para subir (en caso de permisos justificados)
+      if (file && requestType === 'leave') {
+        const filename = `${user.id}/${Date.now()}_${file.name}`;
+        
+        // Verificar si el bucket existe
+        const { data: bucketData, error: bucketError } = await supabase
+          .storage
+          .getBucket('attachments');
+        
+        // Si no existe el bucket, intentar crearlo
+        if (bucketError && bucketError.message.includes('does not exist')) {
+          await supabase.storage.createBucket('attachments', { public: true });
+        }
+        
+        // Subir el archivo
+        const { data: uploadData, error: uploadError } = await supabase
+          .storage
+          .from('attachments')
+          .upload(filename, file);
+          
+        if (uploadError) throw uploadError;
+        
+        // Obtener la URL pública
+        const { data: urlData } = supabase
+          .storage
+          .from('attachments')
+          .getPublicUrl(filename);
+          
+        attachmentUrl = urlData.publicUrl;
+      }
+      
+      // Preparar datos para insertar en la tabla requests
+      const requestData = {
+        userid: user.id,
+        type: requestType,
+        startdate: values.dateRange.from,
+        enddate: values.dateRange.to || values.dateRange.from,
+        starttime: values.startTime,
+        endtime: values.endTime,
+        reason: values.reason,
+        notes: values.notes,
+        attachmenturl: attachmentUrl,
+        status: 'pending'
+      };
+      
+      // Insertar la solicitud en Supabase
+      const { data, error } = await supabase
+        .from('requests')
+        .insert(requestData)
+        .select();
+        
+      if (error) throw error;
+      
+      // Llamar a la función onSubmit original
+      onSubmit(values, file);
+      
+      toast.success(`Solicitud de ${getRequestTypeTitle().toLowerCase()} enviada correctamente`);
+    } catch (error) {
+      console.error("Error al enviar solicitud:", error);
+      toast.error("Error al enviar la solicitud. Por favor, inténtelo de nuevo.");
+    } finally {
+      setLocalIsSubmitting(false);
+    }
   };
 
   return (
@@ -95,10 +196,10 @@ export function RequestForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <DateRangeSection form={form} user={user} isSubmitting={isSubmitting} />
+            <DateRangeSection form={form} user={user} isSubmitting={isSubmitting || localIsSubmitting} />
 
             {showTimeSelectors && (
-              <TimeSelectionSection form={form} isSubmitting={isSubmitting} />
+              <TimeSelectionSection form={form} isSubmitting={isSubmitting || localIsSubmitting} />
             )}
 
             {requestType === 'shiftChange' && availableUsers.length > 0 && (
@@ -106,25 +207,25 @@ export function RequestForm({
                 form={form} 
                 user={user} 
                 availableUsers={availableUsers} 
-                isSubmitting={isSubmitting} 
+                isSubmitting={isSubmitting || localIsSubmitting} 
               />
             )}
 
             <RequestDetailsSection 
               form={form} 
               requestType={requestType}
-              isSubmitting={isSubmitting} 
+              isSubmitting={isSubmitting || localIsSubmitting} 
             />
 
             {requestType === "leave" && (
               <FileUploadSection
                 onFileChange={setFile}
-                isSubmitting={isSubmitting}
+                isSubmitting={isSubmitting || localIsSubmitting}
               />
             )}
 
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? "Enviando..." : "Enviar solicitud"}
+            <Button type="submit" disabled={isSubmitting || localIsSubmitting} className="w-full">
+              {isSubmitting || localIsSubmitting ? "Enviando..." : "Enviar solicitud"}
             </Button>
           </form>
         </Form>

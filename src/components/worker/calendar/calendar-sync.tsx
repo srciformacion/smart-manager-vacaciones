@@ -1,168 +1,365 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CalendarClock, RefreshCw, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-interface CalendarSyncProps {
-  userId?: string;
+interface SyncOption {
+  id: string;
+  name: string;
+  description: string;
+  enabled: boolean;
+  platform: string;
+  lastSync?: Date;
 }
 
-export function CalendarSync({ userId }: CalendarSyncProps) {
-  const [syncGoogle, setSyncGoogle] = useState(false);
-  const [syncOutlook, setSyncOutlook] = useState(false);
-  const [syncApple, setSyncApple] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-
-  // Función para sincronizar calendarios (simulada por ahora)
-  const handleSync = async () => {
-    if (!userId) {
-      toast.error("Debes iniciar sesión para sincronizar calendarios");
-      return;
-    }
-    
-    // Si no hay ninguna sincronización activada
-    if (!syncGoogle && !syncOutlook && !syncApple) {
-      toast.error("Por favor selecciona al menos una plataforma para sincronizar");
-      return;
-    }
-    
-    setSyncing(true);
-    
-    try {
-      // Simulamos la sincronización (esto sería reemplazado por la API real)
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Guardar preferencias de sincronización en Supabase
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          sync_preferences: {
-            google: syncGoogle,
-            outlook: syncOutlook,
-            apple: syncApple,
-            last_synced: new Date().toISOString()
+export function CalendarSync() {
+  const [syncOptions, setSyncOptions] = useState<SyncOption[]>([]);
+  const [syncInProgress, setSyncInProgress] = useState<boolean>(false);
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("google");
+  const [email, setEmail] = useState<string>("");
+  
+  // Cargar configuraciones de sincronización
+  useEffect(() => {
+    const fetchSyncSettings = async () => {
+      try {
+        // Simular carga de configuraciones de Supabase
+        const { data, error } = await supabase
+          .from('calendar_sync_settings')
+          .select('*');
+          
+        if (error) {
+          // Si hay error, usamos datos de ejemplo
+          const defaultOptions: SyncOption[] = [
+            {
+              id: "google",
+              name: "Google Calendar",
+              description: "Sincroniza tus turnos con Google Calendar",
+              enabled: false,
+              platform: "google"
+            },
+            {
+              id: "outlook",
+              name: "Microsoft Outlook",
+              description: "Sincroniza tus turnos con Microsoft Outlook",
+              enabled: false,
+              platform: "outlook"
+            },
+            {
+              id: "phone",
+              name: "Calendario del teléfono",
+              description: "Exporta tus turnos a tu dispositivo móvil",
+              enabled: false,
+              platform: "ical"
+            }
+          ];
+          
+          setSyncOptions(defaultOptions);
+          return;
+        }
+        
+        // Si hay datos, los transformamos al formato esperado
+        if (data && data.length > 0) {
+          const mappedOptions: SyncOption[] = data.map(item => ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            enabled: item.enabled,
+            platform: item.platform,
+            lastSync: item.last_sync ? new Date(item.last_sync) : undefined
+          }));
+          
+          setSyncOptions(mappedOptions);
+        } else {
+          // Usar datos por defecto si no hay registros
+          const defaultOptions: SyncOption[] = [
+            {
+              id: "google",
+              name: "Google Calendar",
+              description: "Sincroniza tus turnos con Google Calendar",
+              enabled: false,
+              platform: "google"
+            },
+            {
+              id: "outlook",
+              name: "Microsoft Outlook",
+              description: "Sincroniza tus turnos con Microsoft Outlook",
+              enabled: false,
+              platform: "outlook"
+            },
+            {
+              id: "phone",
+              name: "Calendario del teléfono",
+              description: "Exporta tus turnos a tu dispositivo móvil",
+              enabled: false,
+              platform: "ical"
+            }
+          ];
+          
+          setSyncOptions(defaultOptions);
+        }
+      } catch (error) {
+        console.error("Error fetching sync settings:", error);
+        // Usar datos por defecto en caso de error
+        const defaultOptions: SyncOption[] = [
+          {
+            id: "google",
+            name: "Google Calendar",
+            description: "Sincroniza tus turnos con Google Calendar",
+            enabled: false,
+            platform: "google"
+          },
+          {
+            id: "outlook",
+            name: "Microsoft Outlook",
+            description: "Sincroniza tus turnos con Microsoft Outlook",
+            enabled: false,
+            platform: "outlook"
+          },
+          {
+            id: "phone",
+            name: "Calendario del teléfono",
+            description: "Exporta tus turnos a tu dispositivo móvil",
+            enabled: false,
+            platform: "ical"
           }
-        })
-        .eq('id', userId);
+        ];
         
-      if (error) {
-        throw error;
+        setSyncOptions(defaultOptions);
       }
-      
-      // Mostrar mensaje de éxito
-      toast.success("Calendarios sincronizados correctamente");
-    } catch (error: any) {
-      console.error("Error syncing calendars:", error);
-      toast.error(`Error al sincronizar: ${error.message}`);
-    } finally {
-      setSyncing(false);
-    }
-  };
+    };
+    
+    fetchSyncSettings();
+  }, []);
 
-  // Cargar preferencias de sincronización guardadas
-  const loadSyncPreferences = async () => {
-    if (!userId) return;
+  const toggleSync = async (id: string) => {
+    // Actualizar estado local primero para UI responsiva
+    setSyncOptions(prevOptions => 
+      prevOptions.map(option => 
+        option.id === id ? { ...option, enabled: !option.enabled } : option
+      )
+    );
     
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('sync_preferences')
-        .eq('id', userId)
-        .single();
-        
-      if (error) {
-        console.error("Error loading sync preferences:", error);
-        return;
-      }
+      // Obtener la opción que se está modificando
+      const option = syncOptions.find(o => o.id === id);
+      if (!option) return;
       
-      if (data?.sync_preferences) {
-        setSyncGoogle(data.sync_preferences.google || false);
-        setSyncOutlook(data.sync_preferences.outlook || false);
-        setSyncApple(data.sync_preferences.apple || false);
-      }
+      // Actualizar en Supabase
+      const { error } = await supabase
+        .from('calendar_sync_settings')
+        .upsert({
+          id: option.id,
+          name: option.name,
+          description: option.description,
+          platform: option.platform,
+          enabled: !option.enabled,
+          last_sync: option.lastSync?.toISOString()
+        });
+        
+      if (error) throw error;
+      
+      toast.success(`Sincronización ${!option.enabled ? "habilitada" : "deshabilitada"} para ${option.name}`);
     } catch (error) {
-      console.error("Error loading sync preferences:", error);
+      console.error("Error toggling sync:", error);
+      toast.error("Error al actualizar la configuración de sincronización");
+      
+      // Revertir cambio en UI si hay error
+      setSyncOptions(prevOptions => 
+        prevOptions.map(option => 
+          option.id === id ? { ...option, enabled: !option.enabled } : option
+        )
+      );
     }
   };
 
-  // Cargar preferencias al montar el componente
-  useState(() => {
-    loadSyncPreferences();
-  });
+  const handleSync = async () => {
+    setSyncInProgress(true);
+    
+    try {
+      // Simular proceso de sincronización
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Actualizar fecha de última sincronización
+      const now = new Date();
+      setSyncOptions(prevOptions => 
+        prevOptions.map(option => 
+          option.enabled ? { ...option, lastSync: now } : option
+        )
+      );
+      
+      // Actualizar en Supabase para las opciones habilitadas
+      const enabledOptions = syncOptions.filter(o => o.enabled);
+      
+      for (const option of enabledOptions) {
+        await supabase
+          .from('calendar_sync_settings')
+          .upsert({
+            id: option.id,
+            name: option.name,
+            description: option.description,
+            platform: option.platform,
+            enabled: option.enabled,
+            last_sync: now.toISOString()
+          });
+      }
+      
+      toast.success("Sincronización completada correctamente");
+    } catch (error) {
+      console.error("Error durante la sincronización:", error);
+      toast.error("Error durante la sincronización");
+    } finally {
+      setSyncInProgress(false);
+    }
+  };
+
+  const handleAddCalendar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.includes('@')) {
+      toast.error("Por favor, introduce un email válido");
+      return;
+    }
+    
+    try {
+      // Crear nueva configuración de sincronización
+      const newOption: SyncOption = {
+        id: `${selectedPlatform}-${Date.now()}`,
+        name: `${selectedPlatform === 'google' ? 'Google Calendar' : 
+               selectedPlatform === 'outlook' ? 'Microsoft Outlook' : 
+               'Calendario personalizado'}`,
+        description: `Sincronización con ${email}`,
+        enabled: true,
+        platform: selectedPlatform
+      };
+      
+      // Actualizar estado local
+      setSyncOptions([...syncOptions, newOption]);
+      
+      // Guardar en Supabase
+      const { error } = await supabase
+        .from('calendar_sync_settings')
+        .insert({
+          id: newOption.id,
+          name: newOption.name,
+          description: newOption.description,
+          platform: newOption.platform,
+          enabled: newOption.enabled,
+          email: email
+        });
+        
+      if (error) throw error;
+      
+      toast.success("Calendario añadido correctamente");
+      setEmail("");
+    } catch (error) {
+      console.error("Error al añadir calendario:", error);
+      toast.error("Error al añadir calendario");
+    }
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sincronización de calendarios</CardTitle>
+        <CardTitle>Sincronización de calendario</CardTitle>
         <CardDescription>
-          Sincroniza tu calendario laboral con otras plataformas.
+          Mantén tu calendario sincronizado con otras aplicaciones
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="google-sync" className="flex items-center space-x-2">
-              <img src="/google-calendar.svg" alt="Google Calendar" className="h-6 w-6" />
-              <span>Sincronizar con Google Calendar</span>
-            </Label>
-            <Switch
-              id="google-sync"
-              checked={syncGoogle}
-              onCheckedChange={setSyncGoogle}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="outlook-sync" className="flex items-center space-x-2">
-              <img src="/outlook-calendar.svg" alt="Outlook Calendar" className="h-6 w-6" />
-              <span>Sincronizar con Outlook Calendar</span>
-            </Label>
-            <Switch
-              id="outlook-sync"
-              checked={syncOutlook}
-              onCheckedChange={setSyncOutlook}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="apple-sync" className="flex items-center space-x-2">
-              <img src="/apple-calendar.svg" alt="Apple Calendar" className="h-6 w-6" />
-              <span>Sincronizar con Apple Calendar</span>
-            </Label>
-            <Switch
-              id="apple-sync"
-              checked={syncApple}
-              onCheckedChange={setSyncApple}
-            />
-          </div>
-          
-          <div className="text-sm text-muted-foreground">
-            La sincronización permitirá que tus turnos aparezcan en los calendarios seleccionados.
-          </div>
-          
-          <Button 
-            onClick={handleSync} 
-            className="w-full"
-            disabled={syncing}
-          >
-            {syncing ? "Sincronizando..." : "Sincronizar ahora"}
-          </Button>
-          
-          <div className="text-xs text-muted-foreground text-center">
-            Última sincronización: {new Date().toLocaleDateString('es-ES', { 
-              day: 'numeric', 
-              month: 'long', 
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </div>
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          {syncOptions.map((option) => (
+            <div key={option.id} className="flex items-start space-x-2">
+              <Checkbox 
+                id={`sync-${option.id}`} 
+                checked={option.enabled}
+                onCheckedChange={() => toggleSync(option.id)}
+              />
+              <div className="grid gap-1.5 leading-none">
+                <Label htmlFor={`sync-${option.id}`} className="text-base">
+                  {option.name}
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  {option.description}
+                </p>
+                {option.lastSync && (
+                  <p className="text-xs text-muted-foreground flex items-center mt-1">
+                    <CalendarClock className="h-3 w-3 mr-1" />
+                    Última sincronización: {option.lastSync.toLocaleString()}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={handleSync}
+          disabled={syncInProgress || !syncOptions.some(o => o.enabled)}
+        >
+          {syncInProgress ? (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              Sincronizando...
+            </>
+          ) : (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Sincronizar ahora
+            </>
+          )}
+        </Button>
+        
+        <div className="pt-6 border-t">
+          <h3 className="font-medium mb-4">Añadir nuevo calendario</h3>
+          <form onSubmit={handleAddCalendar} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="col-span-1">
+                <Label>Plataforma</Label>
+                <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar plataforma" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="google">Google Calendar</SelectItem>
+                    <SelectItem value="outlook">Microsoft Outlook</SelectItem>
+                    <SelectItem value="other">Otro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="col-span-2">
+                <Label>Email</Label>
+                <div className="flex space-x-2">
+                  <Input 
+                    type="email"
+                    placeholder="Tu dirección de email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <Button type="submit">
+                    <Check className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
       </CardContent>
+      <CardFooter className="border-t pt-4 text-sm text-muted-foreground">
+        <div className="flex space-x-1">
+          <CalendarClock className="h-4 w-4" />
+          <p>Los cambios pueden tardar hasta 24 horas en sincronizarse completamente.</p>
+        </div>
+      </CardFooter>
     </Card>
   );
 }
