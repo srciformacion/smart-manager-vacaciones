@@ -24,10 +24,10 @@ export function useWorkCalendar(userId: string) {
   const [annualHours, setAnnualHours] = useState<AnnualHours | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Function to fetch shifts from Supabase or fallback to example data
+  // Función para obtener turnos desde Supabase
   const fetchShifts = async (userId: string, year: number, month: number) => {
     try {
-      // Try to get shifts from Supabase
+      // Obtenemos los turnos de Supabase
       const startDate = new Date(year, month - 1, 1); // Month is 0-indexed in JS
       const endDate = endOfMonth(startDate);
       
@@ -40,12 +40,12 @@ export function useWorkCalendar(userId: string) {
         
       if (error) {
         console.error("Error fetching shifts:", error);
-        // Fallback to example data
+        // Si hay error, generamos datos de ejemplo
         return generateMonthlyShifts(userId, year, month);
       }
       
       if (data && data.length > 0) {
-        // Map Supabase data to CalendarShift format
+        // Convertimos los datos de Supabase al formato CalendarShift
         return data.map(shift => ({
           id: shift.id,
           userId: shift.user_id,
@@ -61,12 +61,49 @@ export function useWorkCalendar(userId: string) {
         }));
       }
       
-      // If no data from Supabase, use example data
+      // Si no hay datos en Supabase, generamos datos de ejemplo
       return generateMonthlyShifts(userId, year, month);
     } catch (error) {
       console.error("Error in fetchShifts:", error);
-      // Fallback to example data
+      // En caso de error, usamos datos de ejemplo
       return generateMonthlyShifts(userId, year, month);
+    }
+  };
+
+  // Función para guardar un turno en Supabase
+  const saveShift = async (shift: CalendarShift) => {
+    try {
+      // Preparamos los datos para Supabase
+      const shiftData = {
+        user_id: shift.userId,
+        date: format(shift.date, 'yyyy-MM-dd'),
+        type: shift.type,
+        start_time: shift.startTime,
+        end_time: shift.endTime,
+        hours: shift.hours || 0,
+        notes: shift.notes,
+        is_exception: shift.isException || false,
+        exception_reason: shift.exceptionReason
+      };
+      
+      // Insertamos o actualizamos el turno
+      const { data, error } = await supabase
+        .from('calendar_shifts')
+        .upsert(shiftData)
+        .select();
+        
+      if (error) {
+        console.error("Error saving shift:", error);
+        toast.error("Error al guardar el turno");
+        return null;
+      }
+      
+      toast.success("Turno guardado correctamente");
+      return data[0];
+    } catch (error) {
+      console.error("Error in saveShift:", error);
+      toast.error("Error al guardar el turno");
+      return null;
     }
   };
 
@@ -88,7 +125,7 @@ export function useWorkCalendar(userId: string) {
     }
   };
 
-  // Load calendar data
+  // Función para cargar datos del calendario
   const loadCalendarData = async (date: Date = new Date()) => {
     setIsLoading(true);
     
@@ -96,12 +133,11 @@ export function useWorkCalendar(userId: string) {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       
-      // Load shifts for the current month
+      // Cargamos turnos del mes actual
       const monthlyShifts = await fetchShifts(userId, year, month);
       setShifts(monthlyShifts);
       
-      // Load annual hours data (fallback to example data for now)
-      // In a full implementation, this would be fetched from Supabase
+      // Cargamos datos de horas anuales
       const { data: annualHoursData, error } = await supabase
         .from('annual_hours')
         .select('*')
@@ -124,21 +160,57 @@ export function useWorkCalendar(userId: string) {
           personalLeaveHours: annualHoursData.personal_leave_hours,
           seniorityAdjustment: annualHoursData.seniority_adjustment,
           remainingHours: annualHoursData.remaining_hours,
-          // Special circumstances would be handled separately
+          // Las circunstancias especiales se manejarían por separado
         });
       } else {
-        // Fallback example data
-        setAnnualHours({
-          userId,
+        // Si no hay datos, creamos un registro inicial en Supabase
+        const defaultHours = {
+          user_id: userId,
           year,
-          baseHours: 1700,
-          workedHours: 450,
-          vacationHours: 40,
-          sickLeaveHours: 0,
-          personalLeaveHours: 8,
-          seniorityAdjustment: 16,
-          remainingHours: 1186,
-        });
+          base_hours: 1700,
+          worked_hours: 0,
+          vacation_hours: 0,
+          sick_leave_hours: 0,
+          personal_leave_hours: 0,
+          seniority_adjustment: 0,
+          remaining_hours: 1700
+        };
+        
+        const { data: newHoursData, error: insertError } = await supabase
+          .from('annual_hours')
+          .insert(defaultHours)
+          .select();
+          
+        if (insertError) {
+          console.error("Error creating annual hours:", insertError);
+        }
+        
+        if (newHoursData && newHoursData.length > 0) {
+          setAnnualHours({
+            userId,
+            year,
+            baseHours: 1700,
+            workedHours: 0,
+            vacationHours: 0,
+            sickLeaveHours: 0,
+            personalLeaveHours: 0,
+            seniorityAdjustment: 0,
+            remainingHours: 1700,
+          });
+        } else {
+          // Usamos datos de ejemplo si hay error
+          setAnnualHours({
+            userId,
+            year,
+            baseHours: 1700,
+            workedHours: 450,
+            vacationHours: 40,
+            sickLeaveHours: 0,
+            personalLeaveHours: 8,
+            seniorityAdjustment: 16,
+            remainingHours: 1186,
+          });
+        }
       }
     } catch (error) {
       console.error("Error loading calendar data:", error);
@@ -148,7 +220,31 @@ export function useWorkCalendar(userId: string) {
     }
   };
 
-  // Temporal navigation
+  // Actualiza las horas trabajadas en la base de datos
+  const updateWorkedHours = async (hours: number) => {
+    if (!annualHours) return null;
+    
+    try {
+      const { data, error } = await supabase
+        .from('annual_hours')
+        .update({ worked_hours: hours })
+        .eq('user_id', userId)
+        .eq('year', annualHours.year)
+        .select();
+        
+      if (error) {
+        console.error("Error updating worked hours:", error);
+        return null;
+      }
+      
+      return data[0];
+    } catch (error) {
+      console.error("Error in updateWorkedHours:", error);
+      return null;
+    }
+  };
+
+  // Navegación temporal
   const navigate = (type: 'day' | 'month' | 'year', direction: 'previous' | 'next') => {
     let nextDate: Date;
     
@@ -170,33 +266,33 @@ export function useWorkCalendar(userId: string) {
     loadCalendarData(nextDate);
   };
 
-  // Navigate to the next month
+  // Ir al mes siguiente
   const nextMonth = () => {
     navigate('month', 'next');
   };
   
-  // Navigate to the previous month
+  // Ir al mes anterior
   const previousMonth = () => {
     navigate('month', 'previous');
   };
 
-  // Navigate to a specific date
+  // Seleccionar una fecha específica
   const selectDate = (date: Date) => {
     setCurrentDate(date);
     loadCalendarData(date);
   };
 
-  // Calculate monthly statistics
+  // Calcular estadísticas mensuales
   const calculateMonthStats = () => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     
-    // Sum worked hours for the current month
+    // Sumar las horas trabajadas del mes actual
     const workedHours = shifts.reduce((total, shift) => {
       return isSameDay(shift.date, monthStart) || 
              isSameDay(shift.date, monthEnd) || 
              (shift.date > monthStart && shift.date < monthEnd) 
-        ? total + shift.hours 
+        ? total + (shift.hours || 0) 
         : total;
     }, 0);
     
@@ -212,7 +308,7 @@ export function useWorkCalendar(userId: string) {
     };
   };
 
-  // Calculate annual statistics
+  // Calcular estadísticas anuales
   const calculateAnnualStats = () => {
     if (!annualHours) return null;
     
@@ -231,35 +327,37 @@ export function useWorkCalendar(userId: string) {
     };
   };
 
-  // Export data to different formats
+  // Exportar datos a diferentes formatos
   const exportData = (format: 'pdf' | 'excel' | 'csv') => {
     toast.success(`Exportando calendario en formato ${format.toUpperCase()}...`);
     
-    // Simulation of export (would be implemented with real data)
+    // Implementación de exportación (simulación)
     setTimeout(() => {
       toast.success(`Calendario exportado exitosamente en formato ${format.toUpperCase()}`);
     }, 1500);
   };
 
-  // Load initial data
+  // Cargar datos iniciales
   useEffect(() => {
-    loadCalendarData(currentDate);
+    if (userId) {
+      loadCalendarData(currentDate);
+    }
   }, [userId]);
 
-  // Generate monthly shifts for a specific user (fallback function)
+  // Generar turnos mensuales para un usuario específico (función de fallback)
   const generateMonthlyShifts = (userId: string, year: number, month: number): CalendarShift[] => {
     const startDate = startOfMonth(new Date(year, month - 1));
     const endDate = endOfMonth(startDate);
     
-    // Generate a sequence of days in the month
+    // Generar una secuencia de días en el mes
     const days = [];
     for (let day = new Date(startDate); day <= endDate; day = addDays(day, 1)) {
       days.push(new Date(day));
     }
     
-    // Basic pattern for shifts based on weekday
+    // Patrón básico de turnos basado en el día de la semana
     return days.map(day => {
-      const weekday = day.getDay(); // 0 = Sunday, 1 = Monday, ...
+      const weekday = day.getDay(); // 0 = domingo, 1 = lunes, ...
       
       let shiftType: any;
       let hours: number;
@@ -267,41 +365,41 @@ export function useWorkCalendar(userId: string) {
       let endTime: string | undefined;
       
       switch (weekday) {
-        case 1: // Monday
+        case 1: // Lunes
           shiftType = "morning";
           hours = 8;
           startTime = "07:00";
           endTime = "15:00";
           break;
-        case 2: // Tuesday
+        case 2: // Martes
           shiftType = "morning";
           hours = 8;
           startTime = "07:00";
           endTime = "15:00";
           break;
-        case 3: // Wednesday
+        case 3: // Miércoles
           shiftType = "afternoon";
           hours = 8;
           startTime = "15:00";
           endTime = "23:00";
           break;
-        case 4: // Thursday
+        case 4: // Jueves
           shiftType = "afternoon";
           hours = 8;
           startTime = "15:00";
           endTime = "23:00";
           break;
-        case 5: // Friday
+        case 5: // Viernes
           shiftType = "night";
           hours = 8;
           startTime = "23:00";
           endTime = "07:00";
           break;
-        case 6: // Saturday
+        case 6: // Sábado
           shiftType = "free";
           hours = 0;
           break;
-        case 0: // Sunday
+        case 0: // Domingo
           shiftType = "free";
           hours = 0;
           break;
@@ -310,7 +408,8 @@ export function useWorkCalendar(userId: string) {
           hours = 0;
       }
       
-      return {
+      // Crear el turno
+      const shift: CalendarShift = {
         id: `${userId}-${day.toISOString()}`,
         userId,
         date: day,
@@ -320,6 +419,11 @@ export function useWorkCalendar(userId: string) {
         color: getShiftColor(shiftType),
         hours,
       };
+      
+      // Guardar el turno en Supabase para futuras consultas
+      saveShift(shift).catch(console.error);
+      
+      return shift;
     });
   };
 
@@ -334,6 +438,8 @@ export function useWorkCalendar(userId: string) {
     navigate,
     calculateMonthStats,
     calculateAnnualStats,
-    exportData
+    exportData,
+    saveShift,
+    updateWorkedHours
   };
 }

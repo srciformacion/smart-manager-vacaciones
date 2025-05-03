@@ -1,65 +1,168 @@
 
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
-export function CalendarSync() {
-  const handleSync = (provider: string) => {
-    toast.success(`Sincronizando con ${provider}...`);
+interface CalendarSyncProps {
+  userId?: string;
+}
+
+export function CalendarSync({ userId }: CalendarSyncProps) {
+  const [syncGoogle, setSyncGoogle] = useState(false);
+  const [syncOutlook, setSyncOutlook] = useState(false);
+  const [syncApple, setSyncApple] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+
+  // Función para sincronizar calendarios (simulada por ahora)
+  const handleSync = async () => {
+    if (!userId) {
+      toast.error("Debes iniciar sesión para sincronizar calendarios");
+      return;
+    }
     
-    // Simulación de sincronización
-    setTimeout(() => {
-      toast.success(`Calendario sincronizado correctamente con ${provider}`);
-    }, 1500);
+    // Si no hay ninguna sincronización activada
+    if (!syncGoogle && !syncOutlook && !syncApple) {
+      toast.error("Por favor selecciona al menos una plataforma para sincronizar");
+      return;
+    }
+    
+    setSyncing(true);
+    
+    try {
+      // Simulamos la sincronización (esto sería reemplazado por la API real)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Guardar preferencias de sincronización en Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          sync_preferences: {
+            google: syncGoogle,
+            outlook: syncOutlook,
+            apple: syncApple,
+            last_synced: new Date().toISOString()
+          }
+        })
+        .eq('id', userId);
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Mostrar mensaje de éxito
+      toast.success("Calendarios sincronizados correctamente");
+    } catch (error: any) {
+      console.error("Error syncing calendars:", error);
+      toast.error(`Error al sincronizar: ${error.message}`);
+    } finally {
+      setSyncing(false);
+    }
   };
-  
+
+  // Cargar preferencias de sincronización guardadas
+  const loadSyncPreferences = async () => {
+    if (!userId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('sync_preferences')
+        .eq('id', userId)
+        .single();
+        
+      if (error) {
+        console.error("Error loading sync preferences:", error);
+        return;
+      }
+      
+      if (data?.sync_preferences) {
+        setSyncGoogle(data.sync_preferences.google || false);
+        setSyncOutlook(data.sync_preferences.outlook || false);
+        setSyncApple(data.sync_preferences.apple || false);
+      }
+    } catch (error) {
+      console.error("Error loading sync preferences:", error);
+    }
+  };
+
+  // Cargar preferencias al montar el componente
+  useState(() => {
+    loadSyncPreferences();
+  });
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg font-medium">Sincronización de Calendario</CardTitle>
+        <CardTitle>Sincronización de calendarios</CardTitle>
         <CardDescription>
-          Sincroniza tu calendario laboral con tus aplicaciones preferidas
+          Sincroniza tu calendario laboral con otras plataformas.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="google-sync">Google Calendar</Label>
-            <p className="text-xs text-muted-foreground">
-              Sincroniza automáticamente con tu cuenta de Google
-            </p>
+      <CardContent>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between space-x-2">
+            <Label htmlFor="google-sync" className="flex items-center space-x-2">
+              <img src="/google-calendar.svg" alt="Google Calendar" className="h-6 w-6" />
+              <span>Sincronizar con Google Calendar</span>
+            </Label>
+            <Switch
+              id="google-sync"
+              checked={syncGoogle}
+              onCheckedChange={setSyncGoogle}
+            />
           </div>
-          <Switch id="google-sync" onCheckedChange={() => handleSync("Google Calendar")} />
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="outlook-sync">Microsoft Outlook</Label>
-            <p className="text-xs text-muted-foreground">
-              Sincroniza con tu calendario de Microsoft
-            </p>
+          
+          <div className="flex items-center justify-between space-x-2">
+            <Label htmlFor="outlook-sync" className="flex items-center space-x-2">
+              <img src="/outlook-calendar.svg" alt="Outlook Calendar" className="h-6 w-6" />
+              <span>Sincronizar con Outlook Calendar</span>
+            </Label>
+            <Switch
+              id="outlook-sync"
+              checked={syncOutlook}
+              onCheckedChange={setSyncOutlook}
+            />
           </div>
-          <Switch id="outlook-sync" onCheckedChange={() => handleSync("Microsoft Outlook")} />
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="apple-sync">Apple Calendar</Label>
-            <p className="text-xs text-muted-foreground">
-              Sincroniza con tu calendario de Apple
-            </p>
+          
+          <div className="flex items-center justify-between space-x-2">
+            <Label htmlFor="apple-sync" className="flex items-center space-x-2">
+              <img src="/apple-calendar.svg" alt="Apple Calendar" className="h-6 w-6" />
+              <span>Sincronizar con Apple Calendar</span>
+            </Label>
+            <Switch
+              id="apple-sync"
+              checked={syncApple}
+              onCheckedChange={setSyncApple}
+            />
           </div>
-          <Switch id="apple-sync" onCheckedChange={() => handleSync("Apple Calendar")} />
+          
+          <div className="text-sm text-muted-foreground">
+            La sincronización permitirá que tus turnos aparezcan en los calendarios seleccionados.
+          </div>
+          
+          <Button 
+            onClick={handleSync} 
+            className="w-full"
+            disabled={syncing}
+          >
+            {syncing ? "Sincronizando..." : "Sincronizar ahora"}
+          </Button>
+          
+          <div className="text-xs text-muted-foreground text-center">
+            Última sincronización: {new Date().toLocaleDateString('es-ES', { 
+              day: 'numeric', 
+              month: 'long', 
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={() => navigator.clipboard.writeText('https://calendario.ejemplo.com/worker123')}>
-          Copiar enlace de calendario
-        </Button>
-        <Button variant="secondary" onClick={() => toast.success("Código QR generado")}>
-          Generar código QR
-        </Button>
-      </CardFooter>
     </Card>
   );
 }

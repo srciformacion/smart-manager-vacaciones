@@ -1,175 +1,286 @@
 
-import { useState } from "react";
-import { CalendarShift } from "@/types/calendar";
-import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from "date-fns";
-import { es } from "date-fns/locale";
-import { Badge } from "@/components/ui/badge";
+import React from 'react';
+import { addDays, format, getDay, startOfMonth, endOfMonth, isToday, isSameMonth } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { CalendarShift } from '@/types/calendar';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useState } from 'react';
+import { toast } from "sonner";
 
 interface MonthCalendarProps {
   currentDate: Date;
   shifts: CalendarShift[];
+  onShiftEdit?: (shift: CalendarShift) => Promise<any>;
 }
 
-export function MonthCalendar({ currentDate, shifts }: MonthCalendarProps) {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  
-  // Get the first day of the month and the last day of the month
+export const MonthCalendar = ({ currentDate, shifts, onShiftEdit }: MonthCalendarProps) => {
+  const [selectedShift, setSelectedShift] = useState<CalendarShift | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedShift, setEditedShift] = useState<CalendarShift | null>(null);
+
+  // Días de la semana
+  const weekDays = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
+
+  // Obtener las fechas para el calendario del mes actual
   const monthStart = startOfMonth(currentDate);
-  const monthEnd = endOfMonth(currentDate);
+  const monthEnd = endOfMonth(monthStart);
+  const startDate = monthStart;
+  const endDate = monthEnd;
+
+  // Calcular los días que se muestran en el calendario
+  const calendarDays = [];
+  let day = startDate;
   
-  // Get all days of the month
-  const days = eachDayOfInterval({
-    start: monthStart,
-    end: monthEnd,
-  });
+  // Ajustar el día de inicio para que comience en lunes (1)
+  const startDay = getDay(startDate) || 7; // Si es domingo (0), lo convierte a 7
+  for (let i = 1; i < startDay; i++) {
+    calendarDays.push(null); // Días vacíos al inicio
+  }
   
-  // Days of the week (0: Sunday, 1: Monday, ..., 6: Saturday)
-  const weekDays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-  
-  // Function to get the shift for a specific day
-  const getShiftForDay = (day: Date) => {
-    return shifts.find(shift => isSameDay(new Date(shift.date), day));
+  // Añadir todos los días del mes
+  while (day <= endDate) {
+    calendarDays.push(day);
+    day = addDays(day, 1);
+  }
+
+  // Obtener el turno para una fecha específica
+  const getShiftForDate = (date: Date | null) => {
+    if (!date) return null;
+    
+    return shifts.find(shift => 
+      format(shift.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+    );
   };
 
-  // Color by shift type
-  const getShiftColor = (type: string) => {
-    switch (type) {
-      case "morning":
-        return "bg-blue-100 text-blue-800 border-blue-300";
-      case "afternoon":
-        return "bg-amber-100 text-amber-800 border-amber-300";
-      case "night":
-        return "bg-indigo-100 text-indigo-800 border-indigo-300";
-      case "24h":
-        return "bg-red-100 text-red-800 border-red-300";
-      case "free":
-        return "bg-green-100 text-green-800 border-green-300";
-      case "guard":
-        return "bg-purple-100 text-purple-800 border-purple-300";
-      case "unassigned":
-        return "bg-gray-100 text-gray-800 border-gray-300";
-      case "training":
-        return "bg-orange-100 text-orange-800 border-orange-300";
-      case "special":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300";
-      case "oncall":
-        return "bg-teal-100 text-teal-800 border-teal-300";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
-    }
+  // Abrir diálogo de edición de turno
+  const openShiftDialog = (shift: CalendarShift) => {
+    setSelectedShift(shift);
+    setEditedShift({...shift});
+    setIsEditing(true);
   };
 
-  // Translation of shift types
-  const getShiftTypeName = (type: string) => {
-    switch (type) {
-      case "morning":
-        return "Mañana";
-      case "afternoon":
-        return "Tarde";
-      case "night":
-        return "Noche";
-      case "24h":
-        return "Guardia 24h";
-      case "free":
-        return "Libre";
-      case "guard":
-        return "Guardia";
-      case "unassigned":
-        return "Sin asignar";
-      case "training":
-        return "Formación";
-      case "special":
-        return "Especial";
-      case "oncall":
-        return "Localizado";
-      default:
-        return type;
+  // Guardar cambios en el turno
+  const saveShiftChanges = async () => {
+    if (!editedShift) return;
+    
+    try {
+      if (onShiftEdit) {
+        await onShiftEdit(editedShift);
+        // Actualizar el turno en el array local
+        const updatedShifts = shifts.map(s => 
+          s.id === editedShift.id ? editedShift : s
+        );
+        // Actualizamos la UI
+        toast.success("Turno actualizado correctamente");
+      }
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving shift:", error);
+      toast.error("Error al guardar el turno");
     }
   };
 
   return (
-    <div className="bg-card rounded-md p-4 border">
-      <div className="grid grid-cols-7 gap-1">
-        {/* Header with days of the week */}
-        {weekDays.map((day) => (
-          <div 
-            key={day} 
-            className="text-center py-2 text-xs font-medium text-muted-foreground"
-          >
-            {day}
-          </div>
-        ))}
-        
-        {/* Empty spaces to adjust the first day of the month */}
-        {Array.from({ length: (monthStart.getDay() + 6) % 7 }, (_, i) => (
-          <div key={`empty-${i}`} className="aspect-square"></div>
-        ))}
-        
-        {/* Days of the month */}
-        {days.map((day) => {
-          const shift = getShiftForDay(day);
-          const isToday = isSameDay(day, new Date());
-          const isSelected = selectedDate ? isSameDay(day, selectedDate) : false;
-          
-          return (
-            <TooltipProvider key={day.toISOString()}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div 
-                    className={cn(
-                      "aspect-square p-1 border rounded-md cursor-pointer transition-all",
-                      isToday && "ring-2 ring-primary",
-                      isSelected && "ring-2 ring-primary-foreground",
-                      !shift || shift.type === "unassigned" ? "hover:bg-muted/50" : "hover:bg-opacity-80"
-                    )}
-                    onClick={() => setSelectedDate(day)}
-                  >
-                    <div className="h-full flex flex-col">
-                      <div className="text-right text-xs p-1">
-                        {format(day, "d")}
+    <>
+      <Card>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-7 gap-1">
+            {/* Cabecera con los días de la semana */}
+            {weekDays.map(day => (
+              <div key={day} className="text-center font-medium py-2">
+                {day}
+              </div>
+            ))}
+            
+            {/* Días del calendario */}
+            {calendarDays.map((date, i) => {
+              const shift = getShiftForDate(date);
+              const isCurrentMonth = date ? isSameMonth(date, currentDate) : false;
+              
+              return (
+                <div 
+                  key={i} 
+                  className={`min-h-[80px] p-1 border rounded-md ${
+                    date && isToday(date) 
+                      ? 'bg-muted border-primary' 
+                      : isCurrentMonth 
+                        ? 'bg-card' 
+                        : 'bg-muted-foreground/10'
+                  }`}
+                  onClick={() => shift && openShiftDialog(shift)}
+                >
+                  {date ? (
+                    <>
+                      <div className="text-xs font-medium mb-1">
+                        {format(date, 'd')}
                       </div>
                       
-                      {shift && shift.type !== "unassigned" && (
-                        <div className="flex-1 flex items-end justify-center pb-1">
+                      {shift ? (
+                        <div className="space-y-1 text-xs">
                           <Badge 
-                            className={cn(
-                              "text-[0.6rem] h-5 px-1",
-                              getShiftColor(shift.type)
-                            )}
-                            variant="outline"
+                            variant="outline" 
+                            className={`w-full justify-center bg-${shift.color}-100 border-${shift.color}-300 text-${shift.color}-600`}
                           >
-                            {getShiftTypeName(shift.type)}
+                            {shift.type === 'morning' && 'Mañana'}
+                            {shift.type === 'afternoon' && 'Tarde'}
+                            {shift.type === 'night' && 'Noche'}
+                            {shift.type === 'free' && 'Libre'}
+                            {shift.type === 'unassigned' && 'Sin asignar'}
+                            {shift.type === '24h' && '24h'}
+                            {shift.type === 'guard' && 'Guardia'}
+                            {shift.type === 'training' && 'Formación'}
                           </Badge>
+                          
+                          {shift.startTime && shift.endTime && (
+                            <div className="text-center text-muted-foreground">
+                              {shift.startTime} - {shift.endTime}
+                            </div>
+                          )}
+                          
+                          {shift.hours > 0 && (
+                            <div className="text-center font-medium">
+                              {shift.hours}h
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          -
                         </div>
                       )}
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{format(day, "EEEE d 'de' MMMM, yyyy", { locale: es })}</p>
-                  {shift && shift.type !== "unassigned" && (
-                    <>
-                      <p className="font-bold">{getShiftTypeName(shift.type)}</p>
-                      {shift.startTime && shift.endTime && (
-                        <p>{shift.startTime} - {shift.endTime}</p>
-                      )}
-                      {shift.hours > 0 && <p>{shift.hours} horas</p>}
-                      {shift.notes && <p className="italic">{shift.notes}</p>}
                     </>
-                  )}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          );
-        })}
-      </div>
-    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Diálogo de edición de turno */}
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Editar turno</DialogTitle>
+          </DialogHeader>
+          
+          {editedShift && (
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="date">Fecha</Label>
+                <Input 
+                  id="date" 
+                  value={format(editedShift.date, 'yyyy-MM-dd')} 
+                  disabled 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="type">Tipo de turno</Label>
+                <Select 
+                  value={editedShift.type} 
+                  onValueChange={(value) => 
+                    setEditedShift({...editedShift, type: value, color: getShiftColor(value)})
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="morning">Mañana</SelectItem>
+                    <SelectItem value="afternoon">Tarde</SelectItem>
+                    <SelectItem value="night">Noche</SelectItem>
+                    <SelectItem value="24h">24 horas</SelectItem>
+                    <SelectItem value="free">Libre</SelectItem>
+                    <SelectItem value="guard">Guardia</SelectItem>
+                    <SelectItem value="unassigned">Sin asignar</SelectItem>
+                    <SelectItem value="training">Formación</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="startTime">Hora inicio</Label>
+                  <Input 
+                    id="startTime" 
+                    value={editedShift.startTime || ""} 
+                    onChange={(e) => setEditedShift({...editedShift, startTime: e.target.value})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endTime">Hora fin</Label>
+                  <Input 
+                    id="endTime" 
+                    value={editedShift.endTime || ""} 
+                    onChange={(e) => setEditedShift({...editedShift, endTime: e.target.value})} 
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="hours">Horas</Label>
+                <Input 
+                  id="hours" 
+                  type="number" 
+                  value={editedShift.hours || 0} 
+                  onChange={(e) => setEditedShift({...editedShift, hours: parseFloat(e.target.value)})} 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="notes">Notas</Label>
+                <Input 
+                  id="notes" 
+                  value={editedShift.notes || ""} 
+                  onChange={(e) => setEditedShift({...editedShift, notes: e.target.value})} 
+                />
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsEditing(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={saveShiftChanges}>
+              Guardar cambios
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
-}
+
+  function getShiftColor(type: string): any {
+    switch (type) {
+      case "morning": return "blue";
+      case "afternoon": return "amber";
+      case "night": return "indigo";
+      case "24h": return "red";
+      case "free": return "green";
+      case "guard": return "purple";
+      case "unassigned": return "gray";
+      case "training": return "orange";
+      default: return "gray";
+    }
+  }
+};

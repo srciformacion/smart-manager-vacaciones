@@ -14,13 +14,15 @@ import { CalendarSync } from "@/components/worker/calendar/calendar-sync";
 import { exampleUser } from "@/data/example-users";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function WorkCalendarPage() {
   const { user, fetchAuthUser } = useProfileAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [vacationDays, setVacationDays] = useState({ used: 0, total: 22 });
   
-  // Initialize calendar hook
+  // Inicializamos el hook del calendario
   const {
     currentDate,
     shifts,
@@ -32,9 +34,11 @@ export default function WorkCalendarPage() {
     navigate: navigateCalendar,
     calculateMonthStats,
     calculateAnnualStats,
-    exportData
+    exportData,
+    saveShift
   } = useWorkCalendar(user?.id || "1");
   
+  // Verificamos autenticación y cargamos datos adicionales
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -42,7 +46,42 @@ export default function WorkCalendarPage() {
         if (!authUser) {
           toast.error("Por favor inicia sesión para acceder a tu calendario");
           navigate('/auth');
+          return;
         }
+        
+        // Obtener días de vacaciones usados
+        const { data: balanceData, error: balanceError } = await supabase
+          .from('balances')
+          .select('*')
+          .eq('userid', authUser.id)
+          .eq('year', new Date().getFullYear())
+          .single();
+        
+        if (balanceError && balanceError.code !== 'PGRST116') {
+          console.error("Error fetching balance:", balanceError);
+        }
+        
+        // Obtener solicitudes de vacaciones aprobadas
+        const { data: vacationRequests, error: requestsError } = await supabase
+          .from('requests')
+          .select('*')
+          .eq('userid', authUser.id)
+          .eq('type', 'vacation')
+          .eq('status', 'approved');
+          
+        if (requestsError) {
+          console.error("Error fetching vacation requests:", requestsError);
+        }
+        
+        // Calcular días usados
+        const usedDays = vacationRequests ? vacationRequests.length : 0;
+        const totalDays = balanceData ? balanceData.vacationdays : 22;
+        
+        setVacationDays({
+          used: usedDays,
+          total: totalDays
+        });
+        
         setLoading(false);
       } catch (error) {
         console.error("Auth check error:", error);
@@ -54,13 +93,7 @@ export default function WorkCalendarPage() {
     checkAuth();
   }, [fetchAuthUser, navigate]);
 
-  // Example data for vacation days
-  const vacationDays = {
-    used: 10,
-    total: 22
-  };
-
-  // Monthly and annual statistics
+  // Estadísticas mensuales y anuales
   const monthStats = calculateMonthStats();
   const annualStats = calculateAnnualStats();
   
@@ -101,6 +134,7 @@ export default function WorkCalendarPage() {
         <MonthCalendar
           currentDate={currentDate}
           shifts={shifts}
+          onShiftEdit={saveShift}
         />
 
         <Tabs defaultValue="corrections" className="mt-8">
@@ -110,10 +144,10 @@ export default function WorkCalendarPage() {
             <TabsTrigger value="sync">Sincronización</TabsTrigger>
           </TabsList>
           <TabsContent value="corrections" className="mt-0">
-            <CorrectionRequest />
+            <CorrectionRequest userId={user?.id} />
           </TabsContent>
           <TabsContent value="export" className="mt-0">
-            <ExportForm />
+            <ExportForm onExport={exportData} />
           </TabsContent>
           <TabsContent value="sync" className="mt-0">
             <CalendarSync />
