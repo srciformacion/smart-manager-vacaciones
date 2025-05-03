@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "@/components/ui/use-toast";
 
-// Demo users for testing
+// Demo users for testing - Asegurando que el usuario RRHH (admin) funcione correctamente
 const DEMO_USERS = [
   { email: "usuario@example.com", password: "password", role: "worker" },
   { email: "rrhh@example.com", password: "password", role: "hr" }
@@ -49,25 +49,31 @@ export default function AuthPage() {
     setIsSubmitting(true);
 
     try {
-      // Find the user in our demo users array
+      // Find the user in our demo users array - Verificamos la coincidencia exacta
       const user = DEMO_USERS.find(u => u.email === email && u.password === password);
       
       if (!user) {
         throw new Error("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
       }
 
-      // Set user role based on match or selection
-      const selectedRole = user.role as UserRole || userRole;
+      // Usamos el rol del usuario encontrado, no el seleccionado en la interfaz
+      const role = user.role as UserRole;
       
       // Store auth info in localStorage
       localStorage.setItem("user", JSON.stringify({ email, id: `user-${Date.now()}` }));
-      localStorage.setItem("userRole", selectedRole);
+      localStorage.setItem("userRole", role);
       
       // Dispatch storage event to notify other tabs
       window.dispatchEvent(new Event("storage"));
       
+      // Mostramos el rol con el que se ha iniciado sesión
+      toast({
+        title: "Sesión iniciada",
+        description: `Has iniciado sesión como ${role === "hr" ? "RRHH" : "Trabajador"}`,
+      });
+      
       // Redirect based on role
-      if (selectedRole === "hr") {
+      if (role === "hr") {
         navigate("/rrhh/dashboard");
       } else {
         navigate("/dashboard");
