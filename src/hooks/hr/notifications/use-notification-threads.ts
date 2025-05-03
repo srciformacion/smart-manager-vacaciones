@@ -138,7 +138,7 @@ export function useNotificationThreads(currentUser: User) {
       read: false
     };
     
-    const updatedThread = {
+    const updatedThread: NotificationThread = {
       ...thread,
       messages: [...thread.messages, newMessage],
       updatedAt: now,
@@ -166,7 +166,7 @@ export function useNotificationThreads(currentUser: User) {
         : message
     );
     
-    const updatedThread = {
+    const updatedThread: NotificationThread = {
       ...thread,
       messages: updatedMessages,
       status: 'open' // Reset status to open since it's been read
