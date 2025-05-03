@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Profile } from "@/components/profile/types";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ProfileWithPreferences } from "@/types/supabase-extensions";
 
 export const useProfileData = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
