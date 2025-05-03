@@ -1,202 +1,83 @@
+import { NavLink } from "react-router-dom";
+import { User } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { InstallPWAButton } from "@/components/pwa/install-pwa-button";
 
-import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { UserRole } from "@/types";
-import { LogOut } from "lucide-react";
-import {
-  Calendar, 
-  Clock,
-  LayoutDashboard,
-  MessageSquare,
-  PersonStanding,
-  Settings,
-  User,
-  Brain,
-  Bell,
-} from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
-
-interface NavLink {
-  href: string;
-  icon: React.ReactNode;
+interface NavItem {
+  to: string;
   label: string;
-  onClick?: () => void;
-  role?: string;
+  icon?: React.ReactNode;
+  requiredRole?: 'worker' | 'hr';
 }
 
 interface SidebarNavigationProps {
-  role?: UserRole;
-  onLogout?: () => void;
-  onNavigate?: () => void;
+  user: User | null;
 }
 
-export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: SidebarNavigationProps) {
-  const location = useLocation();
-  
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
-
-  const handleLogout = async () => {
-    try {
-      localStorage.removeItem("user");
-      localStorage.removeItem("userRole");
-      
-      // Dispatch storage event to notify other tabs
-      window.dispatchEvent(new Event("storage"));
-      
-      // Notify user
-      toast({
-        title: "Sesión cerrada",
-        description: "Has cerrado sesión correctamente",
-      });
-
-      // Use onLogout callback if provided
-      if (onLogout) {
-        onLogout();
-      }
-      
-      // Navigate to auth page (using window.location to ensure full page reload)
-      window.location.href = "/auth";
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-      toast({
-        variant: "destructive",
-        title: "Error al cerrar sesión",
-        description: "Ocurrió un error inesperado",
-      });
-    }
-  };
-
-  const workerLinks: NavLink[] = [
-    {
-      href: "/dashboard",
-      icon: <LayoutDashboard className="h-5 w-5" />,
-      label: "Dashboard",
-    },
-    {
-      href: "/calendario-laboral",
-      icon: <Calendar className="h-5 w-5" />,
-      label: "Calendario Laboral",
-    },
-    {
-      href: "/solicitudes/vacaciones",
-      icon: <Calendar className="h-5 w-5" />,
-      label: "Solicitud de vacaciones",
-    },
-    {
-      href: "/solicitudes/asuntos-propios",
-      icon: <Clock className="h-5 w-5" />,
-      label: "Asuntos propios",
-    },
-    {
-      href: "/solicitudes/permisos",
-      icon: <Clock className="h-5 w-5" />,
-      label: "Permisos",
-    },
-    {
-      href: "/perfiles-turno",
-      icon: <Settings className="h-5 w-5" />,
-      label: "Perfiles de turno",
-    },
-    {
-      href: "/historial",
-      icon: <Clock className="h-5 w-5" />,
-      label: "Historial",
-    },
-    {
-      href: "/chat",
-      icon: <MessageSquare className="h-5 w-5" />,
-      label: "Chat",
-    },
-    {
-      href: "/perfil",
-      icon: <User className="h-5 w-5" />,
-      label: "Perfil",
-    },
+export function SidebarNavigation({ user }: { user: User | null }) {
+  const navigationItems: NavItem[] = [
+    { to: "/dashboard", label: "Dashboard", requiredRole: 'worker' },
+    { to: "/rrhh/dashboard", label: "Dashboard RRHH", requiredRole: 'hr' },
+    { to: "/profile", label: "Mi Perfil" },
+    { to: "/calendar", label: "Calendario", requiredRole: 'worker' },
+    { to: "/rrhh/calendar", label: "Calendario RRHH", requiredRole: 'hr' },
+    { to: "/requests/vacation", label: "Solicitar Vacaciones", requiredRole: 'worker' },
+    { to: "/requests/personal-day", label: "Solicitar Día Personal", requiredRole: 'worker' },
+    { to: "/requests/leave", label: "Solicitar Permiso", requiredRole: 'worker' },
+    { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", requiredRole: 'worker' },
+    { to: "/history", label: "Historial", requiredRole: 'worker' },
+    { to: "/shift-profile", label: "Mi Perfil de Turno", requiredRole: 'worker' },
+    { to: "/rrhh/requests", label: "Gestionar Solicitudes", requiredRole: 'hr' },
+    { to: "/rrhh/workers", label: "Gestionar Trabajadores", requiredRole: 'hr' },
+    { to: "/rrhh/notification", label: "Enviar Notificación", requiredRole: 'hr' },
+    { to: "/rrhh/calendar-notification", label: "Notificar Calendario", requiredRole: 'hr' },
+    { to: "/rrhh/ai-assistant", label: "Asistente IA", requiredRole: 'hr' },
+    { to: "/rrhh/ai-dashboard", label: "Dashboard IA", requiredRole: 'hr' },
+    { to: "/chat", label: "Chat" },
   ];
-  
-  const hrLinks: NavLink[] = [
-    {
-      href: "/rrhh/dashboard",
-      icon: <LayoutDashboard className="h-5 w-5" />,
-      label: "Dashboard",
-    },
-    {
-      href: "/rrhh/solicitudes",
-      icon: <Calendar className="h-5 w-5" />,
-      label: "Gestión de solicitudes",
-    },
-    {
-      href: "/rrhh/trabajadores",
-      icon: <PersonStanding className="h-5 w-5" />,
-      label: "Gestión de trabajadores",
-    },
-    {
-      href: "/rrhh/calendarios",
-      icon: <Calendar className="h-5 w-5" />,
-      label: "Calendarios y turnos",
-    },
-    {
-      href: "/rrhh/notificaciones",
-      icon: <Bell className="h-5 w-5" />,
-      label: "Notificaciones y comunicaciones",
-    },
-    {
-      href: "/rrhh/asistente",
-      icon: <Brain className="h-5 w-5" />,
-      label: "Asistente inteligente",
-    },
-    {
-      href: "/rrhh/ai-assistant",
-      icon: <Brain className="h-5 w-5" />,
-      label: "Asistente IA",
-      role: "hr",
-    },
-    {
-      href: "/chat",
-      icon: <MessageSquare className="h-5 w-5" />,
-      label: "Chat",
-    },
-    {
-      href: "/perfil",
-      icon: <User className="h-5 w-5" />,
-      label: "Perfil",
-    },
-  ];
-  
-  const links = [
-    ...(role === "hr" ? hrLinks : workerLinks),
-    {
-      href: "#",
-      icon: <LogOut className="h-5 w-5" />,
-      label: "Cerrar sesión",
-      onClick: handleLogout,
-    },
-  ];
+
+  const filteredNavigationItems = navigationItems.filter(item => {
+    if (!item.requiredRole) return true;
+    return user?.role === item.requiredRole;
+  });
 
   return (
-    <div className="space-y-1">
-      {links.map((link) => (
-        <Link
-          key={link.href}
-          to={link.href}
-          className={cn(
-            "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-            isActive(link.href) ? "bg-accent text-accent-foreground" : "transparent"
-          )}
-          onClick={(e) => {
-            if (link.onClick) {
-              e.preventDefault();
-              link.onClick();
-            }
-            onNavigate?.();
-          }}
-        >
-          {link.icon}
-          <span className="ml-3">{link.label}</span>
-        </Link>
-      ))}
+    <div className="flex flex-col h-full">
+      <div className="px-4 py-6">
+        <NavLink to="/">
+          <Button variant="ghost" className="font-bold text-lg">
+            La Rioja Cuida
+          </Button>
+        </NavLink>
+      </div>
+      <Separator />
+      <nav className="flex-1 px-2 py-4">
+        <ul className="space-y-1">
+          {filteredNavigationItems.map((item) => (
+            <li key={item.to}>
+              <NavLink
+                to={item.to}
+                className={({ isActive }) =>
+                  `block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-accent-foreground ${
+                    isActive ? 'bg-secondary text-accent-foreground' : 'text-muted-foreground'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <Separator />
+      <div className="flex items-center gap-2 p-4">
+        <ThemeToggle />
+        <NotificationBell />
+        <InstallPWAButton />
+      </div>
     </div>
   );
 }

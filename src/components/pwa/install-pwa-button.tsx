@@ -25,22 +25,22 @@ export function InstallPWAButton() {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
-    // Detectar si la app ya está instalada
+    // Detect if the app is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
     }
 
-    // Capturar el evento beforeinstallprompt
+    // Capture the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevenir que Chrome muestre el diálogo automático
+      // Prevent Chrome from automatically showing the prompt
       e.preventDefault();
-      // Guardar el evento para usarlo más tarde
+      // Store the event for later use
       setInstallPrompt(e as BeforeInstallPromptEvent);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     
-    // Detectar cuando la app se ha instalado
+    // Detect when the app has been installed
     window.addEventListener('appinstalled', () => {
       setIsInstalled(true);
       setInstallPrompt(null);
@@ -58,7 +58,7 @@ export function InstallPWAButton() {
 
   const handleInstallClick = async () => {
     if (!installPrompt) {
-      // Si no hay evento de instalación disponible pero estamos en iOS
+      // If no installation event is available but we're on iOS
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window.MSStream);
       
       if (isIOS) {
@@ -77,23 +77,23 @@ export function InstallPWAButton() {
       return;
     }
 
-    // Mostrar el diálogo de instalación
+    // Show the installation dialog
     await installPrompt.prompt();
     
-    // Esperar la respuesta del usuario
+    // Wait for the user's choice
     const choiceResult = await installPrompt.userChoice;
     
     if (choiceResult.outcome === 'accepted') {
-      console.log('Usuario aceptó la instalación');
+      console.log('User accepted the installation');
     } else {
-      console.log('Usuario rechazó la instalación');
+      console.log('User dismissed the installation');
     }
     
-    // Limpiar el prompt guardado
+    // Clear the saved prompt
     setInstallPrompt(null);
   };
 
-  // No mostrar el botón si ya está instalada o no es posible instalar
+  // Don't show the button if already installed or not possible to install
   if (isInstalled || (!installPrompt && !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window.MSStream)))) {
     return null;
   }

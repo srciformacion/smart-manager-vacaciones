@@ -34,14 +34,17 @@ export default defineConfig(({ mode }) => ({
             sizes: '512x512',
             type: 'image/png',
           }
-        ]
+        ],
+        display: 'standalone',
+        start_url: '/',
+        background_color: '#ffffff'
       },
       strategies: 'injectManifest',
       srcDir: 'src',
-      filename: 'sw-template.js', // Changed from sw.js to sw-template.js
+      filename: 'sw-template.js',
       injectManifest: {
         injectionPoint: 'self.__WB_MANIFEST',
-        swDest: 'dist/sw.js', // Specify output path
+        swDest: 'dist/sw.js'
       }
     })
   ].filter(Boolean),
