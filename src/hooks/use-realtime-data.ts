@@ -65,36 +65,39 @@ export function useRealtimeData<T>(
 
     // Crear un canal para actualizaciones en tiempo real
     const channelName = `realtime:${subscription.tableName}`;
-    const channel = supabase
-      .channel(channelName);
     
-    // La sintaxis correcta para suscribirse a cambios de postgres
-    channel
-      .on(
-        'postgres_changes', 
-        {
-          event: subscription.event || '*',
-          schema: subscription.schema || 'public',
-          table: subscription.tableName,
-          filter: subscription.filter || undefined,
-        },
-        async (payload) => {
-          console.log('Cambio en tiempo real recibido:', payload);
-          
-          // Refrescar datos después de un cambio
-          await fetchInitialData();
-          
-          // Notificar al usuario sobre el cambio
-          const eventType = payload.eventType;
-          if (eventType === 'INSERT') {
-            toast.info('Se ha recibido una nueva solicitud');
-          } else if (eventType === 'UPDATE') {
-            toast.info('Una solicitud ha sido actualizada');
-          } else if (eventType === 'DELETE') {
-            toast.info('Una solicitud ha sido eliminada');
-          }
+    // Configuración para los cambios de Postgres
+    const changes = {
+      event: subscription.event || '*',
+      schema: subscription.schema || 'public',
+      table: subscription.tableName,
+    };
+    
+    // Si hay un filtro, lo añadimos a la configuración
+    if (subscription.filter) {
+      // @ts-ignore - Necesario para manejar el filtro opcional
+      changes.filter = subscription.filter;
+    }
+    
+    // Crear el canal y suscribirse a los cambios con la sintaxis correcta
+    const channel = supabase
+      .channel(channelName)
+      .on('postgres_changes', changes, async (payload) => {
+        console.log('Cambio en tiempo real recibido:', payload);
+        
+        // Refrescar datos después de un cambio
+        await fetchInitialData();
+        
+        // Notificar al usuario sobre el cambio
+        const eventType = payload.eventType;
+        if (eventType === 'INSERT') {
+          toast.info('Se ha recibido una nueva solicitud');
+        } else if (eventType === 'UPDATE') {
+          toast.info('Una solicitud ha sido actualizada');
+        } else if (eventType === 'DELETE') {
+          toast.info('Una solicitud ha sido eliminada');
         }
-      )
+      })
       .subscribe((status) => {
         console.log(`Estado de la suscripción a ${subscription.tableName}:`, status);
         
