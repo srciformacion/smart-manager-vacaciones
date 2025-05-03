@@ -39,6 +39,10 @@ export default defineConfig(({ mode }) => ({
         start_url: '/',
         background_color: '#ffffff'
       },
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,webp}'],
         runtimeCaching: [

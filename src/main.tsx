@@ -4,19 +4,19 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { UpdateNotification } from './components/pwa/update-notification.tsx'
+import { registerSW } from 'virtual:pwa-register'
 
-// Register Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(registration => {
-        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-      })
-      .catch(error => {
-        console.log('ServiceWorker registration failed: ', error);
-      });
-  });
-}
+// Register service worker using vite-plugin-pwa
+const updateSW = registerSW({
+  onNeedRefresh() {
+    // The PWA needs to be refreshed
+    console.log('New content is available, please refresh.')
+  },
+  onOfflineReady() {
+    // The PWA is ready to work offline
+    console.log('App is ready for offline use.')
+  }
+})
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
