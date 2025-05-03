@@ -13,6 +13,7 @@ export default function PersonalDayRequestPage() {
   const { user } = useProfileAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [balance, setBalance] = useState<Balance | null>(null);
   
   useEffect(() => {
@@ -50,6 +51,8 @@ export default function PersonalDayRequestPage() {
     if (!user) return;
     
     try {
+      setSubmitting(true);
+      
       // Calculate the number of days requested
       const startDate = values.dateRange.from;
       const endDate = values.dateRange.to;
@@ -89,6 +92,8 @@ export default function PersonalDayRequestPage() {
         title: "Error",
         description: "No se pudo enviar la solicitud. Por favor, intenta de nuevo."
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -111,7 +116,7 @@ export default function PersonalDayRequestPage() {
           requestType="personalDay"
           user={user || exampleUser}
           onSubmit={handleSubmit}
-          isSubmitting={loading}
+          isSubmitting={loading || submitting}
         />
       </div>
     </MainLayout>

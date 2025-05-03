@@ -5,6 +5,7 @@ import { DateRange } from "react-day-picker";
 import { User, Request, Balance } from "@/types";
 import { validateVacationRequest, suggestAlternativeDates, calculateAvailableDays } from "@/utils/vacationLogic";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from '@/integrations/supabase/client';
 
 export function useVacationRequest(user: User, requests: Request[], balance: Balance) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,6 +84,24 @@ export function useVacationRequest(user: User, requests: Request[], balance: Bal
     }
 
     try {
+      // Create the request in Supabase
+      const { data, error } = await supabase
+        .from('requests')
+        .insert({
+          userId: user.id,
+          type: 'vacation',
+          startDate: values.dateRange.from,
+          endDate: values.dateRange.to,
+          reason: values.reason || '',
+          notes: values.notes || '',
+          status: 'pending',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .select();
+        
+      if (error) throw error;
+      
       toast({
         title: "Solicitud enviada",
         description: "Tu solicitud de vacaciones ha sido registrada exitosamente."

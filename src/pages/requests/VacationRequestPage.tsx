@@ -63,6 +63,26 @@ export default function VacationRequestPage() {
         
         if (balanceData) {
           setBalance(balanceData);
+        } else {
+          // If no balance record exists, let's create a default one
+          const defaultBalance = {
+            userId: user.id,
+            vacationDays: 22,
+            personalDays: 6,
+            leaveDays: 5,
+            year: new Date().getFullYear()
+          };
+          
+          const { data: newBalance, error: insertError } = await supabase
+            .from('balances')
+            .insert(defaultBalance)
+            .select();
+            
+          if (insertError) {
+            console.error('Error creating default balance:', insertError);
+          } else if (newBalance && newBalance.length > 0) {
+            setBalance(newBalance[0]);
+          }
         }
         
       } catch (error) {

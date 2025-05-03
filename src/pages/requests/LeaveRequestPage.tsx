@@ -57,6 +57,24 @@ export default function LeaveRequestPage() {
       let attachmentUrl = null;
       if (file) {
         const filename = `${user.id}/${Date.now()}_${file.name}`;
+        
+        // Make sure the bucket exists before uploading
+        const { error: bucketCheckError } = await supabase
+          .storage
+          .getBucket('attachments');
+          
+        if (bucketCheckError?.message?.includes('does not exist')) {
+          console.log('Trying to create the attachments bucket');
+          const { error: createBucketError } = await supabase
+            .storage
+            .createBucket('attachments', { public: true });
+            
+          if (createBucketError) {
+            console.error('Error creating bucket:', createBucketError);
+            throw new Error('Error creating storage bucket');
+          }
+        }
+        
         const { data: uploadData, error: uploadError } = await supabase
           .storage
           .from('attachments')
