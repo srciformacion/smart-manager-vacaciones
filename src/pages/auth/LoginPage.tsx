@@ -76,6 +76,33 @@ export default function LoginPage() {
     }
   };
 
+  // Function to handle demo login
+  const handleDemoLogin = () => {
+    // Create a default user object for localStorage
+    const userData = {
+      id: `demo-${Date.now().toString()}`,
+      name: "Usuario Demo",
+      email: "demo@example.com",
+      role: userRole,
+    };
+    
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("userRole", userRole);
+    localStorage.setItem("userEmail", "demo@example.com");
+    
+    toast({
+      title: "Acceso en modo demo",
+      description: `Has accedido como ${userRole === "hr" ? "RRHH" : "Trabajador"} en modo demostración`,
+    });
+    
+    // Navigate based on selected role
+    if (userRole === "hr") {
+      navigate("/rrhh/dashboard");
+    } else {
+      navigate("/dashboard");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-secondary/20 p-4">
       <div className="absolute top-4 right-4 flex gap-2">
@@ -130,8 +157,8 @@ export default function LoginPage() {
           <p className="text-sm text-muted-foreground mb-2">
             ¿Quieres probar la aplicación sin crear una cuenta?
           </p>
-          <Button variant="outline" asChild className="transition-all duration-200 hover:bg-secondary">
-            <Link to="/roles">Acceder con rol de demostración</Link>
+          <Button variant="outline" onClick={handleDemoLogin} className="transition-all duration-200 hover:bg-secondary">
+            Acceder con rol de demostración
           </Button>
           
           <div className="mt-6 text-xs text-muted-foreground">
