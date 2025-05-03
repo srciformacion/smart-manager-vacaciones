@@ -1,48 +1,70 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { User } from '@supabase/supabase-js';
-import { toast } from '@/hooks/use-toast';
+import { User, Session } from '@supabase/supabase-js';
+import { toast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { UserRole } from '@/types';
 
-export const useAuth = () => {
+interface AuthContextType {
+  user: User | null;
+  session: Session | null;
+  loading: boolean;
+  error: string | null;
+  signIn: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string, metadata?: { [key: string]: any }) => Promise<any>;
+  signOut: () => Promise<void>;
+  userRole: UserRole;
+  setUserRole: (role: UserRole) => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<UserRole>('worker');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if there's an authenticated user when loading the component
-    const getUser = async () => {
-      setLoading(true);
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
         
-        if (error) {
-          throw error;
+        // Only execute additional logic inside setTimeout to prevent deadlocks
+        if (currentSession?.user) {
+          setTimeout(() => {
+            // Get the stored role or default to worker
+            const storedRole = localStorage.getItem('userRole') as UserRole || 'worker';
+            setUserRole(storedRole);
+          }, 0);
         }
-        
-        setUser(session?.user || null);
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('Unknown error getting session');
-        }
-        console.error('Auth error:', err);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    getUser();
-
-    // Subscribe to auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
+    );
+    
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      
+      if (currentSession?.user) {
+        // Get the stored role or default to worker
+        const storedRole = localStorage.getItem('userRole') as UserRole || 'worker';
+        setUserRole(storedRole);
+      }
+      
+      setLoading(false);
+    }).catch((err) => {
+      console.error('Error getting session:', err);
+      setError('Error getting session');
+      setLoading(false);
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -61,6 +83,21 @@ export const useAuth = () => {
         throw error;
       }
 
+      if (data.user) {
+        // Store role in localStorage for consistency
+        localStorage.setItem("userRole", userRole);
+        localStorage.setItem("userEmail", email);
+        
+        // Navigate based on role
+        setTimeout(() => {
+          if (userRole === "hr") {
+            navigate('/rrhh/dashboard');
+          } else {
+            navigate('/dashboard');
+          }
+        }, 0);
+      }
+
       return data;
     } catch (err) {
       console.error('Sign in error:', err);
@@ -77,7 +114,10 @@ export const useAuth = () => {
         email,
         password,
         options: {
-          data: metadata
+          data: { 
+            ...metadata,
+            role: userRole // Store role in user metadata
+          }
         }
       });
 
@@ -88,6 +128,13 @@ export const useAuth = () => {
           variant: "destructive"
         });
         throw error;
+      }
+
+      if (data.user) {
+        toast({
+          title: "Cuenta creada con éxito",
+          description: "Ya puedes iniciar sesión con tus credenciales.",
+        });
       }
 
       return data;
@@ -112,10 +159,17 @@ export const useAuth = () => {
         throw error;
       }
       
+      // Clear localStorage
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("userEmail");
+      localStorage.removeItem("user");
+      
       toast({
         title: "Sesión cerrada",
         description: "Has cerrado la sesión correctamente"
       });
+      
+      navigate('/auth');
       
     } catch (err) {
       console.error('Sign out error:', err);
@@ -126,12 +180,29 @@ export const useAuth = () => {
     }
   };
 
-  return {
-    user,
-    loading,
-    error,
-    signIn,
-    signUp,
-    signOut
-  };
+  return (
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        session, 
+        loading, 
+        error, 
+        signIn, 
+        signUp, 
+        signOut, 
+        userRole, 
+        setUserRole 
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
