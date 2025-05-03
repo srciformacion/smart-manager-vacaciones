@@ -1,0 +1,58 @@
+
+import { createContext, useContext, ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContextType } from './types';
+import { useAuthState } from './use-auth-state';
+import { signIn, signOut, signUp } from './auth-actions';
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const navigate = useNavigate();
+  const { 
+    user, 
+    session, 
+    loading, 
+    error, 
+    userRole, 
+    setUserRole 
+  } = useAuthState();
+
+  const handleSignIn = async (email: string, password: string) => {
+    return signIn(email, password, userRole, navigate);
+  };
+
+  const handleSignUp = async (email: string, password: string, metadata?: { [key: string]: any }) => {
+    return signUp(email, password, userRole, metadata);
+  };
+
+  const handleSignOut = async () => {
+    return signOut(navigate);
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{ 
+        user, 
+        session, 
+        loading, 
+        error, 
+        signIn: handleSignIn, 
+        signUp: handleSignUp, 
+        signOut: handleSignOut, 
+        userRole, 
+        setUserRole 
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

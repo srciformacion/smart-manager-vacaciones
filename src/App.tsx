@@ -3,7 +3,7 @@ import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Toaster } from "@/components/ui/sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AuthProvider } from "@/hooks/use-auth.tsx";
+import { AuthProvider } from "@/hooks/auth";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { UpdateNotification } from "@/components/pwa/update-notification";
 import { supabase } from '@/integrations/supabase/client';

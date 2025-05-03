@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -10,7 +9,7 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Separator } from "@/components/ui/separator";
 import { LoginForm } from "@/components/auth/login-form";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/use-auth.tsx";
+import { useAuth } from "@/hooks/auth";
 
 export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);

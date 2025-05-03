@@ -1,7 +1,7 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/hooks/use-auth.tsx";
+import { useAuth } from "@/hooks/auth";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProtectedRouteProps {

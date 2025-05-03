@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { CalendarManagement } from "@/components/hr/calendar/calendar-management";
@@ -9,7 +8,7 @@ import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth";
 
 export default function CalendarManagementPage() {
   const { user, fetchAuthUser } = useProfileAuth();
