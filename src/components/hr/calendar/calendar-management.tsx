@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { User } from "@/types";
 import { CalendarShift, ShiftType } from "@/types/calendar";
-import { useCalendarManagement } from "@/hooks/hr/use-calendar-management";
+import { useCalendarManagement } from "@/hooks/hr/calendar-management";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

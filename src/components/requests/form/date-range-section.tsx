@@ -25,7 +25,7 @@ export function DateRangeSection({ form, user, isSubmitting }: DateRangeSectionP
                 from: field.value?.from || undefined,
                 to: field.value?.to || undefined,
               }}
-              onSelect={field.onChange}
+              setDate={field.onChange}
               disabled={isSubmitting}
               className="w-full"
             />
