@@ -25,7 +25,7 @@ export default function LeaveRequestPage() {
         const { data, error } = await supabase
           .from('balances')
           .select('*')
-          .eq('userId', user.id)
+          .eq('userid', user.id)
           .eq('year', new Date().getFullYear())
           .single();
           
@@ -82,7 +82,7 @@ export default function LeaveRequestPage() {
           
         if (uploadError) throw uploadError;
         
-        // Get public URL - Using the getPublicUrl method instead of directly accessing supabaseUrl
+        // Get public URL using getPublicUrl method
         const { data } = supabase
           .storage
           .from('attachments')
@@ -91,11 +91,11 @@ export default function LeaveRequestPage() {
         attachmentUrl = data.publicUrl;
       }
       
-      // Create the request in the database
+      // Create the request in the database - using lowercase column names
       const { data, error } = await supabase
         .from('requests')
         .insert({
-          userId: user.id,
+          userid: user.id,
           type: 'leave',
           startDate: values.dateRange.from,
           endDate: values.dateRange.to,

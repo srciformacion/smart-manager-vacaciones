@@ -25,7 +25,7 @@ export default function PersonalDayRequestPage() {
         const { data, error } = await supabase
           .from('balances')
           .select('*')
-          .eq('userId', user.id)
+          .eq('userid', user.id)
           .eq('year', new Date().getFullYear())
           .single();
           
@@ -57,11 +57,11 @@ export default function PersonalDayRequestPage() {
       const startDate = values.dateRange.from;
       const endDate = values.dateRange.to;
       
-      // Create the request in the database
+      // Create the request in the database - using lowercase column names
       const { data, error } = await supabase
         .from('requests')
         .insert({
-          userId: user.id,
+          userid: user.id,
           type: 'personalDay',
           startDate,
           endDate,

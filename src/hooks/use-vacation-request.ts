@@ -84,11 +84,11 @@ export function useVacationRequest(user: User, requests: Request[], balance: Bal
     }
 
     try {
-      // Create the request in Supabase
+      // Create the request in Supabase - using lowercase column names
       const { data, error } = await supabase
         .from('requests')
         .insert({
-          userId: user.id,
+          userid: user.id,
           type: 'vacation',
           startDate: values.dateRange.from,
           endDate: values.dateRange.to,

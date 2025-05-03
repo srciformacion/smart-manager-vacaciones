@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      balances: {
+        Row: {
+          id: string
+          leavedays: number
+          personaldays: number
+          userid: string
+          vacationdays: number
+          year: number
+        }
+        Insert: {
+          id?: string
+          leavedays?: number
+          personaldays?: number
+          userid: string
+          vacationdays?: number
+          year: number
+        }
+        Update: {
+          id?: string
+          leavedays?: number
+          personaldays?: number
+          userid?: string
+          vacationdays?: number
+          year?: number
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -75,6 +102,54 @@ export type Database = {
           start_date?: string | null
           surname?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      requests: {
+        Row: {
+          attachmenturl: string | null
+          createdat: string | null
+          enddate: string
+          endtime: string | null
+          id: string
+          notes: string | null
+          reason: string | null
+          startdate: string
+          starttime: string | null
+          status: string
+          type: string
+          updatedat: string | null
+          userid: string
+        }
+        Insert: {
+          attachmenturl?: string | null
+          createdat?: string | null
+          enddate: string
+          endtime?: string | null
+          id?: string
+          notes?: string | null
+          reason?: string | null
+          startdate: string
+          starttime?: string | null
+          status?: string
+          type: string
+          updatedat?: string | null
+          userid: string
+        }
+        Update: {
+          attachmenturl?: string | null
+          createdat?: string | null
+          enddate?: string
+          endtime?: string | null
+          id?: string
+          notes?: string | null
+          reason?: string | null
+          startdate?: string
+          starttime?: string | null
+          status?: string
+          type?: string
+          updatedat?: string | null
+          userid?: string
         }
         Relationships: []
       }

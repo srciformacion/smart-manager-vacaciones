@@ -35,7 +35,7 @@ export default function VacationRequestPage() {
         const { data: userRequests, error: requestsError } = await supabase
           .from('requests')
           .select('*')
-          .eq('userId', user.id);
+          .eq('userid', user.id);
           
         if (requestsError) throw requestsError;
         
@@ -45,7 +45,8 @@ export default function VacationRequestPage() {
             startDate: new Date(req.startDate),
             endDate: new Date(req.endDate),
             createdAt: new Date(req.createdAt),
-            updatedAt: new Date(req.updatedAt)
+            updatedAt: new Date(req.updatedAt),
+            userId: req.userid // Map from lowercase userid to camelCase userId for the app's type system
           })));
         }
         
@@ -53,7 +54,7 @@ export default function VacationRequestPage() {
         const { data: balanceData, error: balanceError } = await supabase
           .from('balances')
           .select('*')
-          .eq('userId', user.id)
+          .eq('userid', user.id)
           .eq('year', new Date().getFullYear())
           .single();
           
@@ -62,11 +63,14 @@ export default function VacationRequestPage() {
         }
         
         if (balanceData) {
-          setBalance(balanceData);
+          setBalance({
+            ...balanceData,
+            userId: balanceData.userid // Map from lowercase userid to camelCase userId for the app's type system
+          });
         } else {
-          // If no balance record exists, let's create a default one
+          // If no balance record exists, create a default one
           const defaultBalance = {
-            userId: user.id,
+            userid: user.id, // Use lowercase for DB column
             vacationDays: 22,
             personalDays: 6,
             leaveDays: 5,
@@ -81,7 +85,10 @@ export default function VacationRequestPage() {
           if (insertError) {
             console.error('Error creating default balance:', insertError);
           } else if (newBalance && newBalance.length > 0) {
-            setBalance(newBalance[0]);
+            setBalance({
+              ...newBalance[0],
+              userId: newBalance[0].userid // Map from lowercase userid to camelCase userId for the app's type system
+            });
           }
         }
         
