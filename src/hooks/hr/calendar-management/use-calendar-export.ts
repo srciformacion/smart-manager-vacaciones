@@ -22,12 +22,23 @@ export function useCalendarExport(): CalendarExportActions {
   };
   
   // Importar calendario desde Excel (simulado)
-  const importFromExcel = (file: File) => {
+  const importFromExcel = async (file: File): Promise<boolean> => {
     // En una implementación real, aquí se procesaría el archivo Excel
     
     toast({
       title: "Importación iniciada",
       description: `Procesando archivo ${file.name}...`,
+    });
+    
+    // Simulate processing and return success
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        toast({
+          title: "Importación completada",
+          description: "El archivo ha sido procesado correctamente",
+        });
+        resolve(true);
+      }, 1500);
     });
   };
 
