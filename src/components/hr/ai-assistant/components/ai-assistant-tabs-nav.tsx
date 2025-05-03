@@ -1,6 +1,6 @@
 
-import { TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, CheckCircle, HelpCircle } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MessageSquare, Calendar, BarChart, Settings } from "lucide-react";
 
 interface AIAssistantTabsNavProps {
   activeTab: string;
@@ -9,42 +9,61 @@ interface AIAssistantTabsNavProps {
 
 export function AIAssistantTabsNav({ activeTab, setActiveTab }: AIAssistantTabsNavProps) {
   return (
-    <div className="px-6 pt-4 border-b">
-      <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-4">
-        <TabsTrigger 
-          value="vacation-analysis" 
-          className="flex items-center gap-1"
+    <div className="border-b">
+      <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
+        <TabsTrigger
+          value="vacation-analysis"
+          className={`rounded-none border-b-2 border-transparent px-4 pb-3 pt-2 ${
+            activeTab === "vacation-analysis" ? "border-primary" : ""
+          }`}
           onClick={() => setActiveTab("vacation-analysis")}
         >
-          <Calendar className="h-4 w-4" />
-          <span className="hidden sm:inline">Análisis de Vacaciones</span>
-          <span className="inline sm:hidden">Vacaciones</span>
+          <Calendar className="mr-2 h-4 w-4" />
+          Análisis de Vacaciones
         </TabsTrigger>
-        <TabsTrigger 
-          value="hours-calculation" 
-          className="flex items-center gap-1"
+        
+        <TabsTrigger
+          value="hours-calculation"
+          className={`rounded-none border-b-2 border-transparent px-4 pb-3 pt-2 ${
+            activeTab === "hours-calculation" ? "border-primary" : ""
+          }`}
           onClick={() => setActiveTab("hours-calculation")}
         >
-          <Clock className="h-4 w-4" />
-          <span className="hidden sm:inline">Cálculo de Horas</span>
-          <span className="inline sm:hidden">Horas</span>
+          <BarChart className="mr-2 h-4 w-4" />
+          Cálculo de Horas
         </TabsTrigger>
-        <TabsTrigger 
-          value="simulation" 
-          className="flex items-center gap-1"
+        
+        <TabsTrigger
+          value="simulation"
+          className={`rounded-none border-b-2 border-transparent px-4 pb-3 pt-2 ${
+            activeTab === "simulation" ? "border-primary" : ""
+          }`}
           onClick={() => setActiveTab("simulation")}
         >
-          <CheckCircle className="h-4 w-4" />
-          <span>Simulador</span>
+          <BarChart className="mr-2 h-4 w-4" />
+          Simulación
         </TabsTrigger>
-        <TabsTrigger 
-          value="query-assistant" 
-          className="flex items-center gap-1"
+        
+        <TabsTrigger
+          value="query-assistant"
+          className={`rounded-none border-b-2 border-transparent px-4 pb-3 pt-2 ${
+            activeTab === "query-assistant" ? "border-primary" : ""
+          }`}
           onClick={() => setActiveTab("query-assistant")}
         >
-          <HelpCircle className="h-4 w-4" />
-          <span className="hidden sm:inline">Consultas</span>
-          <span className="inline sm:hidden">Preguntar</span>
+          <MessageSquare className="mr-2 h-4 w-4" />
+          Consulta
+        </TabsTrigger>
+        
+        <TabsTrigger
+          value="ai-settings"
+          className={`rounded-none border-b-2 border-transparent px-4 pb-3 pt-2 ${
+            activeTab === "ai-settings" ? "border-primary" : ""
+          }`}
+          onClick={() => setActiveTab("ai-settings")}
+        >
+          <Settings className="mr-2 h-4 w-4" />
+          Configuración
         </TabsTrigger>
       </TabsList>
     </div>

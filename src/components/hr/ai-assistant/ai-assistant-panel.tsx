@@ -10,6 +10,7 @@ import { VacationAnalysisTab } from "./components/vacation-analysis-tab";
 import { HoursCalculationTab } from "./components/hours-calculation-tab";
 import { SimulationTab } from "./components/simulation-tab";
 import { QueryAssistantTab } from "./components/query-assistant-tab";
+import { AIConnectorSettings } from "./components/ai-connector-settings";
 import { useAIAssistant } from "./hooks/use-ai-assistant";
 
 export function AIAssistantPanel() {
@@ -26,7 +27,8 @@ export function AIAssistantPanel() {
     hoursCalculation,
     handleApproveRecommendation,
     handleSubmitQuery,
-    handleExportData
+    handleExportData,
+    handleConnectorChange
   } = useAIAssistant();
   
   return (
@@ -69,6 +71,12 @@ export function AIAssistantPanel() {
               scrollAreaRef={scrollAreaRef}
               onSubmitQuery={handleSubmitQuery}
             />
+          </TabsContent>
+          
+          <TabsContent value="ai-settings">
+            <div className="p-6">
+              <AIConnectorSettings onConnectorChange={handleConnectorChange} />
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>

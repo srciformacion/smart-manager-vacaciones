@@ -6,6 +6,7 @@ import { useRequests } from "@/hooks/use-requests";
 import { exampleRequests } from "@/data/example-requests";
 import { exampleWorkers } from "@/data/example-users";
 import { exampleBalances } from "@/data/example-balances";
+import { useAIConnector } from "@/hooks/hr/use-smart-assistant/use-ai-connector";
 
 export function useAIAssistant() {
   const [activeTab, setActiveTab] = useState("vacation-analysis");
@@ -14,16 +15,19 @@ export function useAIAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
-  // Initialize AI service
+  // Inicializar servicio AI
   const aiService = new AIService(exampleRequests, exampleWorkers, exampleBalances);
   
-  // Get vacation analysis results
+  // Obtener el conector de IA personalizable
+  const { queryAI, isLoading: connectorLoading, updateConnector } = useAIConnector();
+  
+  // Obtener el análisis de vacaciones
   const vacationAnalysis = aiService.analyzeVacationRequests();
   
-  // Get hours calculation results
+  // Obtener el cálculo de horas
   const hoursCalculation = aiService.calculateAnnualHours();
   
-  // Handle request status changes
+  // Gestionar los cambios de estado de las solicitudes
   const { handleStatusChange } = useRequests(exampleRequests, exampleWorkers);
   
   const handleApproveRecommendation = (requestId: string, recommendation: string) => {
@@ -43,22 +47,38 @@ export function useAIAssistant() {
     }
   };
   
-  const handleSubmitQuery = () => {
+  const handleSubmitQuery = async () => {
     if (!query.trim()) return;
     
     setIsLoading(true);
     
-    // Simulate API delay
-    setTimeout(() => {
-      const response = aiService.processQuery(query);
+    try {
+      // Intentar usar el conector de IA configurado primero
+      const response = await queryAI(query);
       setAIResponse(response);
+      
+    } catch (error) {
+      console.error("Error al usar el conector de IA:", error);
+      
+      // Fallback a la lógica anterior simulada
+      setTimeout(() => {
+        const response = aiService.processQuery(query);
+        setAIResponse(response);
+        setIsLoading(false);
+        
+        // Scroll to result
+        if (scrollAreaRef.current) {
+          scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+        }
+      }, 1000);
+    } finally {
       setIsLoading(false);
       
       // Scroll to result
       if (scrollAreaRef.current) {
         scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
       }
-    }, 1000);
+    }
   };
   
   const handleExportData = (type: string) => {
@@ -114,19 +134,29 @@ export function useAIAssistant() {
     }
   };
   
+  const handleConnectorChange = () => {
+    updateConnector();
+    
+    toast({
+      title: "Configuración actualizada",
+      description: "El conector de IA ha sido actualizado correctamente.",
+    });
+  };
+  
   return {
     activeTab,
     setActiveTab,
     query,
     setQuery,
     aiResponse,
-    isLoading,
+    isLoading: isLoading || connectorLoading,
     scrollAreaRef,
     aiService,
     vacationAnalysis,
     hoursCalculation,
     handleApproveRecommendation,
     handleSubmitQuery,
-    handleExportData
+    handleExportData,
+    handleConnectorChange
   };
 }
