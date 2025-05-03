@@ -2,9 +2,17 @@
 import React from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { ShiftChangeForm } from '@/components/requests/shift-change-form';
-import { exampleUser } from '@/data/example-users';
+import { exampleUser, exampleWorkers } from '@/data/example-users';
 
 export default function ShiftChangeRequestPage() {
+  // Filter out the current user from coworkers
+  const coworkers = exampleWorkers.filter(worker => worker.id !== exampleUser.id);
+
+  // Mock submission function - in a real implementation, this would connect to the database
+  const handleSubmit = (values: any) => {
+    console.log('Shift change request submitted:', values);
+  };
+
   return (
     <MainLayout user={exampleUser}>
       <div className="space-y-6">
@@ -15,7 +23,11 @@ export default function ShiftChangeRequestPage() {
           </p>
         </div>
         
-        <ShiftChangeForm />
+        <ShiftChangeForm 
+          user={exampleUser}
+          coworkers={coworkers}
+          onSubmit={handleSubmit}
+        />
       </div>
     </MainLayout>
   );
