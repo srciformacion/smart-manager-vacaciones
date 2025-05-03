@@ -1,3 +1,4 @@
+
 import { User, Request, NotificationType as AppNotificationType } from "@/types";
 
 // Tipos de notificación

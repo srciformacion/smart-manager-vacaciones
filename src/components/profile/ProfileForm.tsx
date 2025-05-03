@@ -1,17 +1,12 @@
 
+import React from "react";
 import { ProfileFormProps } from "./types";
 import { FormField } from "./FormField";
 import { FormActions } from "./FormActions";
 import { DatePickerField } from "./DatePickerField";
 import { ProfilePhotoUpload } from "./ProfilePhotoUpload";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import { NotificationPreferences } from "./NotificationPreferences";
+import { Separator } from "@/components/ui/separator";
 
 export const ProfileForm = ({
   form,
@@ -24,92 +19,94 @@ export const ProfileForm = ({
   onChange,
   onPhotoChange,
 }: ProfileFormProps) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e);
+  };
+
+  const handleDateChange = (date: Date) => {
+    onChange(date);
+  };
+
+  const handleNotificationChannelChange = (value: string) => {
+    const event = {
+      target: {
+        name: "preferred_notification_channel",
+        value,
+      },
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    onChange(event);
+  };
+
   return (
     <div className="space-y-6">
       {onPhotoChange && (
-        <ProfilePhotoUpload 
-          photoUrl={form.profilePhoto} 
-          disabled={!edit} 
-          onChange={onPhotoChange} 
-        />
+        <div className="flex justify-center mb-6">
+          <ProfilePhotoUpload 
+            photoUrl={form.profilePhoto} 
+            onPhotoChange={onPhotoChange}
+            disabled={!edit && !createMode}
+          />
+        </div>
       )}
-      
-      <FormField
-        name="name"
-        label="Nombre"
-        value={form.name || ""}
-        disabled={!edit}
-        onChange={onChange}
-        required
-      />
 
-      <FormField
-        name="surname"
-        label="Apellido"
-        value={form.surname || ""}
-        disabled={!edit}
-        onChange={onChange}
-        required
-      />
-
-      <FormField
-        name="email"
-        label="Email"
-        type="email"
-        value={form.email || ""}
-        disabled={!edit || !createMode}
-        onChange={onChange}
-        required
-      />
-
-      <FormField
-        name="dni"
-        label="DNI/NIE"
-        value={form.dni || ""}
-        disabled={!edit}
-        onChange={onChange}
-      />
-
-      <FormField
-        name="department"
-        label="Departamento"
-        value={form.department || ""}
-        disabled={!edit}
-        onChange={onChange}
-      />
-
-      <DatePickerField
-        label="Fecha de inicio"
-        value={form.start_date}
-        disabled={!edit}
-        onChange={(date) => onChange(date as Date)}
-      />
-
-      <div className="space-y-2">
-        <Label>Canal de notificación preferido</Label>
-        <Select
-          name="preferred_notification_channel"
-          value={form.preferred_notification_channel || "web"}
-          onValueChange={(value) => onChange({ target: { name: 'preferred_notification_channel', value } } as any)}
-          disabled={!edit}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Seleccionar canal" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="web">Notificaciones web</SelectItem>
-            <SelectItem value="email">Email</SelectItem>
-            <SelectItem value="whatsapp">WhatsApp</SelectItem>
-          </SelectContent>
-        </Select>
-        <p className="text-sm text-muted-foreground mt-1">
-          {!edit ? form.preferred_notification_channel === 'web' 
-            ? 'Recibirás notificaciones en la aplicación web' 
-            : form.preferred_notification_channel === 'email'
-            ? `Recibirás notificaciones por email en ${form.email}`
-            : `Recibirás notificaciones por WhatsApp`
-            : 'Selecciona tu canal preferido para recibir notificaciones importantes'}
-        </p>
+      <div className="space-y-4">
+        <FormField
+          label="Nombre"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          disabled={!edit && !createMode}
+          required
+        />
+        <FormField
+          label="Apellidos"
+          name="surname"
+          value={form.surname}
+          onChange={handleChange}
+          disabled={!edit && !createMode}
+          required
+        />
+        <FormField
+          label="DNI"
+          name="dni"
+          value={form.dni}
+          onChange={handleChange}
+          disabled={!edit && !createMode}
+          required
+        />
+        <FormField
+          label="Email"
+          name="email"
+          type="email"
+          value={form.email}
+          onChange={handleChange}
+          disabled={!edit && !createMode}
+          required
+        />
+        <FormField
+          label="Departamento"
+          name="department"
+          value={form.department}
+          onChange={handleChange}
+          disabled={!edit && !createMode}
+          required
+        />
+        <DatePickerField
+          label="Fecha de incorporación"
+          name="start_date"
+          value={form.start_date}
+          onChange={handleDateChange}
+          disabled={!edit && !createMode}
+        />
+        
+        <Separator className="my-6" />
+        
+        <NotificationPreferences
+          value={form.preferred_notification_channel || 'web'}
+          onChange={handleNotificationChannelChange}
+          disabled={!edit && !createMode}
+        />
       </div>
 
       <FormActions

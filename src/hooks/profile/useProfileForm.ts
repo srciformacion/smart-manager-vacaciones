@@ -1,7 +1,15 @@
 
 import { useState } from "react";
-import { toast } from "@/hooks/use-toast";
 import { Profile } from "@/components/profile/types";
+import { toast } from "@/components/ui/use-toast";
+
+interface UseProfileFormProps {
+  userId: string | null;
+  profile: Profile | null;
+  setProfile: (profile: Profile | null) => void;
+  form: Profile | null;
+  setForm: (form: Profile | null) => void;
+}
 
 export const useProfileForm = (
   userId: string | null,
@@ -14,99 +22,65 @@ export const useProfileForm = (
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
-    if (!form || !userId) {
-      toast({ 
-        variant: "destructive",
-        title: "Error", 
-        description: "Datos de formulario inválidos." 
-      });
-      return;
-    }
-
+    if (!form) return;
+    
     setSaving(true);
     try {
-      if (!profile) {
-        // En un entorno real, esto sería una llamada a la API para guardar en la base de datos
-        const userData = JSON.parse(localStorage.getItem('user') || '{}');
-        const updatedUser = {
-          ...userData,
-          name: form.name,
-          surname: form.surname,
-          email: form.email,
-          dni: form.dni,
-          department: form.department,
-          startDate: form.start_date?.toISOString().split('T')[0],
-          preferredNotificationChannel: form.preferred_notification_channel || 'web',
-          profilePhoto: form.profilePhoto || null
-        };
-        
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        
-        toast({ 
-          title: "Perfil creado", 
-          description: "Tu perfil ha sido creado exitosamente." 
-        });
-      } else {
-        // En un entorno real, esto sería una llamada a la API para actualizar en la base de datos
-        const userData = JSON.parse(localStorage.getItem('user') || '{}');
-        const updatedUser = {
-          ...userData,
-          name: form.name,
-          surname: form.surname,
-          dni: form.dni,
-          department: form.department,
-          startDate: form.start_date?.toISOString().split('T')[0],
-          preferredNotificationChannel: form.preferred_notification_channel || 'web',
-          profilePhoto: form.profilePhoto || userData.profilePhoto || null
-        };
-        
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        
-        toast({ 
-          title: "Perfil actualizado", 
-          description: "Los cambios han sido guardados exitosamente." 
-        });
-      }
+      // En un entorno real, aquí harías una llamada a la API para guardar los datos
+      // Por ahora, simulamos un retardo y actualizamos el estado
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       
-      setEdit(false);
       setProfile(form);
-    } catch (error: any) {
-      toast({ 
+      setEdit(false);
+      
+      // Guardamos también en localStorage para simular persistencia
+      localStorage.setItem(`profile-${userId}`, JSON.stringify(form));
+      
+      toast({
+        title: "Perfil actualizado",
+        description: "Los cambios en tu perfil han sido guardados.",
+      });
+    } catch (error) {
+      console.error("Error al guardar el perfil:", error);
+      toast({
         variant: "destructive",
-        title: "Error", 
-        description: error.message || "No se pudieron guardar los cambios." 
+        title: "Error",
+        description: "No se pudo guardar los cambios. Intentalo de nuevo más tarde.",
       });
     } finally {
       setSaving(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement> | Date) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | Date) => {
     if (!form) return;
     
     if (e instanceof Date) {
-      setForm({ ...form, start_date: e });
+      setForm({
+        ...form,
+        start_date: e,
+      });
     } else {
-      setForm({ ...form, [e.target.name]: e.target.value });
+      const { name, value } = e.target;
+      setForm({
+        ...form,
+        [name]: value,
+      });
     }
+  };
+
+  const handleCancel = () => {
+    setForm(profile);
+    setEdit(false);
   };
 
   const handleProfilePhotoChange = (photoUrl: string) => {
     if (!form) return;
-    setForm({ ...form, profilePhoto: photoUrl });
-  };
-
-  const handleCancel = () => {
-    if (!profile) {
-      toast({ 
-        variant: "destructive",
-        title: "Información requerida", 
-        description: "Debes completar tu perfil para continuar." 
-      });
-      return;
-    }
-    setEdit(false);
-    setForm(profile);
+    
+    setForm({
+      ...form,
+      profilePhoto: photoUrl,
+    });
   };
 
   return {
