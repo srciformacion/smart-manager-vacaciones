@@ -52,7 +52,6 @@ export function ExportForm() {
         <div className="space-y-2">
           <Label htmlFor="export-date-range">Periodo a exportar</Label>
           <DatePickerWithRange 
-            id="export-date-range"
             date={dateRange} 
             setDate={setDateRange} 
             className="w-full"

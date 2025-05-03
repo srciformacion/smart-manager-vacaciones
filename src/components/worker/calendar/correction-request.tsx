@@ -48,7 +48,6 @@ export function CorrectionRequest() {
           <div className="space-y-2">
             <Label htmlFor="date-range">Periodo a corregir</Label>
             <DatePickerWithRange 
-              id="date-range"
               date={dateRange} 
               setDate={setDateRange} 
               className="w-full"

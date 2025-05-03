@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -125,14 +126,14 @@ export function DateRangePicker({
 
 interface DatePickerWithRangeProps {
   date: DateRange | undefined;
-  onSelect: (date: DateRange | undefined) => void;
+  setDate: (date: DateRange | undefined) => void;
   disabled?: boolean;
   className?: string;
 }
 
 export function DatePickerWithRange({
   date,
-  onSelect,
+  setDate,
   disabled,
   className,
 }: DatePickerWithRangeProps) {
@@ -175,7 +176,7 @@ export function DatePickerWithRange({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={onSelect}
+            onSelect={setDate}
             numberOfMonths={1}
             locale={es}
             className={cn("p-3 pointer-events-auto bg-popover border-0")}

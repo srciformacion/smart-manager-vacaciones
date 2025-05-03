@@ -68,8 +68,7 @@ export function HourStatusCard({
         
         <Progress 
           value={percentage} 
-          className="h-2 mt-2"
-          indicatorClassName={cn(getProgressColor(status))}
+          className={cn("h-2 mt-2", getProgressColor(status))}
         />
         
         {extraInfo && (
