@@ -4,6 +4,7 @@ import { useRealtimeData } from "@/hooks/use-realtime-data";
 import { Request, User, RequestStatus } from "@/types";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { RequestListRealtime } from "@/components/requests/request-list-realtime";
 
 interface RealtimeRequestsProps {
   users: User[];
@@ -95,8 +96,14 @@ export function RealtimeRequests({
         </div>
       )}
 
-      {/* Aquí puedes renderizar la lista de solicitudes como prefieras,
-          por ejemplo usando el componente RequestList existente */}
+      {/* Usar el componente RequestListRealtime para mostrar la lista de solicitudes */}
+      <RequestListRealtime
+        users={users}
+        isHRView={true}
+        onViewDetails={onViewDetails}
+        onStatusChange={onStatusChange}
+        onDownloadAttachment={onDownloadAttachment}
+      />
     </div>
   );
 }

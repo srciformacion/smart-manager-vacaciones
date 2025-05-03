@@ -44,15 +44,15 @@ export function RequestListRealtime({
   useEffect(() => {
     if (userId && requests.length > 0) {
       // Buscar solicitudes que acaban de cambiar de estado
-      const newlyApproved = requests.find(req => req.status === 'approved' && req.updatedat && 
-        new Date(req.updatedat).getTime() > Date.now() - 10000); // En los últimos 10 segundos
+      const newlyApproved = requests.find(req => req.status === 'approved' && req.updatedAt && 
+        new Date(req.updatedAt).getTime() > Date.now() - 10000); // En los últimos 10 segundos
       
       if (newlyApproved) {
-        toast.success("¡Tu solicitud ha sido aprobada!");
+        toast.info("¡Tu solicitud ha sido aprobada!");
       }
 
-      const newlyRejected = requests.find(req => req.status === 'rejected' && req.updatedat && 
-        new Date(req.updatedat).getTime() > Date.now() - 10000);
+      const newlyRejected = requests.find(req => req.status === 'rejected' && req.updatedAt && 
+        new Date(req.updatedAt).getTime() > Date.now() - 10000);
       
       if (newlyRejected) {
         toast.error("Tu solicitud ha sido rechazada. Revisa los detalles.");
@@ -85,13 +85,13 @@ export function RequestListRealtime({
 
   // Ordenar solicitudes - más recientes primero
   const sortedRequests = [...requests].sort((a, b) => 
-    new Date(b.createdat || 0).getTime() - new Date(a.createdat || 0).getTime()
+    new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
   );
 
   return (
     <div className="space-y-4">
       {sortedRequests.map((request) => {
-        const user = users.find((u) => u.id === request.userid);
+        const user = users.find((u) => u.id === request.userId);
         
         return (
           <Card key={request.id} className="p-4 relative overflow-hidden">
@@ -122,9 +122,9 @@ export function RequestListRealtime({
                   </Badge>
                   
                   <Badge variant={
-                    request.status === 'approved' ? 'success' :
+                    request.status === 'approved' ? 'outline' :
                     request.status === 'rejected' ? 'destructive' :
-                    request.status === 'moreInfo' ? 'warning' : 'default'
+                    request.status === 'moreInfo' ? 'secondary' : 'default'
                   }>
                     {request.status === 'approved' ? 'Aprobada' :
                      request.status === 'rejected' ? 'Rechazada' :
@@ -139,14 +139,14 @@ export function RequestListRealtime({
                 
                 <p className="text-sm text-muted-foreground">
                   <span className="font-medium">Período:</span>{' '}
-                  {format(new Date(request.startdate), 'PPP', { locale: es })} 
+                  {format(new Date(request.startDate), 'PPP', { locale: es })} 
                   {' '} a {' '}
-                  {format(new Date(request.enddate), 'PPP', { locale: es })}
+                  {format(new Date(request.endDate), 'PPP', { locale: es })}
                 </p>
                 
-                {request.createdat && (
+                {request.createdAt && (
                   <p className="text-xs text-muted-foreground">
-                    Solicitado el {format(new Date(request.createdat), 'PPP', { locale: es })}
+                    Solicitado el {format(new Date(request.createdAt), 'PPP', { locale: es })}
                   </p>
                 )}
               </div>
@@ -190,7 +190,7 @@ export function RequestListRealtime({
                   </div>
                 )}
                 
-                {request.attachmenturl && onDownloadAttachment && (
+                {request.attachmentUrl && onDownloadAttachment && (
                   <Button 
                     variant="outline" 
                     size="sm"

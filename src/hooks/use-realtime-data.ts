@@ -29,7 +29,7 @@ export function useRealtimeData<T>(
       const { data: fetchedData, error } = await supabase
         .from(subscription.tableName)
         .select('*')
-        .order('createdat', { ascending: false });
+        .order('createdAt', { ascending: false });
 
       if (error) throw error;
 

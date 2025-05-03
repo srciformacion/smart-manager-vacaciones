@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Request, User, RequestStatus } from "@/types";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 export function useRequestManagement(initialRequests: Request[], exampleWorkers: User[]) {
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
@@ -14,10 +14,12 @@ export function useRequestManagement(initialRequests: Request[], exampleWorkers:
   };
 
   const handleDetailStatusChange = (request: Request, newStatus: RequestStatus, observations?: string) => {
-    // In a real app, we would update the request in the backend here
-    console.log("Updating request status:", request.id, newStatus, observations);
+    // En una aplicación real, actualizaríamos la solicitud en el backend aquí
+    console.log("Actualizando estado de solicitud:", request.id, newStatus, observations);
     
-    // Close the detail view after processing
+    toast.success(`Solicitud ${request.id} cambiada a estado: ${newStatus}`);
+    
+    // Cerrar la vista de detalles después de procesar
     setTimeout(() => {
       setSelectedRequest(null);
       setSelectedWorker(null);
@@ -27,10 +29,7 @@ export function useRequestManagement(initialRequests: Request[], exampleWorkers:
   const handleDownloadAttachment = (request: Request) => {
     if (request.attachmentUrl) {
       console.log("Descargando adjunto:", request.attachmentUrl);
-      toast({
-        title: "Descargando archivo",
-        description: "El justificante se está descargando...",
-      });
+      toast.info("El justificante se está descargando...");
     }
   };
 
