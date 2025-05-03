@@ -49,11 +49,11 @@ export function useRealtimeData<T>(
     // Cargar datos iniciales
     fetchInitialData();
 
-    // Configurar la suscripción en tiempo real
+    // Configurar la suscripción en tiempo real - Fix the API usage
     const channel = supabase
       .channel('table-changes')
       .on(
-        'postgres_changes',
+        'postgres_changes', // This is the event type, not a channel type
         {
           event: subscription.event || '*',
           schema: subscription.schema || 'public',
