@@ -68,6 +68,7 @@ export function useRealtimeData<T>(
     const channel = supabase.channel(channelName);
     
     // Configurar el canal para escuchar cambios de postgres
+    // El error estaba aquí - la sintaxis correcta para el método .on() con postgres_changes
     channel
       .on(
         'postgres_changes',
