@@ -1,119 +1,80 @@
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Toaster } from "@/components/ui/toaster"
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { ThemeProvider } from "next-themes";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+// Import authentication pages
+import AuthPage from './pages/AuthPage';
+import LoginPage from './pages/LoginPage';
 
-// Pages
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import AuthPage from "./pages/auth/AuthPage";
+// Import worker pages
+import Index from './pages/Index';
+import DashboardPage from './pages/worker/DashboardPage';
+import WorkCalendarPage from './pages/worker/WorkCalendarPage';
+import VacationRequestPage from './pages/requests/VacationRequestPage';
+import LeaveRequestPage from './pages/requests/LeaveRequestPage';
+import PersonalDayRequestPage from './pages/requests/PersonalDayRequestPage';
+import ShiftChangeRequestPage from './pages/requests/ShiftChangeRequestPage';
+import ShiftProfilePage from './pages/worker/ShiftProfilePage';
+import HistoryPage from './pages/worker/HistoryPage';
+import ChatPage from './pages/ChatPage';
+import ProfilePage from './pages/ProfilePage';
 
-// Worker pages
-import DashboardPage from "./pages/worker/DashboardPage";
-import VacationRequestPage from "./pages/worker/VacationRequestPage";
-import PersonalDayRequestPage from "./pages/worker/PersonalDayRequestPage";
-import LeaveRequestPage from "./pages/worker/LeaveRequestPage";
-import ShiftProfilePage from "./pages/worker/ShiftProfilePage";
-import HistoryPage from "./pages/worker/HistoryPage";
-import ShiftChangeRequestPage from "./pages/worker/ShiftChangeRequestPage";
-import WorkCalendarPage from "./pages/worker/WorkCalendarPage";
+// Import HR pages
+import HRDashboardPage from './pages/hr/HRDashboardPage';
+import RequestsManagementPage from './pages/hr/RequestsManagementPage';
+import WorkersManagementPage from './pages/hr/WorkersManagementPage';
+import CalendarManagementPage from './pages/hr/CalendarManagementPage';
+import SmartAssistantPage from './pages/hr/SmartAssistantPage';
+import AIAssistantPage from './pages/hr/AIAssistantPage';
+import SendNotificationPage from './pages/hr/SendNotificationPage';
+import CalendarNotificationPage from './pages/hr/CalendarNotificationPage';
 
-// HR pages
-import HRDashboardPage from "./pages/hr/HRDashboardPage";
-import WorkersManagementPage from "./pages/hr/WorkersManagementPage";
-import RequestsManagementPage from "./pages/hr/RequestsManagementPage";
-import SmartAssistantPage from "./pages/hr/SmartAssistantPage";
-import HRManagementPage from "./pages/hr/HR-management-page";
-import CalendarManagementPage from "./pages/hr/CalendarManagementPage";
-import AIAssistantPage from "@/pages/hr/AIAssistantPage";
-import AIDashboardPage from "@/pages/hr/AIDashboardPage";
-import SendNotificationPage from "@/pages/hr/SendNotificationPage";
-
-// Additional pages
-import ProfilePage from "./pages/ProfilePage";
-import ChatPage from "./pages/chat";
+// Import common components
+import NotFound from './pages/NotFound';
 
 const queryClient = new QueryClient();
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Routes>
+          {/* Auth Routes */}
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/login" element={<LoginPage />} />
 
-  useEffect(() => {
-    const checkAuth = () => {
-      const user = localStorage.getItem("user");
-      setIsAuthenticated(!!user);
-    };
+          {/* Worker Routes */}
+          <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/calendario-laboral" element={<WorkCalendarPage />} />
+          <Route path="/solicitudes/vacaciones" element={<VacationRequestPage />} />
+          <Route path="/solicitudes/permisos" element={<LeaveRequestPage />} />
+          <Route path="/solicitudes/asuntos-propios" element={<PersonalDayRequestPage />} />
+          <Route path="/solicitudes/cambio-turno" element={<ShiftChangeRequestPage />} />
+          <Route path="/perfiles-turno" element={<ShiftProfilePage />} />
+          <Route path="/historial" element={<HistoryPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/perfil" element={<ProfilePage />} />
 
-    checkAuth();
-    
-    // Set up an event listener for storage changes
-    window.addEventListener("storage", checkAuth);
-    return () => window.removeEventListener("storage", checkAuth);
-  }, []);
+          {/* HR Routes */}
+          <Route path="/rrhh/dashboard" element={<HRDashboardPage />} />
+          <Route path="/rrhh/solicitudes" element={<RequestsManagementPage />} />
+          <Route path="/rrhh/trabajadores" element={<WorkersManagementPage />} />
+          <Route path="/rrhh/calendarios" element={<CalendarManagementPage />} />
+          <Route path="/rrhh/notificaciones" element={<CalendarNotificationPage />} />
+          <Route path="/rrhh/asistente" element={<SmartAssistantPage />} />
+          <Route path="/rrhh/ai-assistant" element={<AIAssistantPage />} />
+          <Route path="/rrhh/send-notification" element={<SendNotificationPage />} />
 
-  if (isAuthenticated === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#003366]"></div>
-      </div>
-    ); // Loading state
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  return <>{children}</>;
-}
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="system" enableSystem>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthPage />} />
-            
-            {/* Worker routes */}
-            <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
-            <Route path="/solicitudes/vacaciones" element={<PrivateRoute><VacationRequestPage /></PrivateRoute>} />
-            <Route path="/solicitudes/asuntos-propios" element={<PrivateRoute><PersonalDayRequestPage /></PrivateRoute>} />
-            <Route path="/solicitudes/permisos" element={<PrivateRoute><LeaveRequestPage /></PrivateRoute>} />
-            <Route path="/solicitudes/cambio-turno" element={<PrivateRoute><ShiftChangeRequestPage /></PrivateRoute>} />
-            <Route path="/perfiles-turno" element={<PrivateRoute><ShiftProfilePage /></PrivateRoute>} />
-            <Route path="/historial" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
-            <Route path="/calendario-laboral" element={<PrivateRoute><WorkCalendarPage /></PrivateRoute>} />
-            
-            {/* HR routes */}
-            <Route path="/rrhh/dashboard" element={<PrivateRoute><HRDashboardPage /></PrivateRoute>} />
-            <Route path="/rrhh/trabajadores" element={<PrivateRoute><WorkersManagementPage /></PrivateRoute>} />
-            <Route path="/rrhh/solicitudes" element={<PrivateRoute><RequestsManagementPage /></PrivateRoute>} />
-            <Route path="/rrhh/asistente" element={<PrivateRoute><SmartAssistantPage /></PrivateRoute>} />
-            <Route path="/rrhh/gestion" element={<PrivateRoute><HRManagementPage /></PrivateRoute>} />
-            <Route path="/rrhh/calendarios" element={<PrivateRoute><CalendarManagementPage /></PrivateRoute>} />
-            <Route path="/rrhh/ai-assistant" element={<PrivateRoute><AIAssistantPage /></PrivateRoute>} />
-            <Route path="/rrhh/ai-dashboard" element={<PrivateRoute><AIDashboardPage /></PrivateRoute>} />
-            <Route path="/rrhh/notificaciones" element={<PrivateRoute><SendNotificationPage /></PrivateRoute>} />
-            
-            {/* Chat page - just one route */}
-            <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
-            
-            {/* Additional pages */}
-            <Route path="/perfil" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+          {/* 404 Page */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+      <Toaster />
+      <Toaster />
+    </QueryClientProvider>
+  );
+};
 
 export default App;

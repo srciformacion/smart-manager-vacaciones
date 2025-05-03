@@ -138,6 +138,11 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
       label: "Calendarios y turnos",
     },
     {
+      href: "/rrhh/notificaciones",
+      icon: <Bell className="h-5 w-5" />,
+      label: "Notificaciones y comunicaciones",
+    },
+    {
       href: "/rrhh/asistente",
       icon: <Brain className="h-5 w-5" />,
       label: "Asistente inteligente",
@@ -146,12 +151,6 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
       href: "/rrhh/ai-assistant",
       icon: <Brain className="h-5 w-5" />,
       label: "Asistente IA",
-      role: "hr",
-    },
-    {
-      href: "/rrhh/notificaciones",
-      icon: <Bell className="h-5 w-5" />,
-      label: "Envío de notificaciones",
       role: "hr",
     },
     {
