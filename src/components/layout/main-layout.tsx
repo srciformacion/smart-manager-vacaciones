@@ -20,7 +20,9 @@ export function MainLayout({ user, children }: { user: User | null, children: Re
   const handleLogout = async () => {
     try {
       await signOut();
-      // Note: The navigation will happen in the useAuth hook
+      
+      // Force navigation to auth page and reload to ensure clean state
+      window.location.href = "/auth";
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       toast({
