@@ -4,6 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
+// Extend Window interface to include the MSStream property
+declare global {
+  interface Window {
+    MSStream?: any;
+  }
+}
+
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{
@@ -52,7 +59,7 @@ export function InstallPWAButton() {
   const handleInstallClick = async () => {
     if (!installPrompt) {
       // Si no hay evento de instalación disponible pero estamos en iOS
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window.MSStream);
       
       if (isIOS) {
         toast({
@@ -87,7 +94,7 @@ export function InstallPWAButton() {
   };
 
   // No mostrar el botón si ya está instalada o no es posible instalar
-  if (isInstalled || (!installPrompt && !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream))) {
+  if (isInstalled || (!installPrompt && !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window.MSStream)))) {
     return null;
   }
 
