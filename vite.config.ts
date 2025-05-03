@@ -37,9 +37,8 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       strategies: 'injectManifest',
-      srcDir: './', 
-      filename: 'public/sw.js',
-      outDir: 'dist',
+      srcDir: './',
+      filename: 'sw.js',
       injectManifest: {
         injectionPoint: 'self.__WB_MANIFEST',
       }
