@@ -12,11 +12,11 @@ export const useProfileAuth = () => {
 
   const fetchAuthUser = async () => {
     try {
-      // Primero intentamos obtener el usuario de Supabase
+      // First try to get the user from Supabase
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
-        console.error("Error de autenticación Supabase:", error);
+        console.error("Supabase auth error:", error);
         throw error;
       }
       
@@ -24,12 +24,16 @@ export const useProfileAuth = () => {
         const supabaseUser = session.user;
         setUserId(supabaseUser.id);
         
-        // Obtener datos adicionales del perfil
-        const { data: profileData } = await supabase
+        // Get additional profile data
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', supabaseUser.id)
           .single();
+          
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error("Error fetching profile:", profileError);
+        }
         
         const userRole = localStorage.getItem('userRole') || 'worker';
         
@@ -49,10 +53,15 @@ export const useProfileAuth = () => {
         return supabaseUser;
       }
     } catch (error) {
-      console.error("Error al obtener usuario de Supabase:", error);
+      console.error("Error getting user from Supabase:", error);
+      toast({ 
+        variant: "destructive",
+        title: "Error de autenticación", 
+        description: "No se pudo obtener la información del usuario." 
+      });
     }
     
-    // Si no hay usuario en Supabase, intentamos obtenerlo de localStorage como fallback
+    // If no user in Supabase, try to get from localStorage as fallback
     const userJson = localStorage.getItem("user");
     
     if (!userJson) {

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { toast } from '@/hooks/use-toast';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -9,7 +10,7 @@ export const useAuth = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Comprobamos si hay un usuario autenticado al cargar el componente
+    // Check if there's an authenticated user when loading the component
     const getUser = async () => {
       setLoading(true);
       try {
@@ -24,8 +25,9 @@ export const useAuth = () => {
         if (err instanceof Error) {
           setError(err.message);
         } else {
-          setError('Error desconocido al obtener la sesión');
+          setError('Unknown error getting session');
         }
+        console.error('Auth error:', err);
       } finally {
         setLoading(false);
       }
@@ -33,7 +35,7 @@ export const useAuth = () => {
 
     getUser();
 
-    // Suscripción a cambios de autenticación
+    // Subscribe to auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
@@ -51,15 +53,21 @@ export const useAuth = () => {
       });
 
       if (error) {
+        toast({
+          title: "Error de autenticación",
+          description: error.message,
+          variant: "destructive"
+        });
         throw error;
       }
 
       return data;
     } catch (err) {
+      console.error('Sign in error:', err);
       if (err instanceof Error) {
         throw new Error(err.message);
       }
-      throw new Error('Error desconocido al iniciar sesión');
+      throw new Error('Unknown error signing in');
     }
   };
 
@@ -74,15 +82,21 @@ export const useAuth = () => {
       });
 
       if (error) {
+        toast({
+          title: "Error de registro",
+          description: error.message,
+          variant: "destructive"
+        });
         throw error;
       }
 
       return data;
     } catch (err) {
+      console.error('Sign up error:', err);
       if (err instanceof Error) {
         throw new Error(err.message);
       }
-      throw new Error('Error desconocido al registrarse');
+      throw new Error('Unknown error signing up');
     }
   };
 
@@ -90,13 +104,25 @@ export const useAuth = () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
+        toast({
+          title: "Error al cerrar sesión",
+          description: error.message,
+          variant: "destructive"
+        });
         throw error;
       }
+      
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado la sesión correctamente"
+      });
+      
     } catch (err) {
+      console.error('Sign out error:', err);
       if (err instanceof Error) {
         throw new Error(err.message);
       }
-      throw new Error('Error desconocido al cerrar sesión');
+      throw new Error('Unknown error signing out');
     }
   };
 

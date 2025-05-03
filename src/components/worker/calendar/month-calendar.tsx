@@ -1,7 +1,8 @@
 
 import { useState } from "react";
 import { CalendarShift } from "@/types/calendar";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from "date-fns";
+import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from "date-fns";
+import { es } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
@@ -19,25 +20,25 @@ interface MonthCalendarProps {
 export function MonthCalendar({ currentDate, shifts }: MonthCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   
-  // Obtener el primer día del mes, el último día del mes
+  // Get the first day of the month and the last day of the month
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   
-  // Obtener todos los días del mes
+  // Get all days of the month
   const days = eachDayOfInterval({
     start: monthStart,
     end: monthEnd,
   });
   
-  // Obtener todos los días de la semana (0: domingo, 1: lunes, ..., 6: sábado)
+  // Days of the week (0: Sunday, 1: Monday, ..., 6: Saturday)
   const weekDays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
   
-  // Función para obtener el turno de un día específico
+  // Function to get the shift for a specific day
   const getShiftForDay = (day: Date) => {
     return shifts.find(shift => isSameDay(new Date(shift.date), day));
   };
 
-  // Color por tipo de turno
+  // Color by shift type
   const getShiftColor = (type: string) => {
     switch (type) {
       case "morning":
@@ -50,14 +51,22 @@ export function MonthCalendar({ currentDate, shifts }: MonthCalendarProps) {
         return "bg-red-100 text-red-800 border-red-300";
       case "free":
         return "bg-green-100 text-green-800 border-green-300";
+      case "guard":
+        return "bg-purple-100 text-purple-800 border-purple-300";
       case "unassigned":
         return "bg-gray-100 text-gray-800 border-gray-300";
+      case "training":
+        return "bg-orange-100 text-orange-800 border-orange-300";
+      case "special":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "oncall":
+        return "bg-teal-100 text-teal-800 border-teal-300";
       default:
         return "bg-gray-100 text-gray-800 border-gray-300";
     }
   };
 
-  // Traducción de tipos de turno
+  // Translation of shift types
   const getShiftTypeName = (type: string) => {
     switch (type) {
       case "morning":
@@ -70,8 +79,16 @@ export function MonthCalendar({ currentDate, shifts }: MonthCalendarProps) {
         return "Guardia 24h";
       case "free":
         return "Libre";
+      case "guard":
+        return "Guardia";
       case "unassigned":
         return "Sin asignar";
+      case "training":
+        return "Formación";
+      case "special":
+        return "Especial";
+      case "oncall":
+        return "Localizado";
       default:
         return type;
     }
@@ -80,7 +97,7 @@ export function MonthCalendar({ currentDate, shifts }: MonthCalendarProps) {
   return (
     <div className="bg-card rounded-md p-4 border">
       <div className="grid grid-cols-7 gap-1">
-        {/* Cabecera con los días de la semana */}
+        {/* Header with days of the week */}
         {weekDays.map((day) => (
           <div 
             key={day} 
@@ -90,12 +107,12 @@ export function MonthCalendar({ currentDate, shifts }: MonthCalendarProps) {
           </div>
         ))}
         
-        {/* Espacios vacíos para ajustar el primer día del mes */}
+        {/* Empty spaces to adjust the first day of the month */}
         {Array.from({ length: (monthStart.getDay() + 6) % 7 }, (_, i) => (
           <div key={`empty-${i}`} className="aspect-square"></div>
         ))}
         
-        {/* Días del mes */}
+        {/* Days of the month */}
         {days.map((day) => {
           const shift = getShiftForDay(day);
           const isToday = isSameDay(day, new Date());
@@ -136,7 +153,7 @@ export function MonthCalendar({ currentDate, shifts }: MonthCalendarProps) {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{format(day, "EEEE d 'de' MMMM, yyyy")}</p>
+                  <p>{format(day, "EEEE d 'de' MMMM, yyyy", { locale: es })}</p>
                   {shift && shift.type !== "unassigned" && (
                     <>
                       <p className="font-bold">{getShiftTypeName(shift.type)}</p>
@@ -144,6 +161,7 @@ export function MonthCalendar({ currentDate, shifts }: MonthCalendarProps) {
                         <p>{shift.startTime} - {shift.endTime}</p>
                       )}
                       {shift.hours > 0 && <p>{shift.hours} horas</p>}
+                      {shift.notes && <p className="italic">{shift.notes}</p>}
                     </>
                   )}
                 </TooltipContent>

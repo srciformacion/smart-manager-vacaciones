@@ -1,8 +1,8 @@
 
-import { useState } from "react";
-import { toast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
 import { Profile } from "@/components/profile/types";
-import { NotificationChannel } from "@/types";
+import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useProfileData = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -11,54 +11,83 @@ export const useProfileData = () => {
 
   const fetchProfile = async (userId: string) => {
     try {
-      // En un entorno real, esto sería una llamada a la base de datos
-      const userJson = localStorage.getItem("user");
+      // Try to get profile from Supabase
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
       
-      if (!userJson) {
-        setCreateMode(true);
-        const initialForm = {
-          id: userId,
-          name: "",
-          surname: "",
-          email: "",
-          dni: "",
-          department: "",
-          start_date: undefined,
+      if (error && error.code !== 'PGRST116') {
+        console.error("Error fetching profile from Supabase:", error);
+      }
+
+      if (profileData) {
+        // User exists in database
+        const userProfile: Profile = {
+          id: profileData.id,
+          name: profileData.name || "",
+          surname: profileData.surname || "",
+          email: profileData.email || "",
+          dni: profileData.dni || "",
+          department: profileData.department || "",
+          start_date: profileData.start_date ? new Date(profileData.start_date) : undefined,
+          profilePhoto: undefined, // Photo implementation coming later
           preferred_notification_channel: "web",
-          profilePhoto: undefined
+          notification_channels: [],
+          notification_consent: false
         };
-        setForm(initialForm);
-        return { createMode: true, form: initialForm };
+        
+        setProfile(userProfile);
+        setForm(userProfile);
+        setCreateMode(false);
+        return;
       }
       
-      const userData = JSON.parse(userJson);
-      const profileData = {
-        id: userData.id,
-        name: userData.name || "",
-        surname: userData.surname || "",
-        email: userData.email || "",
-        dni: userData.dni || "",
-        department: userData.department || "",
-        start_date: userData.startDate ? new Date(userData.startDate) : undefined,
-        preferred_notification_channel: userData.preferredNotificationChannel || "web",
-        profilePhoto: userData.profilePhoto
+      // If we don't have profile data from Supabase, check localStorage
+      const localProfile = localStorage.getItem(`profile-${userId}`);
+      
+      if (localProfile) {
+        const profileData = JSON.parse(localProfile);
+        const storedDate = profileData.start_date 
+          ? new Date(profileData.start_date) 
+          : undefined;
+          
+        const userProfile: Profile = {
+          ...profileData,
+          start_date: storedDate
+        };
+        
+        setProfile(userProfile);
+        setForm(userProfile);
+        setCreateMode(false);
+        return;
+      }
+      
+      // Create an empty profile if none exists
+      const newProfile: Profile = {
+        id: userId,
+        name: "",
+        surname: "",
+        email: "",
+        dni: "",
+        department: "",
+        preferred_notification_channel: "web",
+        notification_channels: [],
+        notification_consent: false
       };
       
-      const profileWithDate = {
-        ...profileData,
-        start_date: profileData.start_date
-      };
+      setProfile(newProfile);
+      setForm(newProfile);
+      setCreateMode(true);
       
-      setProfile(profileWithDate);
-      setForm(profileWithDate);
-      return { createMode: false, form: profileWithDate };
-    } catch (error) {
-      toast({ 
+    } catch (err) {
+      console.error("Error loading profile:", err);
+      toast({
         variant: "destructive",
-        title: "Error", 
-        description: "Ocurrió un error al cargar el perfil." 
+        title: "Error",
+        description: "No se pudo cargar el perfil. Por favor, intenta de nuevo más tarde."
       });
-      return { createMode: false, form: null };
     }
   };
 
@@ -68,6 +97,6 @@ export const useProfileData = () => {
     createMode,
     setForm,
     setProfile,
-    fetchProfile,
+    fetchProfile
   };
 };

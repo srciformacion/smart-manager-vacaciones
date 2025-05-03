@@ -13,13 +13,14 @@ import { ExportForm } from "@/components/worker/calendar/export-form";
 import { CalendarSync } from "@/components/worker/calendar/calendar-sync";
 import { exampleUser } from "@/data/example-users";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function WorkCalendarPage() {
   const { user, fetchAuthUser } = useProfileAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   
-  // Inicializar el hook de calendario
+  // Initialize calendar hook
   const {
     currentDate,
     shifts,
@@ -36,23 +37,30 @@ export default function WorkCalendarPage() {
   
   useEffect(() => {
     const checkAuth = async () => {
-      const authUser = await fetchAuthUser();
-      if (!authUser) {
-        navigate('/auth');
+      try {
+        const authUser = await fetchAuthUser();
+        if (!authUser) {
+          toast.error("Por favor inicia sesión para acceder a tu calendario");
+          navigate('/auth');
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Auth check error:", error);
+        toast.error("Error al verificar autenticación");
+        setLoading(false);
       }
-      setLoading(false);
     };
     
     checkAuth();
   }, [fetchAuthUser, navigate]);
 
-  // Datos de ejemplo para días de vacaciones
+  // Example data for vacation days
   const vacationDays = {
     used: 10,
     total: 22
   };
 
-  // Estadísticas mensuales y anuales
+  // Monthly and annual statistics
   const monthStats = calculateMonthStats();
   const annualStats = calculateAnnualStats();
   
