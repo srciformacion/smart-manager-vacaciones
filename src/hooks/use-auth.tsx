@@ -1,4 +1,3 @@
-
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -88,13 +87,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem("userRole", userRole);
         localStorage.setItem("userEmail", email);
         
-        // Navigate based on role
+        // Redirect to welcome page instead of dashboard
         setTimeout(() => {
-          if (userRole === "hr") {
-            navigate('/rrhh/dashboard');
-          } else {
-            navigate('/dashboard');
-          }
+          navigate('/welcome');
         }, 0);
       }
 

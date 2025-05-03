@@ -11,6 +11,7 @@ const Index = lazy(() => import('@/pages/Index'));
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const AuthPage = lazy(() => import('@/pages/auth/AuthPage'));
+const WelcomePage = lazy(() => import('@/pages/auth/WelcomePage')); // Nueva página de bienvenida
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Páginas del Trabajador
@@ -54,6 +55,13 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<LoginPage />} />
             <Route path="/auth/login" element={<LoginPage />} />
+
+            {/* Nueva ruta para la página de bienvenida */}
+            <Route path="/welcome" element={
+              <ProtectedRoute>
+                <WelcomePage />
+              </ProtectedRoute>
+            } />
 
             {/* Rutas de trabajador protegidas */}
             <Route path="/dashboard" element={
