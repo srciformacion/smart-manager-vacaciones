@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { UserRole } from "@/types";
@@ -72,6 +73,11 @@ export function SidebarNavigation({ role = "worker", onLogout, onNavigate }: Sid
       href: "/dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
       label: "Dashboard",
+    },
+    {
+      href: "/calendario-laboral",
+      icon: <Calendar className="h-5 w-5" />,
+      label: "Calendario Laboral",
     },
     {
       href: "/solicitudes/vacaciones",

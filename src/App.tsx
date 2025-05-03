@@ -20,6 +20,7 @@ import LeaveRequestPage from "./pages/worker/LeaveRequestPage";
 import ShiftProfilePage from "./pages/worker/ShiftProfilePage";
 import HistoryPage from "./pages/worker/HistoryPage";
 import ShiftChangeRequestPage from "./pages/worker/ShiftChangeRequestPage";
+import WorkCalendarPage from "./pages/worker/WorkCalendarPage";
 
 // HR pages
 import HRDashboardPage from "./pages/hr/HRDashboardPage";
@@ -88,6 +89,7 @@ const App = () => (
             <Route path="/solicitudes/cambio-turno" element={<PrivateRoute><ShiftChangeRequestPage /></PrivateRoute>} />
             <Route path="/perfiles-turno" element={<PrivateRoute><ShiftProfilePage /></PrivateRoute>} />
             <Route path="/historial" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
+            <Route path="/calendario-laboral" element={<PrivateRoute><WorkCalendarPage /></PrivateRoute>} />
             
             {/* HR routes */}
             <Route path="/rrhh/dashboard" element={<PrivateRoute><HRDashboardPage /></PrivateRoute>} />
