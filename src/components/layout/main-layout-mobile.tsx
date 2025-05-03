@@ -10,7 +10,6 @@ import { Menu, LogOut } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { InstallPWAButton } from "@/components/pwa/install-pwa-button";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -26,14 +25,8 @@ export function MainLayoutMobile({ children, user, className }: MainLayoutMobile
   const navigate = useNavigate();
   const { signOut } = useAuth();
   
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      // No necesitamos redirigir aquí, ya que signOut() ya lo hace
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-      toast.error("Error al cerrar sesión");
-    }
+  const handleLogout = () => {
+    signOut();
   };
 
   if (!isMobile) {

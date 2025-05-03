@@ -134,32 +134,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
-      // Primero limpiar localStorage antes de cerrar sesión en Supabase
+      // First clear localStorage to ensure state is reset
       localStorage.removeItem("userRole");
       localStorage.removeItem("userEmail");
       localStorage.removeItem("user");
       
-      // Luego cerrar sesión en Supabase
-      const { error } = await supabase.auth.signOut();
+      // Reset state before calling Supabase signOut
+      setUser(null);
+      setSession(null);
       
-      if (error) {
-        toast.error(`Error al cerrar sesión: ${error.message}`);
-        throw error;
+      // Then sign out from Supabase - handle potential errors gracefully
+      try {
+        const { error } = await supabase.auth.signOut();
+        
+        if (error) {
+          console.error(`Error during Supabase signOut:`, error.message);
+          // Continue with redirection despite Supabase error
+        }
+      } catch (err) {
+        // Log but don't throw - we still want to complete the local logout
+        console.error('Error: Sign out error:', err);
       }
       
-      // Notificar éxito y redireccionar
+      // Success notification
       toast.success("Has cerrado la sesión correctamente");
       
-      // Usando replace para evitar volver atrás con el botón del navegador
+      // Navigate using replace to prevent going back with browser history
       navigate('/auth', { replace: true });
       
     } catch (err) {
-      console.error('Sign out error:', err);
-      if (err instanceof Error) {
-        toast.error(`Error: ${err.message}`);
-      } else {
-        toast.error('Error desconocido al cerrar sesión');
-      }
+      console.error('Sign out complete error:', err);
+      toast.error('Error al cerrar sesión');
+      // Still redirect to auth page even if there was an error
+      navigate('/auth', { replace: true });
     }
   };
 
