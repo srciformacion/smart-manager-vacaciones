@@ -37,10 +37,11 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       strategies: 'injectManifest',
-      srcDir: './',
-      filename: 'sw.js',
+      srcDir: 'src',
+      filename: 'sw-template.js', // Changed from sw.js to sw-template.js
       injectManifest: {
         injectionPoint: 'self.__WB_MANIFEST',
+        swDest: 'dist/sw.js', // Specify output path
       }
     })
   ].filter(Boolean),
