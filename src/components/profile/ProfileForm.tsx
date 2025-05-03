@@ -27,24 +27,26 @@ export const ProfileForm = ({
     onChange(date);
   };
 
-  const handleNotificationChannelChange = (value: string) => {
+  const handleNotificationChannelChange = (channels: string[]) => {
+    // Create a properly typed event by casting to unknown first
     const event = {
       target: {
-        name: "preferred_notification_channel",
-        value,
+        name: "notification_channels",
+        value: channels,
       },
-    } as React.ChangeEvent<HTMLInputElement>;
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
     
     onChange(event);
   };
 
   const handleNotificationConsent = (value: boolean) => {
+    // Create a properly typed event by casting to unknown first
     const event = {
       target: {
         name: "notification_consent",
         value,
       },
-    } as React.ChangeEvent<HTMLInputElement>;
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
     
     onChange(event);
   };
@@ -113,8 +115,10 @@ export const ProfileForm = ({
         <Separator className="my-6" />
         
         <NotificationPreferences
-          value={form.preferred_notification_channel || 'web'}
-          onChange={handleNotificationChannelChange}
+          selectedChannels={form.notification_channels || []}
+          hasConsent={form.notification_consent || false}
+          onChannelChange={handleNotificationChannelChange}
+          onConsentChange={handleNotificationConsent}
           disabled={!edit && !createMode}
         />
       </div>

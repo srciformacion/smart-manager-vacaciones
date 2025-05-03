@@ -1,42 +1,36 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Mail, MessageSquare, Bell } from "lucide-react";
 
 interface NotificationPreferencesProps {
-  value: string;
-  onChange: (value: string) => void;
+  selectedChannels: string[];
+  hasConsent: boolean;
+  onChannelChange: (channels: string[]) => void;
+  onConsentChange: (value: boolean) => void;
   disabled?: boolean;
 }
 
-export const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ 
-  value, 
-  onChange, 
+export const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
+  selectedChannels,
+  hasConsent,
+  onChannelChange, 
+  onConsentChange,
   disabled = false 
 }) => {
-  const [selectedChannels, setSelectedChannels] = useState<string[]>(value ? [value] : []);
-  const [hasConsent, setHasConsent] = useState(false);
-
-  const handleChannelChange = (channelValue: string) => {
+  const handleChannelChange = (channelValue: string, isChecked: boolean) => {
     let newSelectedChannels: string[];
     
-    if (selectedChannels.includes(channelValue)) {
-      // Remove channel if already selected
-      newSelectedChannels = selectedChannels.filter(channel => channel !== channelValue);
-    } else {
+    if (isChecked) {
       // Add channel if not already selected
       newSelectedChannels = [...selectedChannels, channelValue];
-    }
-    
-    setSelectedChannels(newSelectedChannels);
-    
-    // Set the primary channel (first in the array) as the preferred one
-    if (newSelectedChannels.length > 0) {
-      onChange(newSelectedChannels[0]);
     } else {
-      onChange('web'); // Default to web if nothing selected
+      // Remove channel if already selected
+      newSelectedChannels = selectedChannels.filter(channel => channel !== channelValue);
     }
+    
+    onChannelChange(newSelectedChannels);
   };
 
   return (
@@ -51,7 +45,7 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
             <Checkbox 
               id="web" 
               checked={selectedChannels.includes('web')}
-              onCheckedChange={() => handleChannelChange('web')}
+              onCheckedChange={(checked) => handleChannelChange('web', checked === true)}
               disabled={disabled}
             />
             <Label htmlFor="web" className="flex items-center gap-1 cursor-pointer">
@@ -63,7 +57,7 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
             <Checkbox 
               id="email" 
               checked={selectedChannels.includes('email')}
-              onCheckedChange={() => handleChannelChange('email')}
+              onCheckedChange={(checked) => handleChannelChange('email', checked === true)}
               disabled={disabled}
             />
             <Label htmlFor="email" className="flex items-center gap-1 cursor-pointer">
@@ -75,7 +69,7 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
             <Checkbox 
               id="whatsapp" 
               checked={selectedChannels.includes('whatsapp')}
-              onCheckedChange={() => handleChannelChange('whatsapp')}
+              onCheckedChange={(checked) => handleChannelChange('whatsapp', checked === true)}
               disabled={disabled}
             />
             <Label htmlFor="whatsapp" className="flex items-center gap-1 cursor-pointer">
@@ -88,7 +82,7 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
           <Checkbox 
             id="consent" 
             checked={hasConsent}
-            onCheckedChange={(checked) => setHasConsent(checked === true)}
+            onCheckedChange={(checked) => onConsentChange(checked === true)}
             disabled={disabled || selectedChannels.length === 0}
           />
           <div>

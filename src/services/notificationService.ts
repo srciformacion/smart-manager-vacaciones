@@ -1,3 +1,4 @@
+
 import { NotificationPayload, NotificationType, NotificationChannel } from "@/types";
 import { toast } from "@/hooks/use-toast";
 
@@ -182,9 +183,12 @@ export class NotificationService {
           return false;
         }
         
+        // Asegurar que channel es uno de los tipos válidos antes de la asignación
+        const validChannel = channel as NotificationChannel;
+        
         // Enviar la notificación por el canal
         return await this.sendNotification({
-          canal: channel,
+          canal: validChannel,
           destino: destination,
           titulo: title,
           mensaje: message,
@@ -207,7 +211,9 @@ export class NotificationService {
     // En un entorno real, esto sería una consulta a la base de datos
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      return user.preferredNotificationChannel || 'web';
+      const preferredChannel = user.preferredNotificationChannel || 'web';
+      // Asegurar que el valor devuelto es de tipo NotificationChannel
+      return preferredChannel as NotificationChannel;
     } catch (error) {
       console.error('Error al obtener canal de notificación preferido:', error);
       return 'web'; // Por defecto
@@ -228,25 +234,27 @@ export class NotificationService {
       
       const user = JSON.parse(userJson);
       const channel = user.preferredNotificationChannel || 'web';
+      // Asegurar que channel es uno de los tipos válidos
+      const validChannel = channel as NotificationChannel;
       let destination = '';
       
       // Determinar el destino según el canal
-      if (channel === 'email') {
+      if (validChannel === 'email') {
         destination = user.email || '';
-      } else if (channel === 'whatsapp') {
+      } else if (validChannel === 'whatsapp') {
         destination = user.phone || '';
       } else {
         destination = user.id || '';
       }
       
       if (!destination) {
-        console.error(`No se pudo determinar el destino para el canal ${channel}`);
+        console.error(`No se pudo determinar el destino para el canal ${validChannel}`);
         return false;
       }
       
       // Enviar la notificación por el canal preferido
       return await this.sendNotification({
-        canal: channel,
+        canal: validChannel,
         destino: destination,
         titulo: title,
         mensaje: message,
