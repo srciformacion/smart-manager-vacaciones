@@ -82,7 +82,7 @@ export default function CalendarManagementPage() {
           </TabsContent>
           
           <TabsContent value="excel">
-            <CalendarExcelImport />
+            <CalendarExcelImport users={exampleWorkers} />
           </TabsContent>
         </Tabs>
       </div>
