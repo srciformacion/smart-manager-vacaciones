@@ -7,8 +7,9 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
-interface DatePickerFieldProps {
+export interface DatePickerFieldProps {
   label: string;
+  name?: string; // Make name optional
   value?: Date;
   onChange: (date: Date) => void;
   disabled?: boolean;
@@ -16,6 +17,7 @@ interface DatePickerFieldProps {
 
 export const DatePickerField = ({
   label,
+  name,
   value,
   onChange,
   disabled,
@@ -49,6 +51,7 @@ export const DatePickerField = ({
             disabled={disabled}
             initialFocus
             locale={es}
+            className="pointer-events-auto" // Add this to ensure the calendar is interactive
           />
         </PopoverContent>
       </Popover>

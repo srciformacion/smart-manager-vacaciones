@@ -94,7 +94,6 @@ export const ProfileForm = ({
         />
         <DatePickerField
           label="Fecha de incorporación"
-          name="start_date"
           value={form.start_date}
           onChange={handleDateChange}
           disabled={!edit && !createMode}

@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Camera, RefreshCw, UserRound } from "lucide-react";
 
-interface ProfilePhotoUploadProps {
+export interface ProfilePhotoUploadProps {
   photoUrl?: string;
   disabled: boolean;
-  onChange: (photoUrl: string) => void;
+  onPhotoChange: (photoUrl: string) => void;
 }
 
-export const ProfilePhotoUpload = ({ photoUrl, disabled, onChange }: ProfilePhotoUploadProps) => {
+export const ProfilePhotoUpload = ({ photoUrl, disabled, onPhotoChange }: ProfilePhotoUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
 
   const handleButtonClick = () => {
@@ -23,7 +23,7 @@ export const ProfilePhotoUpload = ({ photoUrl, disabled, onChange }: ProfilePhot
       // Generamos una URL aleatoria para simular una carga de imagen
       const randomId = Math.floor(Math.random() * 1000);
       const mockImageUrl = `https://randomuser.me/api/portraits/${randomId % 2 ? 'men' : 'women'}/${randomId % 100}.jpg`;
-      onChange(mockImageUrl);
+      onPhotoChange(mockImageUrl);
       setIsUploading(false);
     }, 1500);
   };
