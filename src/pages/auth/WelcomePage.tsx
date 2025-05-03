@@ -42,12 +42,8 @@ export default function WelcomePage() {
               leaveDays: balanceData.leave_days || 0
             });
           } else {
-            // Set default values
-            setBalanceData({
-              vacationDays: 22,
-              personalDays: 6, 
-              leaveDays: 3
-            });
+            // Do not set default values for new users
+            setBalanceData(null);
           }
         }
       } catch (error) {

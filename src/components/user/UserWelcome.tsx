@@ -129,7 +129,7 @@ export function UserWelcome({ user, balanceData, isLoading = false }: UserWelcom
         <Alert className="bg-muted">
           <Info className="h-4 w-4" />
           <AlertDescription>
-            No se encontraron datos de saldos. Se mostrarán valores por defecto hasta que se configuren.
+            No se encontraron datos de saldos. Contacte con el departamento de RRHH para configurar sus saldos de días.
           </AlertDescription>
         </Alert>
       )}
