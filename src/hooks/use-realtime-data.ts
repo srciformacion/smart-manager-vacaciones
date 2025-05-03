@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { enableRealtimeForTable } from '@/utils/realtime-utils';
 
 type RealtimeSubscription = {
   tableName: string;
@@ -49,34 +50,60 @@ export function useRealtimeData<T>(
     // Cargar datos iniciales
     fetchInitialData();
 
-    // Create a channel for real-time updates
-    const channel = supabase.channel(`realtime:${subscription.tableName}`);
-    
-    // Configure the channel with postgres changes
-    const configuredChannel = channel.on('postgres_changes', {
-      event: subscription.event || '*',
-      schema: subscription.schema || 'public',
-      table: subscription.tableName,
-      filter: subscription.filter || undefined,
-    }, async (payload) => {
-      console.log('Cambio en tiempo real recibido:', payload);
-      
-      // Refrescar datos después de un cambio
-      await fetchInitialData();
-      
-      // Notificar al usuario sobre el cambio
-      const eventType = payload.eventType;
-      if (eventType === 'INSERT') {
-        toast.info('Se ha recibido una nueva solicitud');
-      } else if (eventType === 'UPDATE') {
-        toast.info('Una solicitud ha sido actualizada');
-      } else if (eventType === 'DELETE') {
-        toast.info('Una solicitud ha sido eliminada');
+    // Habilitar tiempo real para la tabla si no está habilitado
+    const setupRealtime = async () => {
+      try {
+        // Intentar habilitar la funcionalidad de tiempo real para la tabla
+        await enableRealtimeForTable(subscription.tableName);
+      } catch (err) {
+        console.warn(`No se pudo habilitar tiempo real para ${subscription.tableName}:`, err);
+        // No interrumpimos la ejecución, ya que puede que la tabla ya tenga tiempo real habilitado
       }
-    });
+    };
     
-    // Subscribe to the configured channel
-    configuredChannel.subscribe();
+    setupRealtime();
+
+    // Crear un canal para actualizaciones en tiempo real
+    const channelName = `realtime:${subscription.tableName}`;
+    const channel = supabase.channel(channelName);
+    
+    // Configurar el canal para escuchar cambios de postgres
+    channel
+      .on(
+        'postgres_changes',
+        {
+          event: subscription.event || '*',
+          schema: subscription.schema || 'public',
+          table: subscription.tableName,
+          filter: subscription.filter || undefined,
+        },
+        async (payload) => {
+          console.log('Cambio en tiempo real recibido:', payload);
+          
+          // Refrescar datos después de un cambio
+          await fetchInitialData();
+          
+          // Notificar al usuario sobre el cambio
+          const eventType = payload.eventType;
+          if (eventType === 'INSERT') {
+            toast.info('Se ha recibido una nueva solicitud');
+          } else if (eventType === 'UPDATE') {
+            toast.info('Una solicitud ha sido actualizada');
+          } else if (eventType === 'DELETE') {
+            toast.info('Una solicitud ha sido eliminada');
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log(`Estado de la suscripción a ${subscription.tableName}:`, status);
+        
+        if (status === 'SUBSCRIBED') {
+          console.log(`Suscripción exitosa a cambios en ${subscription.tableName}`);
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error(`Error en el canal para ${subscription.tableName}`);
+          toast.error(`Error en la conexión en tiempo real`);
+        }
+      });
 
     // Limpieza al desmontar
     return () => {
