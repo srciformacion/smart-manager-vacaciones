@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import {
   Form,
   FormControl,
@@ -108,7 +109,14 @@ export function LoginForm({ onSubmit, isSubmitting = false, error, mode, onToggl
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contraseña</FormLabel>
+                  <div className="flex justify-between items-center">
+                    <FormLabel>Contraseña</FormLabel>
+                    {mode === "login" && (
+                      <Link to="/auth/reset-password" className="text-xs text-primary hover:underline">
+                        ¿Olvidaste tu contraseña?
+                      </Link>
+                    )}
+                  </div>
                   <FormControl>
                     <div className="relative">
                       <Input
