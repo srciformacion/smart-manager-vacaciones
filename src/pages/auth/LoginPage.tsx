@@ -1,24 +1,34 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LoginForm } from "@/components/auth/login-form";
-import { UserRole } from "@/types";
 import { Link } from "react-router-dom";
+import { UserRole } from "@/types";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/use-auth";
+import { LoginForm } from "@/components/auth/login-form";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const [userRole, setUserRole] = useState<UserRole>("worker");
   const [mode, setMode] = useState<"login" | "register">("login");
   const navigate = useNavigate();
-  const { signIn, signUp } = useAuth();
+  const { user, signIn, signUp, userRole, setUserRole } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      if (userRole === 'hr') {
+        navigate('/rrhh/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  }, [user, userRole, navigate]);
 
   const toggleMode = () => {
     setMode(mode === "login" ? "register" : "login");
@@ -39,34 +49,9 @@ export default function LoginPage() {
           role: userRole,
         });
         
-        toast({
-          title: "Cuenta creada con éxito",
-          description: "Ya puedes iniciar sesión con tus credenciales.",
-        });
-        
         setMode("login");
         setIsSubmitting(false);
         return;
-      }
-      
-      // Set the selected role
-      localStorage.setItem("userRole", userRole);
-      localStorage.setItem("userEmail", values.email);
-      
-      // Create a default user object for localStorage if it doesn't exist
-      const userData = {
-        id: Date.now().toString(),
-        name: "Usuario",
-        email: values.email,
-        role: userRole,
-      };
-      localStorage.setItem("user", JSON.stringify(userData));
-      
-      // Navigate based on selected role
-      if (userRole === "hr") {
-        navigate("/rrhh/dashboard");
-      } else {
-        navigate("/dashboard");
       }
     } catch (err) {
       console.error("Error de autenticación:", err);

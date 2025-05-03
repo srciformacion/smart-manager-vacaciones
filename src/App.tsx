@@ -1,79 +1,162 @@
 
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from "@/components/ui/toaster";
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Toaster } from "@/components/ui/sonner";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 
-// Import authentication pages
-import LoginPage from './pages/auth/LoginPage';
+// Páginas principales
+const Index = lazy(() => import('@/pages/Index'));
+const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+const AuthPage = lazy(() => import('@/pages/auth/AuthPage'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
 
-// Import worker pages
-import Index from './pages/Index';
-import DashboardPage from './pages/worker/DashboardPage';
-import WorkCalendarPage from './pages/worker/WorkCalendarPage';
-import VacationRequestPage from './pages/requests/VacationRequestPage';
-import LeaveRequestPage from './pages/requests/LeaveRequestPage';
-import PersonalDayRequestPage from './pages/requests/PersonalDayRequestPage';
-import ShiftChangeRequestPage from './pages/requests/ShiftChangeRequestPage';
-import ShiftProfilePage from './pages/worker/ShiftProfilePage';
-import HistoryPage from './pages/worker/HistoryPage';
-import ChatPage from './pages/ChatPage';
-import ProfilePage from './pages/ProfilePage';
+// Páginas del Trabajador
+const DashboardPage = lazy(() => import('@/pages/worker/DashboardPage'));
+const WorkCalendarPage = lazy(() => import('@/pages/worker/WorkCalendarPage'));
+const VacationRequestPage = lazy(() => import('@/pages/worker/VacationRequestPage'));
+const PersonalDayRequestPage = lazy(() => import('@/pages/worker/PersonalDayRequestPage'));
+const LeaveRequestPage = lazy(() => import('@/pages/worker/LeaveRequestPage'));
+const ShiftChangeRequestPage = lazy(() => import('@/pages/worker/ShiftChangeRequestPage'));
+const HistoryPage = lazy(() => import('@/pages/worker/HistoryPage'));
+const ShiftProfilePage = lazy(() => import('@/pages/worker/ShiftProfilePage'));
+const ChatPage = lazy(() => import('@/pages/ChatPage'));
 
-// Import HR pages
-import HRDashboardPage from './pages/hr/HRDashboardPage';
-import RequestsManagementPage from './pages/hr/RequestsManagementPage';
-import WorkersManagementPage from './pages/hr/WorkersManagementPage';
-import CalendarManagementPage from './pages/hr/CalendarManagementPage';
-import SmartAssistantPage from './pages/hr/SmartAssistantPage';
-import AIAssistantPage from './pages/hr/AIAssistantPage';
-import SendNotificationPage from './pages/hr/SendNotificationPage';
-import CalendarNotificationPage from './pages/hr/CalendarNotificationPage';
+// Páginas de RRHH
+const HRDashboardPage = lazy(() => import('@/pages/hr/HRDashboardPage'));
+const RequestsManagementPage = lazy(() => import('@/pages/hr/RequestsManagementPage'));
+const WorkersManagementPage = lazy(() => import('@/pages/hr/WorkersManagementPage'));
+const CalendarManagementPage = lazy(() => import('@/pages/hr/CalendarManagementPage'));
+const SendNotificationPage = lazy(() => import('@/pages/hr/SendNotificationPage'));
+const CalendarNotificationPage = lazy(() => import('@/pages/hr/CalendarNotificationPage'));
+const AIAssistantPage = lazy(() => import('@/pages/hr/AIAssistantPage'));
+const AIDashboardPage = lazy(() => import('@/pages/hr/AIDashboardPage'));
 
-// Import common components
-import NotFound from './pages/NotFound';
+const LoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="w-full max-w-md space-y-4">
+      <Skeleton className="h-10 w-[200px]" />
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-10 w-full" />
+    </div>
+  </div>
+);
 
-const queryClient = new QueryClient();
-
-const App = () => {
+function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          {/* Auth Routes */}
-          <Route path="/auth" element={<LoginPage />} />
-          <Route path="/login" element={<Navigate to="/auth" replace />} />
+    <Router>
+      <AuthProvider>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            {/* Rutas públicas */}
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<LoginPage />} />
+            <Route path="/auth/login" element={<LoginPage />} />
 
-          {/* Worker Routes */}
-          <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/calendario-laboral" element={<WorkCalendarPage />} />
-          <Route path="/solicitudes/vacaciones" element={<VacationRequestPage />} />
-          <Route path="/solicitudes/permisos" element={<LeaveRequestPage />} />
-          <Route path="/solicitudes/asuntos-propios" element={<PersonalDayRequestPage />} />
-          <Route path="/solicitudes/cambio-turno" element={<ShiftChangeRequestPage />} />
-          <Route path="/perfiles-turno" element={<ShiftProfilePage />} />
-          <Route path="/historial" element={<HistoryPage />} />
-          <Route path="/chat" element={<ChatPage />} />
-          <Route path="/perfil" element={<ProfilePage />} />
+            {/* Rutas de trabajador protegidas */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute requiredRole="worker">
+                <DashboardPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/calendar" element={
+              <ProtectedRoute requiredRole="worker">
+                <WorkCalendarPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/requests/vacation" element={
+              <ProtectedRoute requiredRole="worker">
+                <VacationRequestPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/requests/personal-day" element={
+              <ProtectedRoute requiredRole="worker">
+                <PersonalDayRequestPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/requests/leave" element={
+              <ProtectedRoute requiredRole="worker">
+                <LeaveRequestPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/requests/shift-change" element={
+              <ProtectedRoute requiredRole="worker">
+                <ShiftChangeRequestPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/history" element={
+              <ProtectedRoute requiredRole="worker">
+                <HistoryPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/shift-profile" element={
+              <ProtectedRoute requiredRole="worker">
+                <ShiftProfilePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            } />
 
-          {/* HR Routes */}
-          <Route path="/rrhh/dashboard" element={<HRDashboardPage />} />
-          <Route path="/rrhh/solicitudes" element={<RequestsManagementPage />} />
-          <Route path="/rrhh/trabajadores" element={<WorkersManagementPage />} />
-          <Route path="/rrhh/calendarios" element={<CalendarManagementPage />} />
-          <Route path="/rrhh/notificaciones" element={<CalendarNotificationPage />} />
-          <Route path="/rrhh/asistente" element={<SmartAssistantPage />} />
-          <Route path="/rrhh/ai-assistant" element={<AIAssistantPage />} />
-          <Route path="/rrhh/send-notification" element={<SendNotificationPage />} />
+            {/* Rutas de RRHH protegidas */}
+            <Route path="/rrhh/dashboard" element={
+              <ProtectedRoute requiredRole="hr">
+                <HRDashboardPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/rrhh/requests" element={
+              <ProtectedRoute requiredRole="hr">
+                <RequestsManagementPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/rrhh/workers" element={
+              <ProtectedRoute requiredRole="hr">
+                <WorkersManagementPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/rrhh/calendar" element={
+              <ProtectedRoute requiredRole="hr">
+                <CalendarManagementPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/rrhh/notification" element={
+              <ProtectedRoute requiredRole="hr">
+                <SendNotificationPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/rrhh/calendar-notification" element={
+              <ProtectedRoute requiredRole="hr">
+                <CalendarNotificationPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/rrhh/ai-assistant" element={
+              <ProtectedRoute requiredRole="hr">
+                <AIAssistantPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/rrhh/ai-dashboard" element={
+              <ProtectedRoute requiredRole="hr">
+                <AIDashboardPage />
+              </ProtectedRoute>
+            } />
 
-          {/* 404 Page */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-      <Toaster />
-    </QueryClientProvider>
+            {/* Rutas de error */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+        <Toaster />
+      </AuthProvider>
+    </Router>
   );
-};
+}
 
 export default App;
