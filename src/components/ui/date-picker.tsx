@@ -10,12 +10,12 @@ import { cn } from "@/lib/utils";
 
 interface DatePickerProps {
   date: Date | undefined;
-  setDate: (date: Date | undefined) => void;
+  onSelect: (date: Date | undefined) => void;
   placeholder?: string;
   className?: string;
 }
 
-export function DatePicker({ date, setDate, placeholder = "Seleccione fecha", className }: DatePickerProps) {
+export function DatePicker({ date, onSelect, placeholder = "Seleccione fecha", className }: DatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -35,9 +35,10 @@ export function DatePicker({ date, setDate, placeholder = "Seleccione fecha", cl
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={onSelect}
           initialFocus
           locale={es}
+          className="p-3 pointer-events-auto"
         />
       </PopoverContent>
     </Popover>

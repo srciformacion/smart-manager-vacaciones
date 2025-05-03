@@ -2,7 +2,7 @@
 import React from 'react';
 import { addDays, format, getDay, startOfMonth, endOfMonth, isToday, isSameMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { CalendarShift } from '@/types/calendar';
+import { CalendarShift, ShiftType } from '@/types/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -197,7 +197,7 @@ export const MonthCalendar = ({ currentDate, shifts, onShiftEdit }: MonthCalenda
                 <Label htmlFor="type">Tipo de turno</Label>
                 <Select 
                   value={editedShift.type} 
-                  onValueChange={(value) => 
+                  onValueChange={(value: ShiftType) => 
                     setEditedShift({...editedShift, type: value, color: getShiftColor(value)})
                   }
                 >
@@ -270,7 +270,7 @@ export const MonthCalendar = ({ currentDate, shifts, onShiftEdit }: MonthCalenda
     </>
   );
 
-  function getShiftColor(type: string): any {
+  function getShiftColor(type: ShiftType) {
     switch (type) {
       case "morning": return "blue";
       case "afternoon": return "amber";

@@ -72,7 +72,7 @@ export function ExportForm({ onExport }: ExportFormProps) {
           
           <div className="space-y-2">
             <Label>Formato de exportación</Label>
-            <Select value={exportFormat} onValueChange={(value: any) => setExportFormat(value)}>
+            <Select value={exportFormat} onValueChange={(value: 'pdf' | 'excel' | 'csv') => setExportFormat(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar formato" />
               </SelectTrigger>
