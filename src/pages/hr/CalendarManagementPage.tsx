@@ -9,30 +9,41 @@ import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function CalendarManagementPage() {
   const { user, fetchAuthUser } = useProfileAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("calendar");
+  const { userRole } = useAuth();
   
+  // Verificamos que tanto el usuario autenticado como el usuario demo con rol HR puedan acceder
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // Intentar obtener el usuario autenticado
         const authUser = await fetchAuthUser();
-        if (!authUser) {
+        
+        // Para usuarios demo, verificamos el rol en localStorage
+        const demoRole = localStorage.getItem("userRole");
+        const demoUser = localStorage.getItem("user");
+        
+        // Si no hay usuario autenticado ni usuario demo, redireccionar a login
+        if (!authUser && (!demoUser || !demoRole)) {
           toast.error("Por favor inicia sesión para acceder a la gestión de calendarios");
           navigate('/auth');
           return;
         }
         
-        // Check if user has HR role
-        if (user?.role !== 'hr') {
+        // Verificamos permisos basados en rol
+        if (userRole !== 'hr' && demoRole !== 'hr') {
           toast.error("No tienes permisos para acceder a esta página");
           navigate('/');
           return;
         }
         
+        console.log("Acceso permitido a CalendarManagementPage - Role:", userRole || demoRole);
         setLoading(false);
       } catch (error) {
         console.error("Auth check error:", error);
@@ -42,7 +53,7 @@ export default function CalendarManagementPage() {
     };
     
     checkAuth();
-  }, [fetchAuthUser, navigate, user]);
+  }, [fetchAuthUser, navigate, userRole]);
 
   if (loading) {
     return (
