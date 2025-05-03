@@ -1,5 +1,6 @@
+
 import { NavLink } from "react-router-dom";
-import { User } from "@/types";
+import { User, UserRole } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -13,11 +14,18 @@ interface NavItem {
   requiredRole?: 'worker' | 'hr';
 }
 
+// Update the props interface to accept either user or role and optional callbacks
 interface SidebarNavigationProps {
-  user: User | null;
+  user?: User | null;
+  role?: UserRole;
+  onLogout?: () => void | Promise<void>;
+  onNavigate?: () => void;
 }
 
-export function SidebarNavigation({ user }: { user: User | null }) {
+export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarNavigationProps) {
+  // Determine role from props - either directly provided or from user object
+  const userRole = role || user?.role;
+  
   const navigationItems: NavItem[] = [
     { to: "/dashboard", label: "Dashboard", requiredRole: 'worker' },
     { to: "/rrhh/dashboard", label: "Dashboard RRHH", requiredRole: 'hr' },
@@ -41,8 +49,14 @@ export function SidebarNavigation({ user }: { user: User | null }) {
 
   const filteredNavigationItems = navigationItems.filter(item => {
     if (!item.requiredRole) return true;
-    return user?.role === item.requiredRole;
+    return userRole === item.requiredRole;
   });
+
+  const handleNavClick = () => {
+    if (onNavigate) {
+      onNavigate();
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -65,6 +79,7 @@ export function SidebarNavigation({ user }: { user: User | null }) {
                     isActive ? 'bg-secondary text-accent-foreground' : 'text-muted-foreground'
                   }`
                 }
+                onClick={handleNavClick}
               >
                 {item.label}
               </NavLink>
@@ -72,6 +87,21 @@ export function SidebarNavigation({ user }: { user: User | null }) {
           ))}
         </ul>
       </nav>
+      {onLogout && (
+        <>
+          <Separator />
+          <div className="p-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onLogout} 
+              className="w-full text-muted-foreground hover:text-foreground"
+            >
+              Cerrar sesión
+            </Button>
+          </div>
+        </>
+      )}
       <Separator />
       <div className="flex items-center gap-2 p-4">
         <ThemeToggle />
