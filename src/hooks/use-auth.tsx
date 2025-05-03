@@ -1,3 +1,4 @@
+
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -74,11 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
-        toast({
-          title: "Error de autenticación",
-          description: error.message,
-          variant: "destructive"
-        });
+        toast.error("Error de autenticación: " + error.message);
         throw error;
       }
 
@@ -117,19 +114,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
-        toast({
-          title: "Error de registro",
-          description: error.message,
-          variant: "destructive"
-        });
+        toast.error("Error de registro: " + error.message);
         throw error;
       }
 
       if (data.user) {
-        toast({
-          title: "Cuenta creada con éxito",
-          description: "Ya puedes iniciar sesión con tus credenciales.",
-        });
+        toast.success("Cuenta creada con éxito. Ya puedes iniciar sesión con tus credenciales.");
       }
 
       return data;
