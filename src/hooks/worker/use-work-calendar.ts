@@ -8,7 +8,17 @@ import {
   calculateWorkedHours 
 } from "@/data/calendar/shifts";
 import { exampleAnnualHours } from "@/data/calendar/hours";
-import { addMonths, subMonths, startOfMonth, endOfMonth, format } from "date-fns";
+import { 
+  addMonths, 
+  subMonths, 
+  addDays,
+  subDays,
+  addYears,
+  subYears,
+  startOfMonth, 
+  endOfMonth, 
+  format 
+} from "date-fns";
 import { toast } from "sonner";
 
 export function useWorkCalendar(userId: string) {
@@ -40,18 +50,42 @@ export function useWorkCalendar(userId: string) {
     }
   };
 
-  // Cambiar al mes siguiente
-  const nextMonth = () => {
-    const nextDate = addMonths(currentDate, 1);
+  // Navegación temporal
+  const navigate = (type: 'day' | 'month' | 'year', direction: 'previous' | 'next') => {
+    let nextDate: Date;
+    
+    switch (type) {
+      case 'day':
+        nextDate = direction === 'next' ? addDays(currentDate, 1) : subDays(currentDate, 1);
+        break;
+      case 'month':
+        nextDate = direction === 'next' ? addMonths(currentDate, 1) : subMonths(currentDate, 1);
+        break;
+      case 'year':
+        nextDate = direction === 'next' ? addYears(currentDate, 1) : subYears(currentDate, 1);
+        break;
+      default:
+        nextDate = currentDate;
+    }
+    
     setCurrentDate(nextDate);
     loadCalendarData(nextDate);
+  };
+
+  // Cambiar al mes siguiente
+  const nextMonth = () => {
+    navigate('month', 'next');
   };
   
   // Cambiar al mes anterior
   const previousMonth = () => {
-    const prevDate = subMonths(currentDate, 1);
-    setCurrentDate(prevDate);
-    loadCalendarData(prevDate);
+    navigate('month', 'previous');
+  };
+
+  // Cambiar a una fecha específica
+  const selectDate = (date: Date) => {
+    setCurrentDate(date);
+    loadCalendarData(date);
   };
 
   // Calcular estadísticas de horas para el mes actual
@@ -113,6 +147,8 @@ export function useWorkCalendar(userId: string) {
     isLoading,
     nextMonth,
     previousMonth,
+    selectDate,
+    navigate,
     calculateMonthStats,
     calculateAnnualStats,
     exportData

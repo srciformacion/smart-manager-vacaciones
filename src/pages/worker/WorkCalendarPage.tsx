@@ -27,6 +27,8 @@ export default function WorkCalendarPage() {
     isLoading,
     nextMonth,
     previousMonth,
+    selectDate,
+    navigate: navigateCalendar,
     calculateMonthStats,
     calculateAnnualStats,
     exportData
@@ -77,10 +79,9 @@ export default function WorkCalendarPage() {
           currentDate={currentDate}
           onPreviousMonth={previousMonth}
           onNextMonth={nextMonth}
-          onDateSelect={(date) => {
-            // Implementar cambio a una fecha específica
-          }}
+          onDateSelect={selectDate}
           onExport={exportData}
+          onNavigate={navigateCalendar}
         />
 
         <HoursSummary

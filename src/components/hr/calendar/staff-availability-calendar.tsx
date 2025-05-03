@@ -1,3 +1,4 @@
+
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -9,10 +10,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, addYears, subYears } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import { useState } from "react";
 import { StatusBadge } from "@/components/hr/calendar/status-badge";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type CalendarStatus = "approved" | "rejected" | "pending" | "moreInfo";
 
@@ -20,6 +23,15 @@ const CalendarWithLegend = () => {
   const [date, setDate] = useState<Date>();
   const [displayMonth, setDisplayMonth] = useState(new Date());
   const [status, setStatus] = useState<CalendarStatus>("approved");
+  
+  // Funciones de navegación
+  const nextYear = () => {
+    setDisplayMonth(addYears(displayMonth, 1));
+  };
+  
+  const previousYear = () => {
+    setDisplayMonth(subYears(displayMonth, 1));
+  };
 
   const MonthPicker = () => {
     const handleMonthChange = (month: Date | undefined) => {
@@ -29,24 +41,34 @@ const CalendarWithLegend = () => {
     };
 
     return (
-      <Select onValueChange={(value) => handleMonthChange(new Date(value))}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder={format(displayMonth, "MMMM yyyy")} />
-        </SelectTrigger>
-        <SelectContent>
-          {[...Array(12)].map((_, i) => {
-            const month = new Date(displayMonth.getFullYear(), i);
-            return (
-              <SelectItem
-                key={i}
-                value={month.toISOString()}
-              >
-                {format(month, "MMMM yyyy")}
-              </SelectItem>
-            );
-          })}
-        </SelectContent>
-      </Select>
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="icon" onClick={previousYear}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        
+        <Select onValueChange={(value) => handleMonthChange(new Date(value))}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder={format(displayMonth, "MMMM yyyy")} />
+          </SelectTrigger>
+          <SelectContent>
+            {[...Array(12)].map((_, i) => {
+              const month = new Date(displayMonth.getFullYear(), i);
+              return (
+                <SelectItem
+                  key={i}
+                  value={month.toISOString()}
+                >
+                  {format(month, "MMMM yyyy")}
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
+        
+        <Button variant="outline" size="icon" onClick={nextYear}>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
     );
   };
 
@@ -66,7 +88,7 @@ const CalendarWithLegend = () => {
             onSelect={setDate}
             initialFocus
             month={displayMonth}
-            className="rounded-md border"
+            className="rounded-md border pointer-events-auto"
           />
         </CardContent>
       </Card>
@@ -97,7 +119,6 @@ const CalendarWithLegend = () => {
 
       <div>
         <DisplayCalendar displayMonth={displayMonth} />
-        <MonthPicker />
       </div>
     </div>
   );
@@ -107,6 +128,15 @@ export function StaffAvailabilityCalendar() {
   const [date, setDate] = useState<Date>();
   const [displayMonth, setDisplayMonth] = useState(new Date());
   const [status, setStatus] = useState<CalendarStatus>("approved");
+  
+  // Funciones de navegación
+  const nextYear = () => {
+    setDisplayMonth(addYears(displayMonth, 1));
+  };
+  
+  const previousYear = () => {
+    setDisplayMonth(subYears(displayMonth, 1));
+  };
 
   const MonthPicker = () => {
     const handleMonthChange = (month: Date | undefined) => {
@@ -116,24 +146,34 @@ export function StaffAvailabilityCalendar() {
     };
 
     return (
-      <Select onValueChange={(value) => handleMonthChange(new Date(value))}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder={format(displayMonth, "MMMM yyyy")} />
-        </SelectTrigger>
-        <SelectContent>
-          {[...Array(12)].map((_, i) => {
-            const month = new Date(displayMonth.getFullYear(), i);
-            return (
-              <SelectItem
-                key={i}
-                value={month.toISOString()}
-              >
-                {format(month, "MMMM yyyy")}
-              </SelectItem>
-            );
-          })}
-        </SelectContent>
-      </Select>
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="icon" onClick={previousYear}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        
+        <Select onValueChange={(value) => handleMonthChange(new Date(value))}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder={format(displayMonth, "MMMM yyyy")} />
+          </SelectTrigger>
+          <SelectContent>
+            {[...Array(12)].map((_, i) => {
+              const month = new Date(displayMonth.getFullYear(), i);
+              return (
+                <SelectItem
+                  key={i}
+                  value={month.toISOString()}
+                >
+                  {format(month, "MMMM yyyy")}
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
+        
+        <Button variant="outline" size="icon" onClick={nextYear}>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
     );
   };
 
@@ -153,7 +193,7 @@ export function StaffAvailabilityCalendar() {
             onSelect={setDate}
             initialFocus
             month={displayMonth}
-            className="rounded-md border"
+            className="rounded-md border pointer-events-auto"
           />
         </CardContent>
       </Card>
@@ -184,7 +224,6 @@ export function StaffAvailabilityCalendar() {
 
       <div>
         <DisplayCalendar displayMonth={displayMonth} />
-        <MonthPicker />
       </div>
     </div>
   );

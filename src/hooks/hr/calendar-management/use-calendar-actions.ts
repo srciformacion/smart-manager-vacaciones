@@ -6,7 +6,14 @@ import { exampleAnnualHours } from "@/data/calendar/hours";
 import { CalendarState, CalendarActions } from "./types";
 import { User } from "@/types";
 import { CalendarShift } from "@/types/calendar";
-import { addMonths, subMonths } from "date-fns";
+import { 
+  addMonths, 
+  subMonths, 
+  addDays, 
+  subDays, 
+  addYears, 
+  subYears 
+} from "date-fns";
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 
@@ -33,20 +40,43 @@ export function useCalendarActions(
     setState(prev => ({ ...prev, annualHours: userAnnualHours }));
   };
   
+  // Navegación temporal
+  const navigate = (type: 'day' | 'month' | 'year', direction: 'previous' | 'next') => {
+    if (!state.selectedUser) return;
+    
+    let nextDate: Date;
+    
+    switch (type) {
+      case 'day':
+        nextDate = direction === 'next' ? addDays(state.currentDate, 1) : subDays(state.currentDate, 1);
+        break;
+      case 'month':
+        nextDate = direction === 'next' ? addMonths(state.currentDate, 1) : subMonths(state.currentDate, 1);
+        break;
+      case 'year':
+        nextDate = direction === 'next' ? addYears(state.currentDate, 1) : subYears(state.currentDate, 1);
+        break;
+      default:
+        nextDate = state.currentDate;
+    }
+    
+    loadUserMonthlyShifts(state.selectedUser, nextDate);
+  };
+  
   // Cambiar al mes siguiente
   const nextMonth = () => {
-    if (state.selectedUser) {
-      const nextDate = addMonths(state.currentDate, 1);
-      loadUserMonthlyShifts(state.selectedUser, nextDate);
-    }
+    navigate('month', 'next');
   };
   
   // Cambiar al mes anterior
   const previousMonth = () => {
-    if (state.selectedUser) {
-      const prevDate = subMonths(state.currentDate, 1);
-      loadUserMonthlyShifts(state.selectedUser, prevDate);
-    }
+    navigate('month', 'previous');
+  };
+  
+  // Seleccionar fecha específica
+  const selectDate = (date: Date) => {
+    if (!state.selectedUser) return;
+    loadUserMonthlyShifts(state.selectedUser, date);
   };
   
   // Actualizar un turno
@@ -90,6 +120,8 @@ export function useCalendarActions(
     loadUserMonthlyShifts,
     nextMonth,
     previousMonth,
+    navigate,
+    selectDate,
     updateShift,
     selectShiftForEdit,
     cancelEdit
