@@ -1,99 +1,119 @@
-
-import { Menu, LogOut } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { SidebarNavigation } from "./sidebar-navigation";
-import { User } from "@/types";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { MainLayoutMobile } from "./main-layout-mobile";
-import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useUser } from "@/hooks/use-user";
+import { Link } from "react-router-dom";
+import { ModeToggle } from "@/components/ui/mode-toggle";
+import { useEffect, useState } from "react";
+import { auth } from "@/integrations/auth/lucia";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/use-auth";
+import { MainSidebar } from "./main-sidebar";
+import { api } from "@/integrations/api";
+import { InstallPWAButton } from '@/components/pwa/install-pwa-button';
 
-export function MainLayout({ user, children }: { user: User | null, children: React.ReactNode }) {
-  const isMobile = useIsMobile();
+interface MainLayoutProps {
+  children: React.ReactNode;
+}
+
+export function MainLayout({ children }: MainLayoutProps) {
+  const { user } = useUser();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const [mounted, setMounted] = useState(false);
 
-  const handleLogout = () => {
-    signOut();
-  };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  if (isMobile) {
-    return <MainLayoutMobile user={user}>{children}</MainLayoutMobile>;
+  async function logout() {
+    await api.logout();
+    navigate("/login");
   }
 
   return (
-    <div className="h-full">
-      <div className="hidden md:fixed md:inset-y-0 md:z-50 md:flex md:w-72 md:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-background px-6 pb-4">
-          <div className="h-16 flex items-center">
-            <h2 
-              className="text-lg font-semibold cursor-pointer" 
-              onClick={() => user ? navigate(user.role === "hr" ? "/rrhh/dashboard" : "/dashboard") : navigate("/")}
-            >
-              La Rioja Cuida
-            </h2>
-          </div>
-
-          <SidebarNavigation role={user?.role} onLogout={handleLogout} />
-        </div>
-      </div>
-
-      <div className="md:pl-72">
-        <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 border-b bg-background px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-          <Button
-            variant="outline"
-            size="icon"
-            className="md:hidden"
-            aria-label="Open Sidebar"
-            onClick={() => {
-              // Sidebar toggle logic would go here if needed
-              console.log("Sidebar toggle");
-            }}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <div className="flex-1" />
-            <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <NotificationCenter />
-              <ThemeToggle />
-              <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200 dark:lg:bg-gray-700" />
-              <div className="flex items-center">
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <span className="sr-only">Your profile</span>
-                  <Avatar>
-                    <AvatarFallback>
-                      {user?.name && user?.name[0]?.toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-                <div className="ml-2">
-                  <p className="text-sm font-medium">{user?.name || "Usuario"}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {user?.role === "hr" ? "RRHH" : "Trabajador"}
-                  </p>
-                </div>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={handleLogout}
-                className="text-muted-foreground hover:text-foreground hover:bg-accent"
-                aria-label="Cerrar sesión"
-              >
-                <LogOut className="h-5 w-5" />
+    <div className="flex h-screen bg-background">
+      <MainSidebar />
+      <div className="flex flex-col flex-1">
+        <header className="z-10 flex items-center h-16 px-4 border-b shrink-0 bg-secondary">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm" className="mr-2 lg:hidden">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4"
+                >
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
               </Button>
-            </div>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full sm:max-w-[300px]">
+              <SheetHeader>
+                <SheetTitle>Menú</SheetTitle>
+                <SheetDescription>
+                  Navega a través de las diferentes opciones.
+                </SheetDescription>
+              </SheetHeader>
+              <MainSidebar />
+            </SheetContent>
+          </Sheet>
+          <div className="flex items-center gap-2">
+            <InstallPWAButton />
+            <ModeToggle />
+            {mounted && user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative w-8 h-8 rounded-full">
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={user?.image} alt={user?.name} />
+                      <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel>
+                    {user?.name}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    Perfil
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => logout()}>
+                    Salir
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/login">
+                <Button>Login</Button>
+              </Link>
+            )}
           </div>
-        </div>
-
-        <main className="py-10">
-          <div className="px-4 sm:px-6 lg:px-8">{children}</div>
-        </main>
+        </header>
+        <main className="flex-1 p-4">{children}</main>
       </div>
     </div>
   );

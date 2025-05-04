@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { UpdateNotification } from './components/pwa/update-notification.tsx'
+import { Toaster } from 'sonner'
 import { registerSW } from 'virtual:pwa-register'
 
 // Register service worker using vite-plugin-pwa
@@ -20,6 +21,7 @@ const updateSW = registerSW({
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
+    <Toaster richColors position="top-right" />
     <UpdateNotification />
     <App />
   </React.StrictMode>,

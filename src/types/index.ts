@@ -188,3 +188,9 @@ export interface NotificationPayload {
   tipo?: NotificationType;
   userId?: string;
 }
+
+// Definición de DateRange para ser usada en los formularios
+export interface DateRange {
+  from: Date;
+  to: Date;
+}

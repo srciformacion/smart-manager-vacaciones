@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { registerSW } from 'virtual:pwa-register';
@@ -18,26 +18,17 @@ export function UpdateNotification() {
         setUpdateAvailable(true);
         setRefreshSW(() => updateSW);
         
-        toast({
-          title: "Nueva versión disponible",
+        toast.message("Nueva versión disponible", {
           description: "Hay una nueva versión de la aplicación disponible.",
-          action: (
-            <Button 
-              variant="default" 
-              size="sm"
-              onClick={() => updateSW?.()}
-              className="gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Actualizar
-            </Button>
-          ),
+          action: {
+            label: "Actualizar",
+            onClick: () => updateSW?.(),
+          },
           duration: 0, // No se cierra automáticamente
         });
       },
       onOfflineReady() {
-        toast({
-          title: "Listo para uso sin conexión",
+        toast.success("Listo para uso sin conexión", {
           description: "La aplicación está lista para usarse sin conexión.",
           duration: 3000,
         });
