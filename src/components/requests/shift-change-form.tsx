@@ -57,7 +57,11 @@ export function ShiftChangeForm({
             email: profile.email || '',
             role: 'worker', // Por defecto asignamos rol de trabajador
             department: profile.department || '',
-            // Añadir otros campos según sea necesario
+            // Añadir campos requeridos por la interfaz User
+            shift: 'Programado' as any,
+            workGroup: 'Grupo Programado' as any,
+            workday: 'Completa' as any,
+            seniority: 1
           }));
           
           setAvailableCoworkers(mappedCoworkers);
@@ -76,32 +80,32 @@ export function ShiftChangeForm({
     
     try {
       // Preparar datos para insertar en la tabla requests
-      const requestData = {
+      const requestPayload = {
         userid: user.id,
         type: 'shiftChange',
-        startdate: values.date,
-        enddate: values.date,
+        startdate: values.dateRange?.from,
+        enddate: values.dateRange?.to || values.dateRange?.from,
         reason: values.reason,
         notes: values.notes,
         status: 'pending'
       };
       
       // Insertar la solicitud en Supabase
-      const { data: requestData, error: requestError } = await supabase
+      const { data, error: requestError } = await supabase
         .from('requests')
-        .insert(requestData)
+        .insert(requestPayload)
         .select();
       
       if (requestError) throw requestError;
       
-      if (requestData && requestData.length > 0) {
+      if (data && data.length > 0) {
         // Insertar el cambio de turno asociado
         const shiftChangeData = {
-          request_id: requestData[0].id,
+          request_id: data[0].id,
           original_user_id: user.id,
           replacement_user_id: values.replacementUserId,
-          original_date: values.date,
-          return_date: values.returnDate
+          original_date: values.dateRange?.from,
+          return_date: values.dateRange?.to
         };
         
         const { error: shiftChangeError } = await supabase
@@ -116,7 +120,7 @@ export function ShiftChangeForm({
           .insert({
             user_id: values.replacementUserId,
             title: "Nueva solicitud de cambio de turno",
-            message: `${user.name} ha solicitado un cambio de turno contigo para el día ${new Date(values.date).toLocaleDateString()}`,
+            message: `${user.name} ha solicitado un cambio de turno contigo para el día ${new Date(values.dateRange?.from || new Date()).toLocaleDateString()}`,
             type: "shiftChange"
           });
         

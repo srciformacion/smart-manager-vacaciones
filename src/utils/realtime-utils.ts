@@ -75,7 +75,8 @@ export const createTableSubscription = (
   // Crear el canal y suscribirse a los cambios
   const channel = supabase
     .channel(channelName)
-    .on('postgres_changes', 
+    .on(
+      'postgres_changes',
       {
         event,
         schema,

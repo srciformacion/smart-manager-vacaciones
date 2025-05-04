@@ -50,10 +50,7 @@ export interface AnnualHours {
   personalLeaveHours: number;
   seniorityAdjustment: number;
   remainingHours: number;
-  specialCircumstances?: {
-    name: string;
-    hours: number;
-  }[];
+  specialCircumstances?: SpecialCircumstances;
 }
 
 export interface ShiftProfile {
@@ -62,4 +59,38 @@ export interface ShiftProfile {
   startTime: string;
   endTime: string;
   isDefault: boolean;
+  userId?: string;
+  shiftType?: string;
+  workDays?: string[];
+  createdBy?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface CalendarTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  shifts: {
+    day: number;
+    type: ShiftType;
+    startTime: string;
+    endTime: string;
+    hours: number;
+  }[];
+}
+
+export interface SpecialCircumstances {
+  id?: string;
+  userId: string;
+  hasReducedWorkday?: boolean;
+  reductionPercentage?: number;
+  hasBreastfeedingPermit?: boolean;
+  breastfeedingEndDate?: Date;
+  otherPermits?: {
+    type: string;
+    startDate: Date;
+    endDate: Date;
+    description: string;
+  }[];
 }

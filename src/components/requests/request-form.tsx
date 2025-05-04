@@ -1,173 +1,115 @@
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { RequestType, User, ShiftProfile } from "@/types";
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { formSchema, FormValues } from "./form/request-form-schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { DateRangeSection } from "./form/date-range-section";
 import { TimeSelectionSection } from "./form/time-selection-section";
-import { ReplacementSection } from "./form/replacement-section";
 import { RequestDetailsSection } from "./form/request-details-section";
 import { FileUploadSection } from "./form/file-upload-section";
-import { getVacationRules } from "@/utils/vacationLogic";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { User, RequestType } from "@/types";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import * as z from "zod";
+import { ShiftProfile } from '@/types/calendar';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+// Define el esquema para validar el formulario
+const formSchema = z.object({
+  dateRange: z.object({
+    from: z.date(),
+    to: z.date().optional(),
+  }),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
+  shiftProfileId: z.string().optional(),
+  reason: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface RequestFormProps {
-  requestType: RequestType;
   user: User;
-  availableUsers?: User[];
-  shiftProfiles?: ShiftProfile[];
-  onSubmit: (values: FormValues, file: File | null) => void;
+  type: RequestType;
+  isLeaveForm?: boolean;
+  onSubmit: (data: any) => void;
   isSubmitting?: boolean;
 }
 
-export function RequestForm({
-  requestType,
-  user,
-  availableUsers = [],
-  shiftProfiles = [],
+export function RequestForm({ 
+  user, 
+  type, 
+  isLeaveForm = false,
   onSubmit,
-  isSubmitting = false,
+  isSubmitting = false
 }: RequestFormProps) {
-  const [file, setFile] = useState<File | null>(null);
-  const [showTimeSelectors] = useState(requestType === 'personalDay');
-  const [localIsSubmitting, setLocalIsSubmitting] = useState(false);
-  const [profiles, setProfiles] = useState<ShiftProfile[]>(shiftProfiles);
-  
-  const defaultProfile = profiles.find(profile => profile.isDefault);
-  
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      dateRange: {
-        from: new Date(),
-        to: new Date(),
-      },
-      reason: "",
-      notes: "",
-      shiftProfileId: defaultProfile?.id || "",
-      startTime: defaultProfile?.startTime || "08:00",
-      endTime: defaultProfile?.endTime || "15:00",
-    },
-  });
+  const [shiftProfiles, setShiftProfiles] = useState<ShiftProfile[]>([]);
+  const [submitting, setSubmitting] = useState<boolean>(isSubmitting);
 
-  // Cargar perfiles de turno desde Supabase
   useEffect(() => {
+    // Cargar perfiles de turno desde Supabase
     const loadShiftProfiles = async () => {
       try {
         const { data, error } = await supabase
-          .from('calendar_templates')
-          .select('*');
+          .from('shift_profiles')
+          .select('*')
+          .eq('user_id', user.id);
           
         if (error) throw error;
         
         if (data && data.length > 0) {
-          // Transformar los datos al formato de ShiftProfile
-          const profilesData = data.map(template => ({
-            id: template.id,
-            name: template.name,
-            startTime: "08:00", // Valores por defecto si no se especifican en el template
-            endTime: "15:00",
-            isDefault: template.is_default || false
+          const mappedProfiles: ShiftProfile[] = data.map(profile => ({
+            id: profile.id,
+            name: profile.name,
+            startTime: profile.start_time || '08:00',
+            endTime: profile.end_time || '16:00',
+            isDefault: profile.is_default,
+            userId: profile.user_id,
+            shiftType: profile.shift_type,
+            workDays: profile.work_days,
+            createdBy: profile.created_by,
+            createdAt: new Date(profile.created_at),
+            updatedAt: new Date(profile.updated_at)
           }));
           
-          setProfiles(profilesData);
+          setShiftProfiles(mappedProfiles);
         }
       } catch (error) {
-        console.error("Error al cargar perfiles de turno:", error);
+        console.error('Error cargando perfiles de turno:', error);
       }
     };
     
     loadShiftProfiles();
-  }, []);
+  }, [user.id]);
 
-  const getRequestTypeTitle = () => {
-    switch (requestType) {
-      case "vacation":
-        return "Solicitud de vacaciones";
-      case "personalDay":
-        return "Solicitud de asuntos propios";
-      case "leave":
-        return "Solicitud de permiso justificado";
-      case "shiftChange":
-        return "Solicitud de cambio de turno";
-      default:
-        return "Nueva solicitud";
-    }
-  };
-
-  const getRequestTypeDescription = () => {
-    switch (requestType) {
-      case "vacation":
-        const rules = getVacationRules(user.workGroup);
-        return `Grupo de trabajo: ${user.workGroup}. ${rules}`;
-      case "personalDay":
-        return "Solicitud de días por asuntos propios. Los días pueden solicitarse en bloques de 8h, 12h o 24h según su turno.";
-      case "leave":
-        return "Solicitud de permiso justificado con documento acreditativo.";
-      case "shiftChange":
-        return "Solicitud de cambio de turno con otro compañero. Debe especificar la fecha de devolución.";
-      default:
-        return "";
-    }
-  };
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      reason: "",
+      notes: "",
+    },
+  });
 
   const handleSubmit = async (values: FormValues) => {
-    setLocalIsSubmitting(true);
+    setSubmitting(true);
     
     try {
-      let attachmentUrl = null;
-      
-      // Si hay un archivo para subir (en caso de permisos justificados)
-      if (file && requestType === 'leave') {
-        const filename = `${user.id}/${Date.now()}_${file.name}`;
-        
-        // Verificar si el bucket existe
-        const { data: bucketData, error: bucketError } = await supabase
-          .storage
-          .getBucket('attachments');
-        
-        // Si no existe el bucket, intentar crearlo
-        if (bucketError && bucketError.message.includes('does not exist')) {
-          await supabase.storage.createBucket('attachments', { public: true });
-        }
-        
-        // Subir el archivo
-        const { data: uploadData, error: uploadError } = await supabase
-          .storage
-          .from('attachments')
-          .upload(filename, file);
-          
-        if (uploadError) throw uploadError;
-        
-        // Obtener la URL pública
-        const { data: urlData } = supabase
-          .storage
-          .from('attachments')
-          .getPublicUrl(filename);
-          
-        attachmentUrl = urlData.publicUrl;
-      }
-      
-      // Preparar datos para insertar en la tabla requests
+      // Preparar datos para la base de datos
       const requestData = {
         userid: user.id,
-        type: requestType,
+        type: type,
         startdate: values.dateRange.from,
         enddate: values.dateRange.to || values.dateRange.from,
         starttime: values.startTime,
         endtime: values.endTime,
         reason: values.reason,
         notes: values.notes,
-        attachmenturl: attachmentUrl,
         status: 'pending'
       };
       
-      // Insertar la solicitud en Supabase
+      // Insertar en la tabla requests
       const { data, error } = await supabase
         .from('requests')
         .insert(requestData)
@@ -175,57 +117,76 @@ export function RequestForm({
         
       if (error) throw error;
       
-      // Llamar a la función onSubmit original
-      onSubmit(values, file);
-      
-      toast.success(`Solicitud de ${getRequestTypeTitle().toLowerCase()} enviada correctamente`);
+      toast.success(`Solicitud de ${getRequestTypeName(type)} enviada correctamente`);
+      onSubmit(values);
     } catch (error) {
-      console.error("Error al enviar solicitud:", error);
-      toast.error("Error al enviar la solicitud. Por favor, inténtelo de nuevo.");
+      console.error('Error al enviar solicitud:', error);
+      toast.error('Error al enviar la solicitud. Por favor, inténtelo de nuevo.');
     } finally {
-      setLocalIsSubmitting(false);
+      setSubmitting(false);
+    }
+  };
+  
+  const getRequestTypeName = (type: RequestType): string => {
+    switch (type) {
+      case 'vacation': return 'vacaciones';
+      case 'personalDay': return 'día personal';
+      case 'leave': return 'permiso';
+      case 'shiftChange': return 'cambio de turno';
+      default: return type;
+    }
+  };
+
+  const getTitle = (): string => {
+    switch (type) {
+      case 'vacation': return 'Solicitud de vacaciones';
+      case 'personalDay': return 'Solicitud de día personal';
+      case 'leave': return 'Solicitud de permiso';
+      case 'shiftChange': return 'Solicitud de cambio de turno';
+      default: return 'Solicitud';
     }
   };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>{getRequestTypeTitle()}</CardTitle>
-        <CardDescription>{getRequestTypeDescription()}</CardDescription>
+        <CardTitle>{getTitle()}</CardTitle>
+        <CardDescription>
+          Complete los detalles para enviar su solicitud
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <DateRangeSection form={form} user={user} isSubmitting={isSubmitting || localIsSubmitting} />
-
-            {showTimeSelectors && (
-              <TimeSelectionSection form={form} isSubmitting={isSubmitting || localIsSubmitting} />
-            )}
-
-            {requestType === 'shiftChange' && availableUsers.length > 0 && (
-              <ReplacementSection 
+            <DateRangeSection 
+              form={form} 
+              user={user} 
+              requestType={type}
+              isSubmitting={submitting || isSubmitting} 
+            />
+            
+            {isLeaveForm && (
+              <TimeSelectionSection 
                 form={form} 
-                user={user} 
-                availableUsers={availableUsers} 
-                isSubmitting={isSubmitting || localIsSubmitting} 
+                shiftProfiles={shiftProfiles}
+                isSubmitting={submitting || isSubmitting} 
               />
             )}
-
+            
             <RequestDetailsSection 
               form={form} 
-              requestType={requestType}
-              isSubmitting={isSubmitting || localIsSubmitting} 
+              requestType={type}
+              isSubmitting={submitting || isSubmitting} 
             />
-
-            {requestType === "leave" && (
-              <FileUploadSection
-                onFileChange={setFile}
-                isSubmitting={isSubmitting || localIsSubmitting}
+            
+            {type === 'leave' && (
+              <FileUploadSection 
+                isSubmitting={submitting || isSubmitting} 
               />
             )}
 
-            <Button type="submit" disabled={isSubmitting || localIsSubmitting} className="w-full">
-              {isSubmitting || localIsSubmitting ? "Enviando..." : "Enviar solicitud"}
+            <Button type="submit" disabled={submitting || isSubmitting} className="w-full">
+              {submitting || isSubmitting ? "Enviando..." : "Enviar solicitud"}
             </Button>
           </form>
         </Form>

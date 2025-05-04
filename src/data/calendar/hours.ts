@@ -1,6 +1,6 @@
 
-import { AnnualHours } from '@/types/calendar';
 import { v4 as uuidv4 } from 'uuid';
+import { AnnualHours, SpecialCircumstances } from '@/types/calendar';
 
 // Example annual hours data for each worker
 export const exampleAnnualHours: AnnualHours[] = [
@@ -50,6 +50,6 @@ export const exampleAnnualHours: AnnualHours[] = [
           description: "Reducción por cuidado de familiar dependiente"
         }
       ]
-    }
+    } as SpecialCircumstances
   }
 ];

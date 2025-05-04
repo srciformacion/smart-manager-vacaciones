@@ -1,6 +1,6 @@
 
-import { CalendarTemplate } from '@/types/calendar';
 import { v4 as uuidv4 } from 'uuid';
+import { CalendarTemplate } from '@/types/calendar';
 
 // Predefined calendar templates
 export const calendarTemplates: CalendarTemplate[] = [

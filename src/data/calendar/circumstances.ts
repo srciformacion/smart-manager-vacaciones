@@ -1,6 +1,6 @@
 
-import { SpecialCircumstances } from '@/types/calendar';
 import { v4 as uuidv4 } from 'uuid';
+import { SpecialCircumstances } from '@/types/calendar';
 
 // Example special circumstances data
 export const exampleSpecialCircumstances: SpecialCircumstances[] = [

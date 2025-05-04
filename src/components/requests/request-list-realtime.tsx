@@ -50,7 +50,7 @@ export function RequestListRealtime({
             endDate: new Date(req.enddate),
             status: req.status as RequestStatus,
             reason: req.reason || '',
-            notes: req.notes || '',
+            observations: req.notes || '',
             createdAt: new Date(req.createdat),
             updatedAt: new Date(req.updatedat),
             attachmentUrl: req.attachmenturl
@@ -69,26 +69,32 @@ export function RequestListRealtime({
     loadRequests();
     
     // Configurar suscripción para escuchar cambios
-    const channel = createTableSubscription(
-      'requests',
-      '*',
-      (payload) => {
-        console.log("Requests realtime update:", payload);
-        
-        // Dependiendo del tipo de evento, actualizar el estado local
-        if (payload.eventType === 'INSERT') {
-          const newRequest = transformRequestData(payload.new);
-          setRequests(prev => [newRequest, ...prev]);
-        } else if (payload.eventType === 'UPDATE') {
-          const updatedRequest = transformRequestData(payload.new);
-          setRequests(prev => prev.map(req => 
-            req.id === updatedRequest.id ? updatedRequest : req
-          ));
-        } else if (payload.eventType === 'DELETE') {
-          setRequests(prev => prev.filter(req => req.id !== payload.old.id));
+    const channel = supabase.channel('table-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'requests'
+        }, 
+        (payload) => {
+          console.log("Requests realtime update:", payload);
+          
+          // Dependiendo del tipo de evento, actualizar el estado local
+          if (payload.eventType === 'INSERT') {
+            const newRequest = transformRequestData(payload.new);
+            setRequests(prev => [newRequest, ...prev]);
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedRequest = transformRequestData(payload.new);
+            setRequests(prev => prev.map(req => 
+              req.id === updatedRequest.id ? updatedRequest : req
+            ));
+          } else if (payload.eventType === 'DELETE') {
+            setRequests(prev => prev.filter(req => req.id !== payload.old.id));
+          }
         }
-      }
-    );
+      )
+      .subscribe();
     
     // Limpiar suscripción al desmontar
     return () => {
@@ -107,7 +113,7 @@ export function RequestListRealtime({
     endDate: new Date(data.enddate),
     status: data.status as RequestStatus,
     reason: data.reason || '',
-    notes: data.notes || '',
+    observations: data.notes || '',
     createdAt: new Date(data.createdat),
     updatedAt: new Date(data.updatedat),
     attachmentUrl: data.attachmenturl
