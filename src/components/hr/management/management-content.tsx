@@ -97,9 +97,9 @@ export function ManagementContent({
         <Card>
           <CardContent className="pt-6">
             <ReportsGenerator 
-              requests={requests}
               users={workers}
               departments={departments}
+              requests={requests}
             />
           </CardContent>
         </Card>

@@ -1,7 +1,21 @@
+
 import { useState } from "react";
 import { User, Request, Department } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
+import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
+import { es } from "date-fns/locale";
+import { toast } from "@/hooks/use-toast";
+import { Download, FileText, FileSpreadsheet, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+// Define the types for report types and formats
+type ReportType = 'turnos' | 'vacaciones' | 'permisos' | 'cambios';
+type ReportFormat = 'pdf' | 'excel' | 'csv';
 
 export interface ReportsGeneratorProps {
   users: User[];
@@ -144,17 +158,15 @@ export function ReportsGenerator({ users, departments, requests }: ReportsGenera
               <Select 
                 value={department} 
                 onValueChange={setDepartment}
-                disabled={!!departmentFilter}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar departamento" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos los departamentos</SelectItem>
-                  <SelectItem value="Atención al cliente">Atención al cliente</SelectItem>
-                  <SelectItem value="Recursos Humanos">Recursos Humanos</SelectItem>
-                  <SelectItem value="Operaciones">Operaciones</SelectItem>
-                  <SelectItem value="Administración">Administración</SelectItem>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
