@@ -1,11 +1,11 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DateRange } from "react-day-picker"; // Added this import to resolve the error
 import { MainLayout } from "@/components/layout/main-layout";
 import { RequestForm } from "@/components/requests/request-form";
 import { User, Request, Balance } from "@/types";
 import { Button } from "@/components/ui/button";
+import { DateRange } from "react-day-picker";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ArrowLeft } from "lucide-react";
 import { VacationBalanceInfo } from "@/components/vacation/vacation-balance-info";
@@ -59,15 +59,20 @@ export default function VacationRequestPage() {
     success,
     remainingDays,
     availableBalance,
-    handleSubmit,
+    handleSubmit: vacationHandleSubmit,
     setSuggestions,
     setValidationError
   } = useVacationRequest(user, requests, balance);
 
+  // Wrapper for the handleSubmit to match the new signature
+  const handleSubmit = (values: any, file: File | null) => {
+    vacationHandleSubmit(values, null);
+  };
+
   const applySuggestion = (suggestion: DateRange) => {
     setValidationError(null);
     setSuggestions([]);
-    handleSubmit({ dateRange: suggestion }, null);
+    vacationHandleSubmit({ dateRange: suggestion }, null);
   };
 
   return (

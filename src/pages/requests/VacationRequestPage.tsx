@@ -5,7 +5,7 @@ import { RequestForm } from '@/components/requests/request-form';
 import { exampleUser } from '@/data/example-users';
 import { exampleRequests } from '@/data/example-requests';
 import { useVacationRequest } from '@/hooks/use-vacation-request';
-import { Balance } from '@/types';
+import { Balance, DateRange } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useProfileAuth } from '@/hooks/profile/useProfileAuth';
@@ -108,7 +108,7 @@ export default function VacationRequestPage() {
   }, [user]);
 
   const { 
-    handleSubmit, 
+    handleSubmit: vacationHandleSubmit, 
     isSubmitting, 
     validationError,
     suggestions,
@@ -116,6 +116,11 @@ export default function VacationRequestPage() {
     availableBalance
   } = useVacationRequest(user || exampleUser, requests, balance);
   
+  // Wrapper for handleSubmit to match the expected signature
+  const handleSubmit = (values: any, file: File | null) => {
+    vacationHandleSubmit(values, null);
+  };
+
   if (!user) {
     return null;
   }

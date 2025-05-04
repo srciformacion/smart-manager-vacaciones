@@ -1,7 +1,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User } from "@/types";
+import { User, UserRole } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,16 +51,16 @@ export function ShiftChangeForm({
         
         if (data && data.length > 0) {
           // Transformamos los datos de la BD al formato que espera la UI
-          const mappedCoworkers = data.map(profile => ({
+          const mappedCoworkers: User[] = data.map(profile => ({
             id: profile.id,
             name: profile.name || '',
             email: profile.email || '',
-            role: 'worker', // Por defecto asignamos rol de trabajador
+            role: 'worker' as UserRole, // Cast to UserRole type
             department: profile.department || '',
             // Añadir campos requeridos por la interfaz User
-            shift: 'Programado' as any,
-            workGroup: 'Grupo Programado' as any,
-            workday: 'Completa' as any,
+            shift: 'Programado',
+            workGroup: 'Grupo Programado',
+            workday: 'Completa',
             seniority: 1
           }));
           
@@ -80,7 +80,7 @@ export function ShiftChangeForm({
     
     try {
       // Preparar datos para insertar en la tabla requests
-      const requestPayload = {
+      const payload = {
         userid: user.id,
         type: 'shiftChange',
         startdate: values.dateRange?.from,
@@ -93,7 +93,7 @@ export function ShiftChangeForm({
       // Insertar la solicitud en Supabase
       const { data, error: requestError } = await supabase
         .from('requests')
-        .insert(requestPayload)
+        .insert(payload)
         .select();
       
       if (requestError) throw requestError;

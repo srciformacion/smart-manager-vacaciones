@@ -2,16 +2,17 @@
 import React from "react";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
-import { User } from "@/types";
+import { User, RequestType } from "@/types";
 import { getVacationRules } from "@/utils/vacationLogic";
 
 interface DateRangeSectionProps {
   form: any;
   user: User;
   isSubmitting: boolean;
+  requestType: RequestType;
 }
 
-export function DateRangeSection({ form, user, isSubmitting }: DateRangeSectionProps) {
+export function DateRangeSection({ form, user, isSubmitting, requestType }: DateRangeSectionProps) {
   return (
     <FormField
       control={form.control}

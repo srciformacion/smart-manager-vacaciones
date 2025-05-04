@@ -32,21 +32,22 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface RequestFormProps {
   user: User;
-  type: RequestType;
+  requestType: RequestType;
   isLeaveForm?: boolean;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: any, file?: File | null) => void;
   isSubmitting?: boolean;
 }
 
 export function RequestForm({ 
   user, 
-  type, 
+  requestType, 
   isLeaveForm = false,
   onSubmit,
   isSubmitting = false
 }: RequestFormProps) {
   const [shiftProfiles, setShiftProfiles] = useState<ShiftProfile[]>([]);
   const [submitting, setSubmitting] = useState<boolean>(isSubmitting);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     // Cargar perfiles de turno desde Supabase
@@ -99,7 +100,7 @@ export function RequestForm({
       // Preparar datos para la base de datos
       const requestData = {
         userid: user.id,
-        type: type,
+        type: requestType,
         startdate: values.dateRange.from,
         enddate: values.dateRange.to || values.dateRange.from,
         starttime: values.startTime,
@@ -117,8 +118,8 @@ export function RequestForm({
         
       if (error) throw error;
       
-      toast.success(`Solicitud de ${getRequestTypeName(type)} enviada correctamente`);
-      onSubmit(values);
+      toast.success(`Solicitud de ${getRequestTypeName(requestType)} enviada correctamente`);
+      onSubmit(values, selectedFile);
     } catch (error) {
       console.error('Error al enviar solicitud:', error);
       toast.error('Error al enviar la solicitud. Por favor, inténtelo de nuevo.');
@@ -138,13 +139,17 @@ export function RequestForm({
   };
 
   const getTitle = (): string => {
-    switch (type) {
+    switch (requestType) {
       case 'vacation': return 'Solicitud de vacaciones';
       case 'personalDay': return 'Solicitud de día personal';
       case 'leave': return 'Solicitud de permiso';
       case 'shiftChange': return 'Solicitud de cambio de turno';
       default: return 'Solicitud';
     }
+  };
+
+  const handleFileChange = (file: File | null) => {
+    setSelectedFile(file);
   };
 
   return (
@@ -161,7 +166,7 @@ export function RequestForm({
             <DateRangeSection 
               form={form} 
               user={user} 
-              requestType={type}
+              requestType={requestType}
               isSubmitting={submitting || isSubmitting} 
             />
             
@@ -175,12 +180,13 @@ export function RequestForm({
             
             <RequestDetailsSection 
               form={form} 
-              requestType={type}
+              requestType={requestType}
               isSubmitting={submitting || isSubmitting} 
             />
             
-            {type === 'leave' && (
+            {requestType === 'leave' && (
               <FileUploadSection 
+                onFileChange={handleFileChange}
                 isSubmitting={submitting || isSubmitting} 
               />
             )}

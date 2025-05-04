@@ -1,31 +1,21 @@
-
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DatePicker } from "@/components/ui/date-picker";
+import { User, Request, Department } from "@/types";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
-import { toast } from "sonner";
-import { Download, FileSpreadsheet, FileText, Loader2 } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { es } from "date-fns/locale";
-import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-type ReportFormat = 'pdf' | 'excel' | 'csv';
-type ReportType = 'turnos' | 'vacaciones' | 'permisos' | 'cambios';
-
-interface ReportsGeneratorProps {
-  departmentFilter?: string;
+export interface ReportsGeneratorProps {
+  users: User[];
+  departments: Department[];
+  requests: Request[];
 }
 
-export function ReportsGenerator({ departmentFilter }: ReportsGeneratorProps) {
+export function ReportsGenerator({ users, departments, requests }: ReportsGeneratorProps) {
   // Estados para control de formulario
   const [startDate, setStartDate] = useState<Date>(startOfMonth(subMonths(new Date(), 1)));
   const [endDate, setEndDate] = useState<Date>(endOfMonth(new Date()));
   const [reportType, setReportType] = useState<ReportType>('turnos');
   const [reportFormat, setReportFormat] = useState<ReportFormat>('pdf');
-  const [department, setDepartment] = useState<string>(departmentFilter || 'todos');
+  const [department, setDepartment] = useState<string>('todos');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
   // Función para generar el informe

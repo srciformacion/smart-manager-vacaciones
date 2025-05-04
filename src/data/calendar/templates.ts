@@ -1,6 +1,20 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { CalendarTemplate } from '@/types/calendar';
+import { ShiftType } from '@/types/calendar';
+
+// Define la interfaz para la plantilla de calendario
+export interface CalendarTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  shifts: {
+    day: number;
+    type: ShiftType;
+    startTime: string;
+    endTime: string;
+    hours: number;
+  }[];
+}
 
 // Predefined calendar templates
 export const calendarTemplates: CalendarTemplate[] = [

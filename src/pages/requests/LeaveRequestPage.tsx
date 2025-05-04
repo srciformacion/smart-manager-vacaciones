@@ -150,6 +150,7 @@ export default function LeaveRequestPage() {
           user={user || exampleUser}
           onSubmit={handleSubmit}
           isSubmitting={loading || uploading}
+          isLeaveForm={true}
         />
       </div>
     </MainLayout>

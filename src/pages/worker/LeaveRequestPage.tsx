@@ -134,6 +134,7 @@ export default function LeaveRequestPage() {
             user={user}
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}
+            isLeaveForm={true}
           />
         )}
       </div>
