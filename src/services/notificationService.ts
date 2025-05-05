@@ -1,3 +1,4 @@
+
 import { NotificationPayload, NotificationType, NotificationChannel } from "@/types";
 import { toast } from "@/hooks/use-toast";
 
@@ -11,10 +12,11 @@ export class NotificationService {
    * @param notification Datos de la notificación a enviar
    */
   static async sendNotification(notification: NotificationPayload): Promise<boolean> {
-    console.log(`Sending notification via ${notification.canal}:`, notification);
+    const channel = notification.channel?.[0] || notification.canal;
+    console.log(`Sending notification via ${channel}:`, notification);
     
     try {
-      switch (notification.canal) {
+      switch (channel) {
         case 'web':
           return await this.sendWebNotification(notification);
         case 'email':
@@ -22,7 +24,7 @@ export class NotificationService {
         case 'whatsapp':
           return await this.sendWhatsAppNotification(notification);
         default:
-          console.error('Canal de notificación no válido:', notification.canal);
+          console.error('Canal de notificación no válido:', channel);
           return false;
       }
     } catch (error) {
@@ -42,9 +44,9 @@ export class NotificationService {
       const newNotification = {
         id: `notification-${Date.now()}`,
         userId: notification.userId || 'unknown',
-        title: notification.titulo,
-        message: notification.mensaje,
-        type: notification.tipo || 'requestCreated',
+        title: notification.title || notification.titulo || '',
+        message: notification.message || notification.mensaje || '',
+        type: notification.type || notification.tipo || 'requestCreated',
         channel: 'web',
         status: 'pending',
         createdAt: new Date(),
@@ -56,8 +58,8 @@ export class NotificationService {
       
       // Mostrar un toast para notificaciones en tiempo real (simulado)
       toast({
-        title: notification.titulo,
-        description: notification.mensaje,
+        title: newNotification.title,
+        description: newNotification.message,
       });
       
       // Disparar un evento para que los componentes se actualicen
@@ -77,13 +79,14 @@ export class NotificationService {
   private static async sendEmailNotification(notification: NotificationPayload): Promise<boolean> {
     try {
       // MOCK: En un entorno real, esto sería una llamada a un servicio de email como SendGrid
-      console.log(`MOCK EMAIL SENT TO: ${notification.destino}`);
-      console.log(`Subject: ${notification.titulo}`);
-      console.log(`Body: ${notification.mensaje}`);
+      const destination = notification.destino || 'user@example.com';
+      console.log(`MOCK EMAIL SENT TO: ${destination}`);
+      console.log(`Subject: ${notification.title || notification.titulo || ''}`);
+      console.log(`Body: ${notification.message || notification.mensaje || ''}`);
       
       toast({
         title: "Email enviado (simulado)",
-        description: `A: ${notification.destino}`,
+        description: `A: ${destination}`,
       });
       
       return true;
@@ -100,12 +103,13 @@ export class NotificationService {
   private static async sendWhatsAppNotification(notification: NotificationPayload): Promise<boolean> {
     try {
       // MOCK: En un entorno real, esto sería una llamada a Twilio o WhatsApp Business API
-      console.log(`MOCK WHATSAPP SENT TO: ${notification.destino}`);
-      console.log(`Message: ${notification.titulo}: ${notification.mensaje}`);
+      const destination = notification.destino || 'user-phone';
+      console.log(`MOCK WHATSAPP SENT TO: ${destination}`);
+      console.log(`Message: ${notification.title || notification.titulo || ''}: ${notification.message || notification.mensaje || ''}`);
       
       toast({
         title: "WhatsApp enviado (simulado)",
-        description: `A: ${notification.destino}`,
+        description: `A: ${destination}`,
       });
       
       return true;

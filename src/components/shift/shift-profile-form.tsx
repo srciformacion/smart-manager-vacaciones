@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,24 +33,24 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const weekDays: { value: WeekDay; label: string }[] = [
-  { value: 'monday', label: 'Lunes' },
-  { value: 'tuesday', label: 'Martes' },
-  { value: 'wednesday', label: 'Miércoles' },
-  { value: 'thursday', label: 'Jueves' },
-  { value: 'friday', label: 'Viernes' },
-  { value: 'saturday', label: 'Sábado' },
-  { value: 'sunday', label: 'Domingo' },
+  { value: "Monday", label: 'Lunes' },
+  { value: "Tuesday", label: 'Martes' },
+  { value: "Wednesday", label: 'Miércoles' },
+  { value: "Thursday", label: 'Jueves' },
+  { value: "Friday", label: 'Viernes' },
+  { value: "Saturday", label: 'Sábado' },
+  { value: "Sunday", label: 'Domingo' },
 ];
 
-const shiftTypes: { value: ShiftType; label: string }[] = [
-  { value: 'Turno 24h', label: 'Turno 24h' },
-  { value: 'Localizado', label: 'Localizado' },
-  { value: 'Programado Mañana', label: 'Programado Mañana' },
-  { value: 'Programado Tarde', label: 'Programado Tarde' },
-  { value: 'Programado Noche', label: 'Programado Noche' },
-  { value: 'Teleoperación Turno Mañana', label: 'Teleoperación Turno Mañana' },
-  { value: 'Teleoperación Turno Tarde', label: 'Teleoperación Turno Tarde' },
-  { value: 'Teleoperación Turno Noche', label: 'Teleoperación Turno Noche' },
+const shiftTypes = [
+  { value: "Turno 24h", label: 'Turno 24h' },
+  { value: "Localizado", label: 'Localizado' },
+  { value: "Programado Mañana", label: 'Programado Mañana' },
+  { value: "Programado Tarde", label: 'Programado Tarde' },
+  { value: "Programado Noche", label: 'Programado Noche' },
+  { value: "Teleoperación Turno Mañana", label: 'Teleoperación Turno Mañana' },
+  { value: "Teleoperación Turno Tarde", label: 'Teleoperación Turno Tarde' },
+  { value: "Teleoperación Turno Noche", label: 'Teleoperación Turno Noche' },
 ];
 
 interface ShiftProfileFormProps {
@@ -77,8 +76,8 @@ export function ShiftProfileForm({
       workDays: existingProfile.workDays,
       startTime: existingProfile.startTime,
       endTime: existingProfile.endTime,
-      createdBy: existingProfile.createdBy,
-      isDefault: existingProfile.isDefault,
+      createdBy: existingProfile.createdBy || 'trabajador',
+      isDefault: existingProfile.isDefault || false,
     } : {
       shiftType: '',
       workDays: [],
@@ -90,7 +89,7 @@ export function ShiftProfileForm({
   });
 
   // Obtener el tipo de turno seleccionado
-  const selectedShiftType = form.watch("shiftType") as ShiftType;
+  const selectedShiftType = form.watch("shiftType");
   
   // Autocompletar horarios según el tipo de turno
   const handleShiftTypeChange = (value: string) => {

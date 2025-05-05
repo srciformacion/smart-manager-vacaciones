@@ -29,6 +29,13 @@ interface ShiftProfilesListProps {
 // Función para convertir WeekDay a texto en español
 const getWeekDayText = (day: string): string => {
   const days: Record<string, string> = {
+    Monday: 'Lunes',
+    Tuesday: 'Martes',
+    Wednesday: 'Miércoles',
+    Thursday: 'Jueves',
+    Friday: 'Viernes',
+    Saturday: 'Sábado',
+    Sunday: 'Domingo',
     monday: 'Lunes',
     tuesday: 'Martes',
     wednesday: 'Miércoles',

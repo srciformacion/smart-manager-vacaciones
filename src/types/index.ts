@@ -43,7 +43,14 @@ export type WeekDay =
   | "Thursday"
   | "Friday"
   | "Saturday"
-  | "Sunday";
+  | "Sunday"
+  | "monday"    // Adding lowercase versions to maintain compatibility
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday"
+  | "sunday";
 
 export type WorkGroup = 
   | "A" 
@@ -54,6 +61,7 @@ export type WorkGroup =
   | "F" 
   | "Grupo Programado"
   | "Urgente 24h"
+  | "Urgente 12h" // Adding this missing option
   | "Grupo Localizado"
   | "Grupo 1/3"
   | "Top Programado";
@@ -100,11 +108,13 @@ export interface ShiftProfile {
   userId: string;
   name: string;
   workDays: WeekDay[];
-  shiftType: ShiftType[];
+  shiftType: string; // Changed from ShiftType[] to string to match actual usage
   startTime: string;
   endTime: string;
   createdAt: Date;
   updatedAt: Date;
+  createdBy?: "trabajador" | "empresa"; // Added missing property
+  isDefault?: boolean; // Added missing property
 }
 
 export interface NotificationPayload {
@@ -113,6 +123,12 @@ export interface NotificationPayload {
   message: string;
   type?: NotificationType;
   channel: NotificationChannel[];
+  // Add Spanish equivalents for backward compatibility
+  canal?: NotificationChannel;
+  titulo?: string;
+  mensaje?: string;
+  tipo?: NotificationType;
+  destino?: string;
 }
 
 export interface Request {
@@ -150,6 +166,10 @@ export interface User {
   avatar?: string;
   seniority?: number;
   phone?: string;
+  startDate?: Date; // Added missing property
+  shiftStartTime?: string; // Added missing property
+  shiftEndTime?: string; // Added missing property
+  workdays?: WeekDay[]; // Added missing property (lowercase version)
 }
 
 export interface Notification {
@@ -168,4 +188,5 @@ export interface Balance {
   vacationDays: number;
   personalDays: number;
   leaveDays: number;
+  year?: number; // Added missing property
 }

@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -51,26 +50,25 @@ export function DateRangePicker({
   const modifiers = React.useMemo(() => {
     if (!workGroup) return {};
 
-    switch (workGroup) {
-      case 'Grupo Localizado':
-      case 'Urgente 12h':
-      case 'Grupo 1/3':
-        return {
-          startDate: (date: Date) => {
-            const day = date.getDate();
-            return day === 1 || day === 16;
-          },
-        };
-      case 'Grupo Programado':
-      case 'Top Programado':
-        return {
-          startDate: (date: Date) => {
-            return date.getDay() === 1; // 1 es lunes
-          },
-        };
-      default:
-        return {};
+    // Use a safer comparison approach to avoid type issues
+    const workGroupStr = String(workGroup);
+    
+    if (["Grupo Localizado", "Urgente 12h", "Grupo 1/3"].includes(workGroupStr)) {
+      return {
+        startDate: (date: Date) => {
+          const day = date.getDate();
+          return day === 1 || day === 16;
+        },
+      };
+    } 
+    else if (["Grupo Programado", "Top Programado"].includes(workGroupStr)) {
+      return {
+        startDate: (date: Date) => {
+          return date.getDay() === 1; // 1 es lunes
+        },
+      };
     }
+    return {};
   }, [workGroup]);
 
   return (

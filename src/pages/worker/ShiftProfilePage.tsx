@@ -4,7 +4,7 @@ import { MainLayout } from "@/components/layout/main-layout";
 import { ShiftProfileForm } from "@/components/shift/shift-profile-form";
 import { ShiftProfilesList } from "@/components/shift/shift-profiles-list";
 import { Button } from "@/components/ui/button";
-import { User, ShiftProfile, ShiftType, WeekDay, Department } from "@/types";
+import { User, ShiftProfile, Department } from "@/types";
 import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,7 +20,7 @@ const exampleUser: User = {
   department: "Urgencias y Emergencias (Transporte Urgente)", // Corregido para que coincida con el tipo Department
   seniority: 5,
   startDate: new Date("2018-03-15"),
-  workdays: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+  workDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
   shiftStartTime: "08:00",
   shiftEndTime: "15:00"
 };
@@ -29,25 +29,27 @@ const exampleProfiles: ShiftProfile[] = [
   {
     id: "prof-1",
     userId: "1",
+    name: "Turno de Mañana",
     shiftType: "Programado Mañana",
-    workDays: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+    workDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
     startTime: "08:00",
     endTime: "15:00",
-    createdBy: "trabajador",
     createdAt: new Date("2023-01-15"),
     updatedAt: new Date("2023-01-15"),
+    createdBy: "trabajador",
     isDefault: true
   },
   {
     id: "prof-2",
     userId: "1",
+    name: "Turno de Tarde",
     shiftType: "Programado Tarde",
-    workDays: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+    workDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
     startTime: "15:00",
     endTime: "22:00",
-    createdBy: "trabajador",
     createdAt: new Date("2023-02-20"),
     updatedAt: new Date("2023-02-20"),
+    createdBy: "trabajador",
     isDefault: false
   }
 ];
@@ -79,14 +81,20 @@ export default function ShiftProfilePage() {
     setIsCreating(false);
   };
 
-  const handleSubmit = (values: Omit<ShiftProfile, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
+  const handleSubmit = (values: any) => {
+    // Convert form values to ShiftProfile
+    const shiftProfileData = {
+      ...values,
+      name: values.shiftType, // Use shiftType as default name if not provided
+    };
+    
     if (editingProfile) {
       // Actualizar perfil existente
       const updatedProfiles = profiles.map(profile => {
         if (profile.id === editingProfile.id) {
           return {
             ...profile,
-            ...values,
+            ...shiftProfileData,
             updatedAt: new Date()
           };
         }
@@ -104,7 +112,13 @@ export default function ShiftProfilePage() {
       const newProfile: ShiftProfile = {
         id: `prof-${Date.now()}`,
         userId: user!.id,
-        ...values,
+        name: shiftProfileData.shiftType,
+        shiftType: shiftProfileData.shiftType,
+        workDays: shiftProfileData.workDays,
+        startTime: shiftProfileData.startTime,
+        endTime: shiftProfileData.endTime,
+        createdBy: shiftProfileData.createdBy,
+        isDefault: shiftProfileData.isDefault,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

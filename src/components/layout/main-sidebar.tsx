@@ -13,8 +13,13 @@ export function MainSidebar() {
     navigate("/login");
   };
 
-  // Asegúrate de que el usuario sea del tipo correcto
-  const typedUser = user as User;
+  // Convert the user object to our User type or use null
+  const typedUser = user ? {
+    id: user.id,
+    name: user.user_metadata?.name || "Usuario",
+    email: user.email || "",
+    role: (user.user_metadata?.role || localStorage.getItem("role") || "worker") as "worker" | "hr",
+  } as User : null;
 
   return (
     <aside className="hidden lg:block w-64 border-r border-sidebar-border bg-sidebar">

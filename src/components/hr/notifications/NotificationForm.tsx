@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { NotificationFormState } from "./types";
 import { RecipientsSection } from "./RecipientsSection";
@@ -54,12 +53,17 @@ export function NotificationForm() {
         const worker = exampleWorkers.find(w => w.id === recipient);
         
         await sendNotification({
+          userId: worker?.id || recipient,
+          title: form.subject,
+          message: form.message,
+          type: form.notificationType,
+          channel: [form.channel],
+          // For backwards compatibility
           canal: form.channel,
-          destino: worker?.email || recipient,
           titulo: form.subject,
           mensaje: form.message,
           tipo: form.notificationType,
-          userId: worker?.id
+          destino: worker?.email || recipient
         });
       }
       
