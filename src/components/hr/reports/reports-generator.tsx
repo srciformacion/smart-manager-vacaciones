@@ -8,9 +8,15 @@ import { ReportsGeneratorProps } from "./types";
 
 export function ReportsGenerator({ users, departments }: ReportsGeneratorProps) {
   // Convert departments array to string array if needed
-  const departmentNames = departments.map((dept) => 
-    typeof dept === 'string' ? dept : dept.toString()
-  );
+  const departmentNames = departments.map((dept) => {
+    if (typeof dept === 'string') {
+      return dept;
+    } else if (dept && typeof dept === 'object' && 'toString' in dept) {
+      return dept.toString();
+    } else {
+      return 'Unknown Department';
+    }
+  });
   
   return (
     <Card className="w-full">

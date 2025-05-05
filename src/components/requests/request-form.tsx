@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -10,25 +9,10 @@ import { RequestDetailsSection } from "./form/request-details-section";
 import { FileUploadSection } from "./form/file-upload-section";
 import { User, RequestType } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import * as z from "zod";
+import { requestFormSchema, RequestFormValues } from "./form/request-form-schema";
 import { ShiftProfile } from '@/types/calendar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-
-// Define el esquema para validar el formulario
-const formSchema = z.object({
-  dateRange: z.object({
-    from: z.date(),
-    to: z.date().optional(),
-  }),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-  shiftProfileId: z.string().optional(),
-  reason: z.string().optional(),
-  notes: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
 
 interface RequestFormProps {
   user: User;
@@ -85,15 +69,15 @@ export function RequestForm({
     loadShiftProfiles();
   }, [user.id]);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<RequestFormValues>({
+    resolver: zodResolver(requestFormSchema),
     defaultValues: {
       reason: "",
       notes: "",
     },
   });
 
-  const handleSubmit = async (values: FormValues) => {
+  const handleSubmit = async (values: RequestFormValues) => {
     setSubmitting(true);
     
     try {

@@ -1,3 +1,4 @@
+
 import {
   Sheet,
   SheetContent,
@@ -16,31 +17,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useUser } from "@/hooks/use-user";
 import { Link } from "react-router-dom";
-import { ModeToggle } from "@/components/ui/mode-toggle";
 import { useEffect, useState } from "react";
-import { auth } from "@/integrations/auth/lucia";
 import { useNavigate } from "react-router-dom";
 import { MainSidebar } from "./main-sidebar";
-import { api } from "@/integrations/api";
 import { InstallPWAButton } from '@/components/pwa/install-pwa-button';
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { User } from "@/types";
+import { useAuth } from "@/hooks/use-auth";
 
-interface MainLayoutProps {
+export interface MainLayoutProps {
   children: React.ReactNode;
+  user?: User | null;
 }
 
-export function MainLayout({ children }: MainLayoutProps) {
-  const { user } = useUser();
+export function MainLayout({ children, user }: MainLayoutProps) {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
+  const { signOut } = useAuth();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   async function logout() {
-    await api.logout();
+    await signOut();
     navigate("/login");
   }
 
@@ -48,7 +49,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="flex h-screen bg-background">
       <MainSidebar />
       <div className="flex flex-col flex-1">
-        <header className="z-10 flex items-center h-16 px-4 border-b shrink-0 bg-secondary">
+        <header className="z-10 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-secondary">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="sm" className="mr-2 lg:hidden">
@@ -80,9 +81,9 @@ export function MainLayout({ children }: MainLayoutProps) {
               <MainSidebar />
             </SheetContent>
           </Sheet>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-auto">
             <InstallPWAButton />
-            <ModeToggle />
+            <ThemeToggle />
             {mounted && user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

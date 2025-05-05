@@ -1,21 +1,21 @@
 
-import { DateRange } from "react-day-picker";
 import * as z from "zod";
+import { DateRange } from "@/types/date-range";
 
-export const formSchema = z.object({
+export const requestFormSchema = z.object({
   dateRange: z.object({
     from: z.date(),
-    to: z.date(),
+    to: z.date().optional(),
   }).transform((val): DateRange => ({
     from: val.from,
-    to: val.to,
+    to: val.to
   })),
-  reason: z.string().optional(),
-  notes: z.string().optional(),
-  shiftProfileId: z.string().optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
+  shiftProfileId: z.string().optional(),
   replacementUserId: z.string().optional(),
+  reason: z.string().optional(),
+  notes: z.string().optional(),
 });
 
-export type FormValues = z.infer<typeof formSchema>;
+export type RequestFormValues = z.infer<typeof requestFormSchema>;
