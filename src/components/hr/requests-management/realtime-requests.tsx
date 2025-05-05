@@ -55,13 +55,27 @@ export function RealTimeRequests() {
     setSelectedRequest(null);
   };
 
+  // Needed to fix TypeScript errors with RequestDetails props
+  const handleStatusChangeForDetails = (status: RequestStatus) => {
+    if (selectedRequest) {
+      handleStatusChange(selectedRequest, status);
+    }
+  };
+
+  const handleDownloadAttachmentForDetails = () => {
+    if (selectedRequest) {
+      handleDownloadAttachment(selectedRequest);
+    }
+  };
+
   if (selectedRequest) {
     return (
       <RequestDetails
         request={selectedRequest}
         onClose={handleCloseDetails}
-        onStatusChange={handleStatusChange}
-        onDownloadAttachment={handleDownloadAttachment}
+        onStatusChange={handleStatusChangeForDetails}
+        onDownloadAttachment={handleDownloadAttachmentForDetails}
+        isHRView={true}
       />
     );
   }

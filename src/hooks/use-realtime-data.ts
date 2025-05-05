@@ -80,11 +80,11 @@ export function useRealtimeData<T>(
     // Crear un canal para actualizaciones en tiempo real
     const channelName = `realtime:${subscription.tableName}`;
     
-    // Crear el canal y suscribirse a los cambios
+    // Create the channel and subscribe to changes using the Supabase realtime API
     const channel = supabase
       .channel(channelName)
       .on(
-        'postgres_changes',
+        'postgres_changes' as any, // Type assertion to fix TypeScript error
         {
           event: subscription.event || '*',
           schema: subscription.schema || 'public',
