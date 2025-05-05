@@ -23,7 +23,7 @@ export const enableRealtimeForTable = async (
     const channel = supabase
       .channel(channelName)
       .on(
-        'postgres_changes',
+        'postgres_changes',  // This is correct, it's a special channel type
         {
           event: config.event || '*',
           schema: config.schema || 'public',
