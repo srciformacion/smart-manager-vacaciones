@@ -23,7 +23,7 @@ export const enableRealtimeForTable = async (
     const channel = supabase
       .channel(channelName)
       .on(
-        'postgres_changes',
+        'postgres_changes' as any, // Type assertion to fix TypeScript error
         {
           event: config.event || '*',
           schema: config.schema || 'public',

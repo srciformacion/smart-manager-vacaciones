@@ -99,7 +99,7 @@ export function useRealtimeData<T>(
           
           // Notificar al usuario sobre el cambio
           // Fixed: Access the correct property based on payload type
-          const event = payload.eventType || payload.type;
+          const event = payload.type || '*'; // Use payload.type instead of eventType
           if (event === 'INSERT') {
             toast.info('Se ha recibido una nueva solicitud');
           } else if (event === 'UPDATE') {
