@@ -10,7 +10,7 @@ import { User } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { enableRealtimeForTable } from "@/utils/realtime-utils";
+import { enableRealtimeForTable, RealtimeConfig } from "@/utils/realtime-utils";
 import { supabase } from "@/integrations/supabase/client";
 
 const tabs = [
@@ -45,10 +45,12 @@ export function RequestsManagementPage() {
 
   const enableRealtime = async () => {
     try {
-      const result = await enableRealtimeForTable(supabase, {
+      const realtimeConfig: RealtimeConfig = {
         table: "requests",
         event: "*"
-      });
+      };
+      
+      const result = await enableRealtimeForTable(supabase, realtimeConfig);
       
       if (result.success) {
         setIsRealtimeEnabled(true);
@@ -116,3 +118,5 @@ export function RequestsManagementPage() {
     </MainLayout>
   );
 }
+
+export default RequestsManagementPage;

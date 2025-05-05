@@ -54,7 +54,12 @@ export function useRealtimeData<T>(
     const setupRealtime = async () => {
       try {
         // Intentar habilitar la funcionalidad de tiempo real para la tabla
-        await enableRealtimeForTable(subscription.tableName);
+        await enableRealtimeForTable(supabase, {
+          table: subscription.tableName,
+          event: subscription.event,
+          schema: subscription.schema,
+          filter: subscription.filter
+        });
       } catch (err) {
         console.warn(`No se pudo habilitar tiempo real para ${subscription.tableName}:`, err);
         // No interrumpimos la ejecución, ya que puede que la tabla ya tenga tiempo real habilitado

@@ -16,16 +16,27 @@ export const enableRealtimeForTable = async (
   config: RealtimeConfig
 ): Promise<{ success: boolean; error: Error | null }> => {
   try {
-    // Enable realtime for the table
-    const { data, error } = await supabase
-      .from(config.table)
-      .on(config.event || '*', (payload) => {
-        console.log('Realtime payload:', payload);
-      })
+    // Crear el canal para la tabla específica
+    const channelName = `channel_${config.table}`;
+    const channel = supabase
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
+          event: config.event || '*',
+          schema: config.schema || 'public',
+          table: config.table,
+          ...(config.filter ? { filter: config.filter } : {})
+        },
+        (payload) => {
+          console.log('Realtime payload:', payload);
+        }
+      )
       .subscribe();
 
-    if (error) {
-      console.error(`Error enabling realtime for ${config.table}:`, error);
+    if (!channel) {
+      const error = new Error(`Error enabling realtime for ${config.table}`);
+      console.error(error);
       return { success: false, error };
     }
 

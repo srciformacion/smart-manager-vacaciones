@@ -1,80 +1,98 @@
 
-import { Download, FileText, FileSpreadsheet } from "lucide-react";
-import { format, subMonths } from "date-fns";
-import { es } from "date-fns/locale";
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { HistoricalReport } from "./types";
+import { Badge } from "@/components/ui/badge";
+import { Eye, Download, FileSpreadsheet, FileText } from "lucide-react";
 
-// Sample data for the reports history
-const sampleReports: HistoricalReport[] = [
-  {
-    id: "1",
-    date: new Date(),
-    type: "turnos",
-    format: "pdf",
-    status: "completed"
-  },
-  {
-    id: "2",
-    date: subMonths(new Date(), 1),
-    type: "vacaciones",
-    format: "excel",
-    status: "completed"
-  },
-];
+export interface ReportHistoryProps {
+  onViewReport: (reportId: string) => void;
+  onDownloadReport: (reportId: string) => void;
+}
 
-export function ReportHistory() {
-  // Function to download a report
-  const handleDownloadReport = (reportId: string, format: string) => {
-    toast.success(`Descargando informe en formato ${format.toUpperCase()}...`);
-  };
+export function ReportHistory({ onViewReport, onDownloadReport }: ReportHistoryProps) {
+  // En una aplicación real, estos informes vendrían de una API o base de datos
+  const [reports] = useState([
+    {
+      id: "rep-001",
+      name: "Informe de asistencia Q1 2023",
+      type: "attendance",
+      date: "2023-03-31",
+      format: "excel"
+    },
+    {
+      id: "rep-002",
+      name: "Vacaciones departamento IT",
+      type: "vacation",
+      date: "2023-04-15",
+      format: "pdf"
+    },
+    {
+      id: "rep-003",
+      name: "Análisis de ausencias 2023",
+      type: "absence",
+      date: "2023-05-10",
+      format: "excel"
+    }
+  ]);
 
   return (
-    <div className="space-y-4">
-      <div className="overflow-hidden rounded-md border">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/50">
-              <th className="h-10 px-4 text-left font-medium">Fecha</th>
-              <th className="h-10 px-4 text-left font-medium">Tipo</th>
-              <th className="h-10 px-4 text-left font-medium">Formato</th>
-              <th className="h-10 px-4 text-left font-medium">Estado</th>
-              <th className="h-10 px-4 text-left font-medium">Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sampleReports.map((report) => (
-              <tr key={report.id} className="border-b">
-                <td className="p-4">{format(report.date, 'PP', { locale: es })}</td>
-                <td className="p-4">Informe de {report.type}</td>
-                <td className="p-4 flex items-center">
-                  {report.format === 'pdf' ? (
-                    <FileText className="mr-2 h-4 w-4" />
+    <Card className="border">
+      <CardContent className="pt-6">
+        {reports.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No hay informes generados
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {reports.map((report) => (
+              <div
+                key={report.id}
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg"
+              >
+                <div className="flex items-center gap-3 mb-3 sm:mb-0">
+                  {report.format === "excel" ? (
+                    <FileSpreadsheet className="h-8 w-8 text-emerald-500" />
                   ) : (
-                    <FileSpreadsheet className="mr-2 h-4 w-4" />
+                    <FileText className="h-8 w-8 text-blue-500" />
                   )}
-                  {report.format.toUpperCase()}
-                </td>
-                <td className="p-4">
-                  <span className="inline-flex items-center rounded-full border border-green-500/30 px-2.5 py-0.5 text-xs font-semibold bg-green-500/10 text-green-700">
-                    {report.status === 'completed' ? 'Completado' : 'Pendiente'}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => handleDownloadReport(report.id, report.format)}
+                  <div>
+                    <h3 className="font-medium">{report.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className="text-xs">
+                        {report.type}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(report.date).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 sm:flex-initial"
+                    onClick={() => onViewReport(report.id)}
                   >
-                    <Download className="h-4 w-4" />
+                    <Eye className="mr-1 h-4 w-4" />
+                    Ver
                   </Button>
-                </td>
-              </tr>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 sm:flex-initial"
+                    onClick={() => onDownloadReport(report.id)}
+                  >
+                    <Download className="mr-1 h-4 w-4" />
+                    Descargar
+                  </Button>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

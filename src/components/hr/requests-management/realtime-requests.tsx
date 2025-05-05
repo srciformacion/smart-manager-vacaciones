@@ -5,22 +5,9 @@ import { Request, User, RequestStatus } from "@/types";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { RequestListRealtime } from "@/components/requests/request-list-realtime";
 import { Bell, RefreshCw } from "lucide-react";
 
-interface RealtimeRequestsProps {
-  users: User[];
-  onViewDetails: (request: Request) => void;
-  onStatusChange: (request: Request, newStatus: RequestStatus) => void;
-  onDownloadAttachment: (request: Request) => void;
-}
-
-export function RealtimeRequests({
-  users,
-  onViewDetails,
-  onStatusChange,
-  onDownloadAttachment
-}: RealtimeRequestsProps) {
+export function RealtimeRequests() {
   // Usar el hook de tiempo real para las solicitudes
   const {
     data: requests,
@@ -29,17 +16,14 @@ export function RealtimeRequests({
     refresh
   } = useRealtimeData<Request>(
     { tableName: 'requests', event: '*' },
-    [],
-    (newData) => {
-      // Este callback se ejecuta cuando hay nuevos datos
-      console.log("Nuevos datos recibidos:", newData);
-    }
+    []
   );
 
   // Estado para llevar un registro de las nuevas solicitudes
   const [newRequestsCount, setNewRequestsCount] = useState(0);
   const [unseenRequests, setUnseenRequests] = useState<string[]>([]);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [users, setUsers] = useState<User[]>([]);
 
   // Efecto para detectar nuevas solicitudes
   useEffect(() => {
@@ -80,6 +64,19 @@ export function RealtimeRequests({
     setLastRefresh(new Date());
     toast.info("Actualizando datos en tiempo real...");
   }, [refresh]);
+
+  // Handlers para operaciones en las solicitudes
+  const handleViewDetails = (request: Request) => {
+    console.log("Ver detalles:", request);
+  };
+
+  const handleStatusChange = (request: Request, newStatus: RequestStatus) => {
+    console.log("Cambiar estado:", request, newStatus);
+  };
+
+  const handleDownloadAttachment = (request: Request) => {
+    console.log("Descargar adjunto:", request);
+  };
 
   if (loading) {
     return (
@@ -141,14 +138,54 @@ export function RealtimeRequests({
         </div>
       )}
 
-      {/* Usar el componente RequestListRealtime para mostrar la lista de solicitudes */}
-      <RequestListRealtime
-        users={users}
-        isHRView={true}
-        onViewDetails={onViewDetails}
-        onStatusChange={onStatusChange}
-        onDownloadAttachment={onDownloadAttachment}
-      />
+      {requests.length > 0 ? (
+        <div className="border rounded-md">
+          <table className="w-full">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="p-2 text-left">ID</th>
+                <th className="p-2 text-left">Tipo</th>
+                <th className="p-2 text-left">Fecha</th>
+                <th className="p-2 text-left">Estado</th>
+                <th className="p-2 text-left">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {requests.map((request) => (
+                <tr key={request.id} className="border-t">
+                  <td className="p-2">{request.id.slice(0, 8)}</td>
+                  <td className="p-2">{request.type}</td>
+                  <td className="p-2">
+                    {new Date(request.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="p-2">
+                    <Badge variant={
+                      request.status === 'approved' ? 'success' :
+                      request.status === 'rejected' ? 'destructive' :
+                      'default'
+                    }>
+                      {request.status}
+                    </Badge>
+                  </td>
+                  <td className="p-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewDetails(request)}
+                    >
+                      Ver
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="text-center p-8 border rounded-md bg-background">
+          <p className="text-muted-foreground">No hay solicitudes en tiempo real</p>
+        </div>
+      )}
     </div>
   );
 }

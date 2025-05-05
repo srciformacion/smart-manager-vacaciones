@@ -1,48 +1,61 @@
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { NotificationSender } from "@/components/hr/notification-sender";
-import { RequestsTabContent } from "@/components/hr/requests-tab-content";
-import { Request, User } from "@/types";
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { RequestTable } from "@/components/requests/table/request-table";
+import { Request, User, RequestStatus } from "@/types";
 
 interface TabsContentProps {
-  activeTab: string;
-  setActiveTab: (value: string) => void;
-  requests: Request[];
-  workers: User[];
-  onViewDetails: (request: Request) => void;
-  onStatusChange: (request: Request, newStatus: string) => void;
-  onDownloadAttachment: (request: Request) => void;
+  status: string;
+  searchTerm: string;
+  selectedDate: Date | undefined;
 }
 
-export function RequestsManagementTabs({
-  activeTab,
-  setActiveTab,
-  requests,
-  workers,
-  onViewDetails,
-  onStatusChange,
-  onDownloadAttachment,
-}: TabsContentProps) {
+export function TabsContent({ status, searchTerm, selectedDate }: TabsContentProps) {
+  // En una implementación real, aquí usaríamos los filtros para obtener datos de Supabase
+  const [requests, setRequests] = useState<Request[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // Esta función simularía obtener datos filtrados
+  const getFilteredData = () => {
+    setLoading(true);
+    // Aquí iría el código para filtrar según status, searchTerm y selectedDate
+    // Por ahora dejamos el arreglo vacío
+    setLoading(false);
+  };
+
+  const handleViewDetails = (request: Request) => {
+    console.log("Ver detalles de solicitud:", request);
+  };
+
+  const handleStatusChange = (request: Request, newStatus: RequestStatus) => {
+    console.log(`Cambiar estado de solicitud ${request.id} a ${newStatus}`);
+  };
+
+  const handleDownloadAttachment = (request: Request) => {
+    console.log("Descargar adjunto:", request.attachmentUrl);
+  };
+
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab}>
-      <TabsList>
-        <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
-        <TabsTrigger value="notificaciones">Enviar notificaciones</TabsTrigger>
-      </TabsList>
-      <TabsContent value="solicitudes">
-        <RequestsTabContent
-          requests={requests}
-          workers={workers}
-          onViewDetails={onViewDetails}
-          onStatusChange={onStatusChange}
-          onDownloadAttachment={onDownloadAttachment}
-        />
-      </TabsContent>
-      <TabsContent value="notificaciones">
-        <div className="max-w-2xl mx-auto">
-          <NotificationSender />
-        </div>
-      </TabsContent>
-    </Tabs>
+    <Card className="border-0 shadow-none">
+      <CardContent className="p-0">
+        {loading ? (
+          <div className="text-center py-8">Cargando...</div>
+        ) : requests.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No hay solicitudes que coincidan con los criterios de búsqueda
+          </div>
+        ) : (
+          <RequestTable
+            requests={requests}
+            users={users}
+            isHRView={true}
+            onViewDetails={handleViewDetails}
+            onStatusChange={handleStatusChange}
+            onDownloadAttachment={handleDownloadAttachment}
+          />
+        )}
+      </CardContent>
+    </Card>
   );
 }

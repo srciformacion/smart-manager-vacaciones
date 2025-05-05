@@ -6,8 +6,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReportForm } from "./report-form";
 import { ReportHistory } from "./report-history";
 import { toast } from "sonner";
+import { Department, Request, User } from "@/types";
 
-export function ReportsGenerator() {
+interface ReportsGeneratorProps {
+  users?: User[];
+  departments?: Department[];
+  requests?: Request[];
+}
+
+export function ReportsGenerator({ users, departments, requests }: ReportsGeneratorProps) {
   const [activeTab, setActiveTab] = useState("generate");
   const navigate = useNavigate();
 
