@@ -2,11 +2,11 @@
 import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { UseFormReturn } from "react-hook-form";
-import { FormValues } from "./request-form-schema";
+import { RequestFormValues } from "./request-form-schema";
 import { User } from "@/types";
 
 interface DateSectionProps {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<RequestFormValues>;
   user: User;
   isSubmitting?: boolean;
 }

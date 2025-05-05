@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DateSection } from "./form/date-section";
 import { ReplacementSection } from "./form/replacement-section";
 import { RequestDetailsSection } from "./form/request-details-section";
-import { formSchema, FormValues } from "./form/request-form-schema";
+import { requestFormSchema, RequestFormValues } from "./form/request-form-schema";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ import { toast } from "sonner";
 interface ShiftChangeFormProps {
   user: User;
   coworkers: User[];
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: RequestFormValues) => void;
   isSubmitting?: boolean;
 }
 
@@ -29,8 +29,8 @@ export function ShiftChangeForm({
   const [availableCoworkers, setAvailableCoworkers] = useState<User[]>(coworkers);
   const [submitting, setSubmitting] = useState<boolean>(isSubmitting);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<RequestFormValues>({
+    resolver: zodResolver(requestFormSchema),
     defaultValues: {
       reason: "",
       notes: "",
@@ -75,7 +75,7 @@ export function ShiftChangeForm({
     loadCoworkers();
   }, [user.id]);
 
-  const handleFormSubmit = async (values: FormValues) => {
+  const handleFormSubmit = async (values: RequestFormValues) => {
     setSubmitting(true);
     
     try {

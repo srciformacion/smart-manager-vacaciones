@@ -2,6 +2,7 @@
 import { SidebarNavigation } from "./sidebar-navigation";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
+import { User } from "@/types";
 
 export function MainSidebar() {
   const { user, signOut } = useAuth();
@@ -15,7 +16,7 @@ export function MainSidebar() {
   return (
     <aside className="hidden lg:block w-64 border-r bg-background">
       <SidebarNavigation 
-        user={user} 
+        user={user as User} 
         onLogout={handleLogout}
       />
     </aside>

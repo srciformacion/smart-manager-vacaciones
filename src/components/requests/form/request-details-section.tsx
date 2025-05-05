@@ -3,11 +3,11 @@ import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessa
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UseFormReturn } from "react-hook-form";
-import { FormValues } from "./request-form-schema";
+import { RequestFormValues } from "./request-form-schema";
 import { RequestType } from "@/types";
 
 interface RequestDetailsSectionProps {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<RequestFormValues>;
   requestType: RequestType;
   isSubmitting?: boolean;
 }

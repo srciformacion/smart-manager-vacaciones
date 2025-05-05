@@ -1,8 +1,6 @@
 
 import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
 import { FileUpload } from "@/components/ui/file-upload";
-import { UseFormReturn } from "react-hook-form";
-import { FormValues } from "./request-form-schema";
 
 interface FileUploadSectionProps {
   onFileChange: (file: File | null) => void;

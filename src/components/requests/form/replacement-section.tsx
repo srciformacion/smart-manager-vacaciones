@@ -3,10 +3,10 @@ import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessa
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User } from "@/types";
 import { UseFormReturn } from "react-hook-form";
-import { FormValues } from "./request-form-schema";
+import { RequestFormValues } from "./request-form-schema";
 
 interface ReplacementSectionProps {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<RequestFormValues>;
   user: User;
   availableUsers: User[];
   isSubmitting?: boolean;

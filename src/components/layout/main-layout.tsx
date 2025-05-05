@@ -89,8 +89,8 @@ export function MainLayout({ children, user }: MainLayoutProps) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative w-8 h-8 rounded-full">
                     <Avatar className="w-8 h-8">
-                      <AvatarImage src={user?.image} alt={user?.name} />
-                      <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={user.avatar || user.profilePhoto} alt={user.name} />
+                      <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>

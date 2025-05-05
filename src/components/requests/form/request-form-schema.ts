@@ -18,4 +18,8 @@ export const requestFormSchema = z.object({
   notes: z.string().optional(),
 });
 
+// For backwards compatibility with existing components
+export const formSchema = requestFormSchema;
+
 export type RequestFormValues = z.infer<typeof requestFormSchema>;
+export type FormValues = RequestFormValues;

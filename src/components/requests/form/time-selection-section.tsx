@@ -3,14 +3,16 @@ import { Clock } from "lucide-react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
-import { FormValues } from "./request-form-schema";
+import { RequestFormValues } from "./request-form-schema";
+import { ShiftProfile } from "@/types/calendar";
 
 interface TimeSelectionSectionProps {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<RequestFormValues>;
+  shiftProfiles?: ShiftProfile[];
   isSubmitting?: boolean;
 }
 
-export function TimeSelectionSection({ form, isSubmitting }: TimeSelectionSectionProps) {
+export function TimeSelectionSection({ form, shiftProfiles, isSubmitting }: TimeSelectionSectionProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <FormField
@@ -61,4 +63,3 @@ export function TimeSelectionSection({ form, isSubmitting }: TimeSelectionSectio
     </div>
   );
 }
-

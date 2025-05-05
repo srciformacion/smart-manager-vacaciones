@@ -11,8 +11,8 @@ export function ReportsGenerator({ users, departments }: ReportsGeneratorProps) 
   const departmentNames = departments.map((dept) => {
     if (typeof dept === 'string') {
       return dept;
-    } else if (dept && typeof dept === 'object' && 'toString' in dept) {
-      return dept.toString();
+    } else if (dept && typeof dept === 'object' && 'name' in dept) {
+      return dept.name;
     } else {
       return 'Unknown Department';
     }
