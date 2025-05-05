@@ -1,21 +1,31 @@
 
-import { useState, useEffect } from "react";
+import * as React from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
-interface DatePickerProps {
-  date: Date | undefined;
-  onSelect: (date: Date | undefined) => void;
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+export interface DatePickerProps {
+  selectedDate?: Date;
+  onSelect?: (date: Date | undefined) => void;
   placeholder?: string;
   className?: string;
 }
 
-export function DatePicker({ date, onSelect, placeholder = "Seleccione fecha", className }: DatePickerProps) {
+export function DatePicker({
+  selectedDate,
+  onSelect,
+  placeholder = "Seleccionar fecha",
+  className,
+}: DatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -23,22 +33,24 @@ export function DatePicker({ date, onSelect, placeholder = "Seleccione fecha", c
           variant={"outline"}
           className={cn(
             "w-full justify-start text-left font-normal",
-            !date && "text-muted-foreground",
+            !selectedDate && "text-muted-foreground",
             className
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP", { locale: es }) : <span>{placeholder}</span>}
+          {selectedDate ? (
+            format(selectedDate, "PPP", { locale: es })
+          ) : (
+            <span>{placeholder}</span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
-          selected={date}
+          selected={selectedDate}
           onSelect={onSelect}
           initialFocus
-          locale={es}
-          className="p-3 pointer-events-auto"
         />
       </PopoverContent>
     </Popover>

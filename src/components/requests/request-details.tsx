@@ -1,7 +1,7 @@
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Request, User } from "@/types";
+import { Request, User, RequestStatus } from "@/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -12,7 +12,7 @@ interface RequestDetailsProps {
   request: Request;
   user?: User;
   onClose: () => void;
-  onStatusChange?: (status: Request["status"]) => void;
+  onStatusChange?: (status: RequestStatus) => void;
   onDownloadAttachment?: () => void;
   isHRView?: boolean;
 }
@@ -36,9 +36,14 @@ export function RequestDetails({
       case "vacation":
         return "Solicitud de vacaciones";
       case "personalDay":
+      case "personal-day":
         return "Solicitud de asuntos propios";
       case "leave":
+      case "sick-leave":
         return "Solicitud de permiso justificado";
+      case "shiftChange":
+      case "shift-change":
+        return "Solicitud de cambio de turno";
       default:
         return "Solicitud";
     }
@@ -160,7 +165,7 @@ export function RequestDetails({
             <Button 
               variant="outline" 
               className="bg-warning/10 text-warning hover:bg-warning/20" 
-              onClick={() => onStatusChange?.("moreInfo")}
+              onClick={() => onStatusChange?.("moreInfo" as RequestStatus)}
             >
               Solicitar más información
             </Button>

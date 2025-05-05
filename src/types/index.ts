@@ -1,10 +1,14 @@
+
 export type RequestType =
   | "vacation"
   | "personal-day"
   | "sick-leave"
-  | "shift-change";
+  | "shift-change"
+  | "personalDay"
+  | "leave"
+  | "shiftChange";
 
-export type RequestStatus = "pending" | "approved" | "rejected";
+export type RequestStatus = "pending" | "approved" | "rejected" | "moreInfo";
 
 export type UserRole = "worker" | "hr";
 
@@ -14,9 +18,13 @@ export type Department =
   | "Sales"
   | "Human Resources"
   | "Finance"
-  | "Operations";
+  | "Operations"
+  | "Recursos Humanos"
+  | "Atención al cliente"
+  | "Administración"
+  | "Personal de movimiento";
 
-export type Shift = "Morning" | "Afternoon" | "Night";
+export type Shift = "Morning" | "Afternoon" | "Night" | "Programado";
 
 export type WeekDay =
   | "Monday"
@@ -26,6 +34,22 @@ export type WeekDay =
   | "Friday"
   | "Saturday"
   | "Sunday";
+
+export type WorkGroup = "A" | "B" | "C" | "D" | "E" | "F" | "Grupo Programado";
+
+export type ShiftType = "Fixed" | "Rotating" | "Flexible" | "Programado";
+
+export type WorkdayType = "Full" | "Part-time" | "Completa" | "Parcial";
+
+export type NotificationType = 
+  | "requestCreated" 
+  | "requestApproved" 
+  | "requestRejected" 
+  | "requestMoreInfo";
+
+export type NotificationChannel = "email" | "sms" | "push" | "whatsapp";
+
+export type CalendarStatus = RequestStatus | "moreInfo";
 
 export interface Request {
   id: string;
@@ -37,9 +61,11 @@ export interface Request {
   createdAt: Date;
   updatedAt: Date;
   reason?: string;
+  observations?: string;
   attachmentUrl?: string;
   startTime?: string;
   endTime?: string;
+  replacementUserId?: string;
 }
 
 export interface User {
@@ -52,9 +78,14 @@ export interface User {
   shift?: Shift;
   position?: string;
   workDays?: WeekDay[];
+  workday?: string;
+  workGroup?: WorkGroup;
   startTime?: string;
   endTime?: string;
   profilePicture?: string;
+  avatar?: string;
+  seniority?: number;
+  phone?: string;
 }
 
 export interface Notification {
@@ -63,9 +94,13 @@ export interface Notification {
   message: string;
   createdAt: Date;
   read: boolean;
+  title?: string;
+  type?: NotificationType;
 }
 
 export interface Balance {
   vacationDays: number;
   personalDays: number;
+  leaveDays: number;
 }
+

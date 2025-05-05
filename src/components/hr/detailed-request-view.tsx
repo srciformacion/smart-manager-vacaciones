@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Request, User } from "@/types";
+import { Request, User, RequestStatus } from "@/types";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 interface DetailedRequestViewProps {
   request: Request;
   user?: User | null;
-  onStatusChange: (request: Request, newStatus: Request["status"], observations?: string) => void;
+  onStatusChange: (request: Request, newStatus: RequestStatus, observations?: string) => void;
   onDownloadAttachment?: (request: Request) => void;
   onClose: () => void;
 }
@@ -34,7 +34,7 @@ export function DetailedRequestView({
     (new Date(request.endDate).getTime() - new Date(request.startDate).getTime()) / (1000 * 60 * 60 * 24)
   ) + 1;
 
-  const handleStatusChange = async (newStatus: Request["status"]) => {
+  const handleStatusChange = async (newStatus: RequestStatus) => {
     try {
       setIsSubmitting(true);
       setActionMessage(null);
@@ -60,10 +60,13 @@ export function DetailedRequestView({
       case "vacation":
         return "Solicitud de vacaciones";
       case "personalDay":
+      case "personal-day":
         return "Solicitud de asuntos propios";
       case "leave":
+      case "sick-leave":
         return "Solicitud de permiso justificado";
       case "shiftChange":
+      case "shift-change":
         return "Solicitud de cambio de turno";
       default:
         return "Solicitud";
@@ -84,7 +87,7 @@ export function DetailedRequestView({
       
       <CardContent className="space-y-6">
         {actionMessage && (
-          <Alert variant={actionMessage.type === "success" ? "default" : "destructive"}>
+          <Alert variant={actionMessage.type === "success" ? "success" : "destructive"}>
             <AlertTitle>{actionMessage.type === "success" ? "Éxito" : "Error"}</AlertTitle>
             <AlertDescription>{actionMessage.message}</AlertDescription>
           </Alert>
@@ -218,7 +221,7 @@ export function DetailedRequestView({
             <Button 
               variant="outline" 
               className="bg-warning/10 text-warning hover:bg-warning/20" 
-              onClick={() => handleStatusChange("moreInfo")}
+              onClick={() => handleStatusChange("moreInfo" as RequestStatus)}
               disabled={isSubmitting}
             >
               Solicitar más información
