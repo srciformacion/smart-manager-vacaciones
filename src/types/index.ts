@@ -1,4 +1,3 @@
-
 export type RequestType =
   | "vacation"
   | "personal-day"
@@ -92,7 +91,11 @@ export type NotificationType =
   | "requestCreated" 
   | "requestApproved" 
   | "requestRejected" 
-  | "requestMoreInfo";
+  | "requestMoreInfo"
+  | "shiftAssigned"
+  | "calendarChanged"
+  | "chatMessage"
+  | "documentReminder";
 
 export type NotificationChannel = "email" | "sms" | "push" | "whatsapp" | "web";
 
@@ -123,7 +126,7 @@ export interface NotificationPayload {
   message: string;
   type?: NotificationType;
   channel: NotificationChannel[];
-  // Add Spanish equivalents for backward compatibility
+  // Spanish equivalents for backward compatibility
   canal?: NotificationChannel;
   titulo?: string;
   mensaje?: string;

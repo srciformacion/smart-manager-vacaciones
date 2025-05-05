@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { sendEmailNotification } from "@/utils/emailService";
+import { sendNotification } from "@/services/notification";
 import { NotificationType } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";

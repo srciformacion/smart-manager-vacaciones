@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { NotificationFormState } from "./types";
 import { RecipientsSection } from "./RecipientsSection";
@@ -6,7 +7,7 @@ import { NotificationChannelSection } from "./NotificationChannelSection";
 import { NotificationContentSection } from "./NotificationContentSection";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { sendNotification } from "@/services/notificationService";
+import { sendNotification } from "@/services/notification";
 import { toast } from "@/hooks/use-toast";
 import { exampleWorkers } from "@/data/example-users";
 

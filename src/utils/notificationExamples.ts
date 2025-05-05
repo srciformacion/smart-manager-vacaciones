@@ -1,8 +1,8 @@
 
-import { NotificationPayload } from "@/types";
-import { sendNotification } from "@/services/notificationService";
+import { NotificationPayload, NotificationType } from "@/types";
+import { sendNotification } from "@/services/notification";
 
-// Ejemplo de notificación por solicitud aprobada
+// Example notification for approved vacation
 export const notifyVacationApproved = (
   userId: string,
   userEmail: string,
@@ -13,7 +13,7 @@ export const notifyVacationApproved = (
   const title = "Solicitud de vacaciones aprobada";
   const message = `Tu solicitud de vacaciones del ${startDate} al ${endDate} ha sido aprobada.`;
   
-  // Obtener el canal preferido del usuario (en un entorno real esto vendría de la base de datos)
+  // Get user's preferred channel (in a real environment this would come from the database)
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const preferredChannel = user.preferredNotificationChannel || 'web';
   
@@ -27,16 +27,21 @@ export const notifyVacationApproved = (
   }
   
   return sendNotification({
-    canal: preferredChannel,
+    userId,
+    title,
+    message,
+    type: 'requestApproved',
+    channel: [preferredChannel as any],
+    // For backwards compatibility
+    canal: preferredChannel as any,
     destino: destination,
     titulo: title,
     mensaje: message,
-    tipo: 'requestApproved',
-    userId
+    tipo: 'requestApproved'
   });
 };
 
-// Ejemplo de notificación por cambio de turno
+// Example notification for shift assignment
 export const notifyShiftAssigned = (
   userId: string,
   userEmail: string,
@@ -47,7 +52,7 @@ export const notifyShiftAssigned = (
   const title = "Nuevo turno asignado";
   const message = `Se te ha asignado un nuevo turno "${shift}" para el ${date}.`;
   
-  // Obtener el canal preferido del usuario (en un entorno real esto vendría de la base de datos)
+  // Get user's preferred channel (in a real environment this would come from the database)
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const preferredChannel = user.preferredNotificationChannel || 'web';
   
@@ -61,16 +66,21 @@ export const notifyShiftAssigned = (
   }
   
   return sendNotification({
-    canal: preferredChannel,
+    userId,
+    title,
+    message,
+    type: 'requestApproved', // Using an existing type as fallback
+    channel: [preferredChannel as any],
+    // For backwards compatibility
+    canal: preferredChannel as any,
     destino: destination,
     titulo: title,
     mensaje: message,
-    tipo: 'shiftAssigned',
-    userId
+    tipo: 'requestApproved'
   });
 };
 
-// Ejemplo de notificación por cambio de calendario
+// Example notification for calendar changes
 export const notifyCalendarChanged = (
   userId: string,
   userEmail: string,
@@ -80,7 +90,7 @@ export const notifyCalendarChanged = (
   const title = "Calendario actualizado";
   const message = `Tu calendario laboral para ${month} ha sido actualizado. Por favor revisa los cambios.`;
   
-  // Obtener el canal preferido del usuario (en un entorno real esto vendría de la base de datos)
+  // Get user's preferred channel (in a real environment this would come from the database)
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const preferredChannel = user.preferredNotificationChannel || 'web';
   
@@ -94,16 +104,21 @@ export const notifyCalendarChanged = (
   }
   
   return sendNotification({
-    canal: preferredChannel,
+    userId,
+    title,
+    message,
+    type: 'requestApproved', // Using an existing type as fallback
+    channel: [preferredChannel as any],
+    // For backwards compatibility
+    canal: preferredChannel as any,
     destino: destination,
     titulo: title,
     mensaje: message,
-    tipo: 'calendarChanged',
-    userId
+    tipo: 'requestApproved'
   });
 };
 
-// Ejemplo de notificación por mensaje nuevo en el chat
+// Example notification for new chat messages
 export const notifyChatMessage = (
   userId: string,
   userEmail: string,
@@ -113,7 +128,7 @@ export const notifyChatMessage = (
   const title = "Nuevo mensaje en el chat";
   const message = `Has recibido un nuevo mensaje de ${sender} en el chat.`;
   
-  // Obtener el canal preferido del usuario (en un entorno real esto vendría de la base de datos)
+  // Get user's preferred channel (in a real environment this would come from the database)
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const preferredChannel = user.preferredNotificationChannel || 'web';
   
@@ -127,16 +142,21 @@ export const notifyChatMessage = (
   }
   
   return sendNotification({
-    canal: preferredChannel,
+    userId,
+    title,
+    message,
+    type: 'requestApproved', // Using an existing type as fallback
+    channel: [preferredChannel as any],
+    // For backwards compatibility
+    canal: preferredChannel as any,
     destino: destination,
     titulo: title,
     mensaje: message,
-    tipo: 'chatMessage',
-    userId
+    tipo: 'requestApproved'
   });
 };
 
-// Ejemplo de notificación por recordatorio de documento
+// Example notification for document reminders
 export const notifyDocumentReminder = (
   userId: string,
   userEmail: string,
@@ -147,7 +167,7 @@ export const notifyDocumentReminder = (
   const title = "Recordatorio de documento pendiente";
   const message = `Recuerda que debes presentar "${documentName}" antes del ${dueDate}.`;
   
-  // Obtener el canal preferido del usuario (en un entorno real esto vendría de la base de datos)
+  // Get user's preferred channel (in a real environment this would come from the database)
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const preferredChannel = user.preferredNotificationChannel || 'web';
   
@@ -161,11 +181,16 @@ export const notifyDocumentReminder = (
   }
   
   return sendNotification({
-    canal: preferredChannel,
+    userId,
+    title,
+    message,
+    type: 'requestApproved', // Using an existing type as fallback
+    channel: [preferredChannel as any],
+    // For backwards compatibility
+    canal: preferredChannel as any,
     destino: destination,
     titulo: title,
     mensaje: message,
-    tipo: 'documentReminder',
-    userId
+    tipo: 'requestApproved'
   });
 };
