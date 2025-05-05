@@ -11,7 +11,7 @@ interface NavItem {
   to: string;
   label: string;
   icon?: React.ReactNode;
-  requiredRole?: 'worker' | 'hr';
+  requiredRole?: UserRole;
 }
 
 // Update the props interface to accept either user or role and optional callbacks
@@ -47,6 +47,7 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
     { to: "/chat", label: "Chat" },
   ];
 
+  // Filtrar los elementos de navegación según el rol del usuario
   const filteredNavigationItems = navigationItems.filter(item => {
     if (!item.requiredRole) return true;
     return userRole === item.requiredRole;

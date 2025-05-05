@@ -13,11 +13,13 @@ export function MainSidebar() {
     navigate("/login");
   };
 
+  // Asegúrate de que el usuario sea del tipo correcto
+  const typedUser = user as User;
+
   return (
     <aside className="hidden lg:block w-64 border-r border-sidebar-border bg-sidebar">
       <SidebarNavigation 
-        // Cast user to the correct User type from our application
-        user={user as unknown as User} 
+        user={typedUser}
         onLogout={handleLogout}
       />
     </aside>

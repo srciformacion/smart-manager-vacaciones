@@ -18,14 +18,19 @@ export interface DatePickerProps {
   onSelect?: (date: Date | undefined) => void;
   placeholder?: string;
   className?: string;
+  date?: Date; // Alias para selectedDate para compatibilidad
 }
 
 export function DatePicker({
   selectedDate,
+  date,
   onSelect,
   placeholder = "Seleccionar fecha",
   className,
 }: DatePickerProps) {
+  // Usar date como fallback para selectedDate para mantener compatibilidad
+  const effectiveDate = selectedDate || date;
+  
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -33,13 +38,13 @@ export function DatePicker({
           variant={"outline"}
           className={cn(
             "w-full justify-start text-left font-normal",
-            !selectedDate && "text-muted-foreground",
+            !effectiveDate && "text-muted-foreground",
             className
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {selectedDate ? (
-            format(selectedDate, "PPP", { locale: es })
+          {effectiveDate ? (
+            format(effectiveDate, "PPP", { locale: es })
           ) : (
             <span>{placeholder}</span>
           )}
@@ -48,7 +53,7 @@ export function DatePicker({
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
-          selected={selectedDate}
+          selected={effectiveDate}
           onSelect={onSelect}
           initialFocus
         />

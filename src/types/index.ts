@@ -22,9 +22,19 @@ export type Department =
   | "Recursos Humanos"
   | "Atención al cliente"
   | "Administración"
-  | "Personal de movimiento";
+  | "Personal de movimiento"
+  | "Operaciones"
+  | "Centro Coordinador Programado"
+  | "Urgencias y Emergencias (Transporte Urgente)";
 
-export type Shift = "Morning" | "Afternoon" | "Night" | "Programado";
+export type Shift = 
+  | "Morning" 
+  | "Afternoon" 
+  | "Night" 
+  | "Programado"
+  | "Urgente 24h"
+  | "Localizado"
+  | "Programado Mañana";
 
 export type WeekDay =
   | "Monday"
@@ -35,11 +45,40 @@ export type WeekDay =
   | "Saturday"
   | "Sunday";
 
-export type WorkGroup = "A" | "B" | "C" | "D" | "E" | "F" | "Grupo Programado";
+export type WorkGroup = 
+  | "A" 
+  | "B" 
+  | "C" 
+  | "D" 
+  | "E" 
+  | "F" 
+  | "Grupo Programado"
+  | "Urgente 24h"
+  | "Grupo Localizado"
+  | "Grupo 1/3"
+  | "Top Programado";
 
-export type ShiftType = "Fixed" | "Rotating" | "Flexible" | "Programado";
+export type ShiftType = 
+  | "Fixed" 
+  | "Rotating" 
+  | "Flexible" 
+  | "Programado"
+  | "Urgente 24h"
+  | "Localizado"
+  | "Programado Mañana"
+  | "Programado Tarde"
+  | "Programado Noche"
+  | "Teleoperación Turno Mañana"
+  | "Teleoperación Turno Tarde"
+  | "Teleoperación Turno Noche"
+  | "Turno 24h";
 
-export type WorkdayType = "Full" | "Part-time" | "Completa" | "Parcial";
+export type WorkdayType = 
+  | "Full" 
+  | "Part-time" 
+  | "Completa" 
+  | "Parcial"
+  | "Reducida";
 
 export type NotificationType = 
   | "requestCreated" 
@@ -47,9 +86,34 @@ export type NotificationType =
   | "requestRejected" 
   | "requestMoreInfo";
 
-export type NotificationChannel = "email" | "sms" | "push" | "whatsapp";
+export type NotificationChannel = "email" | "sms" | "push" | "whatsapp" | "web";
 
 export type CalendarStatus = RequestStatus | "moreInfo";
+
+export interface DateRange {
+  from: Date | undefined;
+  to: Date | undefined;
+}
+
+export interface ShiftProfile {
+  id: string;
+  userId: string;
+  name: string;
+  workDays: WeekDay[];
+  shiftType: ShiftType[];
+  startTime: string;
+  endTime: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface NotificationPayload {
+  userId: string;
+  title: string;
+  message: string;
+  type?: NotificationType;
+  channel: NotificationChannel[];
+}
 
 export interface Request {
   id: string;
@@ -99,8 +163,9 @@ export interface Notification {
 }
 
 export interface Balance {
+  id?: string;
+  userId?: string;
   vacationDays: number;
   personalDays: number;
   leaveDays: number;
 }
-
