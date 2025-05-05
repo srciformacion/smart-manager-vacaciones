@@ -98,12 +98,13 @@ export function useRealtimeData<T>(
           await fetchInitialData();
           
           // Notificar al usuario sobre el cambio
-          const eventType = payload.eventType;
-          if (eventType === 'INSERT') {
+          // Fixed: Access the correct property based on payload type
+          const event = payload.eventType || payload.type;
+          if (event === 'INSERT') {
             toast.info('Se ha recibido una nueva solicitud');
-          } else if (eventType === 'UPDATE') {
+          } else if (event === 'UPDATE') {
             toast.info('Una solicitud ha sido actualizada');
-          } else if (eventType === 'DELETE') {
+          } else if (event === 'DELETE') {
             toast.info('Una solicitud ha sido eliminada');
           }
         }

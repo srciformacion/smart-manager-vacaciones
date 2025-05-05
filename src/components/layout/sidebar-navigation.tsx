@@ -12,6 +12,7 @@ interface NavItem {
   label: string;
   icon?: React.ReactNode;
   requiredRole?: UserRole;
+  visible?: boolean;
 }
 
 // Update the props interface to accept either user or role and optional callbacks
@@ -28,31 +29,34 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
   console.log("SidebarNavigation - User role:", userRole);
   
   const navigationItems: NavItem[] = [
+    // Worker navigation items
     { to: "/dashboard", label: "Dashboard", requiredRole: 'worker' },
-    { to: "/rrhh/dashboard", label: "Dashboard RRHH", requiredRole: 'hr' },
     { to: "/profile", label: "Mi Perfil" },
     { to: "/calendar", label: "Calendario", requiredRole: 'worker' },
-    { to: "/rrhh/calendar", label: "Calendario RRHH", requiredRole: 'hr' },
     { to: "/requests/vacation", label: "Solicitar Vacaciones", requiredRole: 'worker' },
     { to: "/requests/personal-day", label: "Solicitar Día Personal", requiredRole: 'worker' },
     { to: "/requests/leave", label: "Solicitar Permiso", requiredRole: 'worker' },
     { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", requiredRole: 'worker' },
     { to: "/history", label: "Historial", requiredRole: 'worker' },
     { to: "/shift-profile", label: "Mi Perfil de Turno", requiredRole: 'worker' },
+    // HR navigation items
+    { to: "/rrhh/dashboard", label: "Dashboard RRHH", requiredRole: 'hr' },
+    { to: "/rrhh/calendar", label: "Calendario RRHH", requiredRole: 'hr' },
     { to: "/rrhh/requests", label: "Gestionar Solicitudes", requiredRole: 'hr' },
     { to: "/rrhh/workers", label: "Gestionar Trabajadores", requiredRole: 'hr' },
     { to: "/rrhh/notification", label: "Enviar Notificación", requiredRole: 'hr' },
     { to: "/rrhh/calendar-notification", label: "Notificar Calendario", requiredRole: 'hr' },
     { to: "/rrhh/ai-assistant", label: "Asistente IA", requiredRole: 'hr' },
     { to: "/rrhh/ai-dashboard", label: "Dashboard IA", requiredRole: 'hr' },
+    // Shared navigation items
     { to: "/chat", label: "Chat" },
   ];
 
   // Filter navigation items based on user role
   const filteredNavigationItems = navigationItems.filter(item => {
     if (!item.requiredRole) return true; // Always show items without a required role
-    if (userRole === 'hr') return true; // HR users can access all links
-    return userRole === item.requiredRole; // For others, show only items matching their role
+    if (item.requiredRole === userRole) return true; // Show items matching the user's role
+    return false; // Don't show items for other roles
   });
 
   const handleNavClick = () => {
@@ -66,7 +70,7 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
   return (
     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
       <div className="px-4 py-6">
-        <NavLink to="/">
+        <NavLink to={userRole === 'hr' ? "/rrhh/dashboard" : "/dashboard"}>
           <Button variant="ghost" className="font-bold text-lg w-full text-sidebar-foreground">
             La Rioja Cuida
           </Button>
