@@ -24,7 +24,8 @@ interface SidebarNavigationProps {
 
 export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarNavigationProps) {
   // Determine role from props - either directly provided or from user object
-  const userRole = role || user?.role;
+  const userRole = role || user?.role || 'worker';
+  console.log("SidebarNavigation - User role:", userRole);
   
   const navigationItems: NavItem[] = [
     { to: "/dashboard", label: "Dashboard", requiredRole: 'worker' },
@@ -47,10 +48,11 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
     { to: "/chat", label: "Chat" },
   ];
 
-  // Filtrar los elementos de navegación según el rol del usuario
+  // Filter navigation items based on user role
   const filteredNavigationItems = navigationItems.filter(item => {
-    if (!item.requiredRole) return true;
-    return userRole === item.requiredRole;
+    if (!item.requiredRole) return true; // Always show items without a required role
+    if (userRole === 'hr') return true; // HR users can access all links
+    return userRole === item.requiredRole; // For others, show only items matching their role
   });
 
   const handleNavClick = () => {
@@ -58,6 +60,8 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
       onNavigate();
     }
   };
+
+  console.log("Filtered navigation items:", filteredNavigationItems.map(item => item.label));
 
   return (
     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">

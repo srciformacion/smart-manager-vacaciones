@@ -20,8 +20,8 @@ export function assignWorkGroup(
     return 'Urgente 24h';
   }
   
-  // Check for Urgente 12h using string comparison since both are now the same type
-  if (shift === 'Urgente 12h') {
+  // Check for specific shift types using string comparison
+  if (String(shift) === 'Urgente 12h') {
     return 'Urgente 12h';
   }
   
