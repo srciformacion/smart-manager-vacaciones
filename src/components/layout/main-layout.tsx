@@ -89,14 +89,14 @@ export function MainLayout({ children, user }: MainLayoutProps) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative w-8 h-8 rounded-full">
                     <Avatar className="w-8 h-8">
-                      <AvatarImage src={user.avatar || user.profilePhoto} alt={user.name} />
-                      <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={user.profilePicture} alt={user.name || 'Usuario'} />
+                      <AvatarFallback>{user.name ? user.name.charAt(0) : 'U'}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel>
-                    {user?.name}
+                    {user?.name || 'Usuario'}
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate("/profile")}>

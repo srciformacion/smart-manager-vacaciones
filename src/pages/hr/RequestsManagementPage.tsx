@@ -1,151 +1,118 @@
 
 import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { exampleRequests } from "@/data/example-requests";
-import { exampleUser } from "@/data/example-users";
-import { RequestStatus, Request, User } from "@/types";
-import { useRequestManagement } from "@/hooks/hr/use-request-management";
-import { DetailedRequestView } from "@/components/hr/detailed-request-view";
-import { Tabs, TabsContent as RadixTabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Header } from "@/components/hr/requests-management/header";
+import { TabsContent as RequestsTabsContent } from "@/components/hr/requests-management/tabs-content";
 import { RealtimeRequests } from "@/components/hr/requests-management/realtime-requests";
-import { enableRealtimeForTable } from "@/utils/realtime-utils";
+import { useAuth } from "@/hooks/use-auth";
+import { User } from "@/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { enableRealtimeForTable } from "@/utils/realtime-utils";
 import { supabase } from "@/integrations/supabase/client";
 
-// Componente para el encabezado de la página
-function Header({ viewMode, setViewMode }: { viewMode: "list" | "calendar", setViewMode: (mode: "list" | "calendar") => void }) {
-  return (
-    <div className="flex items-center justify-between p-6 border-b">
-      <div>
-        <h1 className="text-2xl font-bold">Gestión de Solicitudes</h1>
-        <p className="text-muted-foreground">Gestione las solicitudes de los trabajadores</p>
-      </div>
-      <div className="flex items-center space-x-2">
-        {/* Controles de visualización */}
-      </div>
-    </div>
-  );
-}
+const tabs = [
+  { value: "pending", label: "Pendientes" },
+  { value: "approved", label: "Aprobadas" },
+  { value: "rejected", label: "Rechazadas" },
+  { value: "all", label: "Todas" },
+  { value: "realtime", label: "Tiempo Real" },
+];
 
-// Componente para el contenido de las pestañas
-function TabsContent({ 
-  requests, 
-  workers, 
-  onViewDetails, 
-  onStatusChange, 
-  onDownloadAttachment 
-}: { 
-  requests: Request[], 
-  workers: User[], 
-  onViewDetails: (req: Request) => void, 
-  onStatusChange: (req: Request, status: RequestStatus) => void, 
-  onDownloadAttachment: (req: Request) => void 
-}) {
-  return (
-    <div className="space-y-4">
-      {/* Aquí estaría el contenido principal de las solicitudes */}
-      <p>Total de solicitudes: {requests.length}</p>
-    </div>
-  );
-}
+export function RequestsManagementPage() {
+  const [activeTab, setActiveTab] = useState("pending");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isRealtimeEnabled, setIsRealtimeEnabled] = useState(false);
+  const { user } = useAuth();
 
-export default function RequestsManagementPage() {
-  const [activeTab, setActiveTab] = useState("realtime"); // Cambiado a "realtime" por defecto
-  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
-  const [realtimeEnabled, setRealtimeEnabled] = useState(false);
-
-  // En lugar de usar exampleUsers importado, lo definimos aquí para evitar el error de importación
-  const workers: User[] = exampleUser ? [exampleUser] : [];
-
-  const {
-    selectedRequest,
-    selectedWorker,
-    handleViewRequestDetails,
-    handleDetailStatusChange,
-    handleDownloadAttachment,
-    closeRequestDetails,
-  } = useRequestManagement(exampleRequests, workers);
-
-  // En un entorno de producción, estas serían solicitudes reales de la base de datos
-  const requests: Request[] = exampleRequests;
-
-  // Efecto para habilitar el tiempo real al cargar la página
   useEffect(() => {
-    const setupRealtime = async () => {
-      try {
-        const result = await enableRealtimeForTable('requests');
-        if (result.success) {
-          setRealtimeEnabled(true);
-          console.log("Tiempo real habilitado para la tabla 'requests'");
-        } else {
-          console.error("Error al habilitar tiempo real:", result.error);
-        }
-      } catch (err) {
-        console.error("Error al configurar tiempo real:", err);
+    // Enable realtime for requests table when the realtime tab is active
+    if (activeTab === "realtime" && !isRealtimeEnabled) {
+      enableRealtime();
+    }
+
+    return () => {
+      // Clean up realtime subscriptions when component unmounts
+      if (isRealtimeEnabled) {
+        supabase.removeAllChannels();
+        setIsRealtimeEnabled(false);
       }
     };
+  }, [activeTab]);
 
-    setupRealtime();
-  }, []);
+  const enableRealtime = async () => {
+    try {
+      const result = await enableRealtimeForTable(supabase, {
+        table: "requests",
+        event: "*"
+      });
+      
+      if (result.success) {
+        setIsRealtimeEnabled(true);
+        toast.success("Notificaciones en tiempo real activadas");
+      } else {
+        toast.error(`Error al activar notificaciones: ${result.error?.message}`);
+      }
+    } catch (error) {
+      console.error("Error enabling realtime:", error);
+      toast.error("Error al activar notificaciones en tiempo real");
+    }
+  };
+
+  // Handler for date changes
+  const handleDateChange = (date: Date | undefined) => {
+    setSelectedDate(date);
+  };
+
+  // Handler for search term changes
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+  };
 
   return (
-    <MainLayout user={exampleUser}>
-      <Header 
-        viewMode={viewMode} 
-        setViewMode={setViewMode} 
-      />
+    <MainLayout user={user as unknown as User}>
+      <div className="space-y-4">
+        <Header
+          onDateChange={handleDateChange}
+          onSearchChange={handleSearchChange}
+          selectedDate={selectedDate}
+          searchTerm={searchTerm}
+        />
 
-      <div className="p-8">
         <Card>
           <CardHeader>
-            <CardTitle>Gestión de Solicitudes</CardTitle>
-            {realtimeEnabled && (
-              <div className="text-sm text-green-500 flex items-center gap-1">
-                <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
-                Tiempo real habilitado
-              </div>
-            )}
+            <CardTitle>Solicitudes</CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Tabs para elegir entre vista normal o tiempo real */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="normal">Vista Normal</TabsTrigger>
-                <TabsTrigger value="realtime">Tiempo Real</TabsTrigger>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid grid-cols-5">
+                {tabs.map((tab) => (
+                  <TabsTrigger key={tab.value} value={tab.value}>
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
               </TabsList>
-              
-              <RadixTabsContent value="normal">
-                <TabsContent 
-                  requests={requests}
-                  workers={workers}
-                  onViewDetails={handleViewRequestDetails}
-                  onStatusChange={handleDetailStatusChange}
-                  onDownloadAttachment={handleDownloadAttachment}
-                />
-              </RadixTabsContent>
-              
-              <RadixTabsContent value="realtime">
-                <RealtimeRequests 
-                  users={workers}
-                  onViewDetails={handleViewRequestDetails}
-                  onStatusChange={handleDetailStatusChange}
-                  onDownloadAttachment={handleDownloadAttachment}
-                />
-              </RadixTabsContent>
+
+              {tabs.map((tab) => (
+                <TabsContent key={tab.value} value={tab.value}>
+                  {tab.value === "realtime" ? (
+                    <RealtimeRequests />
+                  ) : (
+                    <RequestsTabsContent
+                      status={tab.value}
+                      searchTerm={searchTerm}
+                      selectedDate={selectedDate}
+                    />
+                  )}
+                </TabsContent>
+              ))}
             </Tabs>
           </CardContent>
         </Card>
       </div>
-
-      {selectedRequest && (
-        <DetailedRequestView
-          request={selectedRequest}
-          onClose={closeRequestDetails}
-          onStatusChange={handleDetailStatusChange}
-          onDownloadAttachment={handleDownloadAttachment}
-        />
-      )}
     </MainLayout>
   );
 }

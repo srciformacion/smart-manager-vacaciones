@@ -1,44 +1,50 @@
 
-import { RealtimeChannel } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { Session, SupabaseClient } from "@supabase/supabase-js";
 
-// Enable realtime for a table
-export async function enableRealtimeForTable(tableName: string): Promise<void> {
+export interface RealtimeConfig {
+  table: string;
+  event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
+  schema?: string;
+  filter?: string;
+}
+
+/**
+ * Enables realtime subscription for a table
+ */
+export const enableRealtimeForTable = async (
+  supabase: SupabaseClient,
+  config: RealtimeConfig
+): Promise<{ success: boolean; error: Error | null }> => {
   try {
-    // Set table for realtime
-    const { error } = await supabase.rpc('enable_realtime', {
-      table_name: tableName
-    });
-    
+    // Enable realtime for the table
+    const { data, error } = await supabase
+      .from(config.table)
+      .on(config.event || '*', (payload) => {
+        console.log('Realtime payload:', payload);
+      })
+      .subscribe();
+
     if (error) {
-      console.warn(`Could not enable realtime for ${tableName}:`, error);
-    } else {
-      console.log(`Realtime enabled for ${tableName}`);
+      console.error(`Error enabling realtime for ${config.table}:`, error);
+      return { success: false, error };
     }
-  } catch (err) {
-    console.error(`Error enabling realtime for ${tableName}:`, err);
-    throw err;
+
+    console.log(`Realtime enabled for ${config.table}`);
+    return { success: true, error: null };
+  } catch (error) {
+    console.error(`Error in enableRealtimeForTable:`, error);
+    return { success: false, error: error as Error };
   }
-}
+};
 
-// Initialize the channel for PostgreSQL changes
-export function initPostgresChangeChannel<T>(
-  channel: string,
-  table: string,
-  eventTypes: string[],
-  callback: (payload: T) => void
-): RealtimeChannel {
-  const realtimeChannel = supabase
-    .channel(channel)
-    .on(
-      'postgres_changes' as any, // Use any to avoid the error of types
-      { event: eventTypes, schema: 'public', table },
-      (payload) => {
-        console.log('Realtime change detected:', payload);
-        callback(payload as unknown as T);
-      }
-    )
-    .subscribe();
-
-  return realtimeChannel;
-}
+/**
+ * Disables all realtime subscriptions
+ */
+export const disableAllRealtime = (supabase: SupabaseClient): void => {
+  try {
+    supabase.removeAllChannels();
+    console.log('All realtime subscriptions removed');
+  } catch (error) {
+    console.error('Error disabling realtime:', error);
+  }
+};

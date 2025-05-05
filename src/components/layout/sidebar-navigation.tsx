@@ -59,24 +59,26 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
       <div className="px-4 py-6">
         <NavLink to="/">
-          <Button variant="ghost" className="font-bold text-lg">
+          <Button variant="ghost" className="font-bold text-lg w-full text-sidebar-foreground">
             La Rioja Cuida
           </Button>
         </NavLink>
       </div>
-      <Separator />
-      <nav className="flex-1 px-2 py-4">
+      <Separator className="bg-sidebar-border" />
+      <nav className="flex-1 px-2 py-4 overflow-y-auto">
         <ul className="space-y-1">
           {filteredNavigationItems.map((item) => (
             <li key={item.to}>
               <NavLink
                 to={item.to}
                 className={({ isActive }) =>
-                  `block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-accent-foreground ${
-                    isActive ? 'bg-secondary text-accent-foreground' : 'text-muted-foreground'
+                  `block rounded-md px-3 py-2 text-sm font-medium transition-colors
+                  ${isActive 
+                    ? 'bg-sidebar-accent text-sidebar-accent-foreground font-bold' 
+                    : 'text-sidebar-foreground hover:bg-sidebar-primary/20 hover:text-sidebar-foreground'
                   }`
                 }
                 onClick={handleNavClick}
@@ -89,20 +91,20 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
       </nav>
       {onLogout && (
         <>
-          <Separator />
+          <Separator className="bg-sidebar-border" />
           <div className="p-4">
             <Button 
               variant="outline" 
               size="sm" 
               onClick={onLogout} 
-              className="w-full text-muted-foreground hover:text-foreground"
+              className="w-full bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90"
             >
               Cerrar sesión
             </Button>
           </div>
         </>
       )}
-      <Separator />
+      <Separator className="bg-sidebar-border" />
       <div className="flex items-center gap-2 p-4">
         <ThemeToggle />
         <NotificationBell />

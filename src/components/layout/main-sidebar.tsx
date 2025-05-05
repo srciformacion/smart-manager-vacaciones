@@ -14,9 +14,10 @@ export function MainSidebar() {
   };
 
   return (
-    <aside className="hidden lg:block w-64 border-r bg-background">
+    <aside className="hidden lg:block w-64 border-r border-sidebar-border bg-sidebar">
       <SidebarNavigation 
-        user={user as User} 
+        // Cast user to the correct User type from our application
+        user={user as unknown as User} 
         onLogout={handleLogout}
       />
     </aside>
