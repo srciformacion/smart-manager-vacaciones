@@ -60,7 +60,8 @@ export type WorkGroup =
   | "F" 
   | "Grupo Programado"
   | "Urgente 24h"
-  | "Urgente 12h" // Adding this missing option
+  | "Urgente 12h"
+  | "GES Sala Sanitaria"
   | "Grupo Localizado"
   | "Grupo 1/3"
   | "Top Programado";
@@ -78,7 +79,10 @@ export type ShiftType =
   | "Teleoperación Turno Mañana"
   | "Teleoperación Turno Tarde"
   | "Teleoperación Turno Noche"
-  | "Turno 24h";
+  | "Turno 24h"
+  | "GES Sala Sanitaria"
+  | "Top Programado"
+  | "Grupo 1/3";
 
 export type WorkdayType = 
   | "Full" 

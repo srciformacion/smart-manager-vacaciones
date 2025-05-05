@@ -1,25 +1,26 @@
 
 import { ShiftType, WorkdayType, Department, WorkGroup } from '@/types';
 
-// Función para asignar automáticamente el grupo de trabajo según las reglas
+// Function to automatically assign work group based on rules
 export function assignWorkGroup(
   shift: ShiftType,
   workday: WorkdayType,
   department: Department
 ): WorkGroup {
   
-  // Reglas de asignación basadas en los datos proporcionados
+  // Assignment rules based on provided data
   
-  // Turno Localizado siempre va al Grupo Localizado
+  // Turno Localizado always goes to Grupo Localizado
   if (shift === 'Localizado') {
     return 'Grupo Localizado';
   }
   
-  // Turnos de urgencias
+  // Emergency shifts
   if (shift === 'Urgente 24h') {
     return 'Urgente 24h';
   }
   
+  // Check for Urgente 12h using string comparison since both are now the same type
   if (shift === 'Urgente 12h') {
     return 'Urgente 12h';
   }
@@ -39,11 +40,11 @@ export function assignWorkGroup(
     return 'Grupo 1/3';
   }
   
-  // Por defecto, asignar a Grupo Programado
+  // Default, assign to Grupo Programado
   return 'Grupo Programado';
 }
 
-// Función para obtener las reglas de vacaciones según el grupo
+// Function to get vacation rules based on work group
 export function getVacationRules(workGroup: WorkGroup): string {
   switch (workGroup) {
     case 'Grupo Localizado':

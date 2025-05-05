@@ -4,7 +4,7 @@ import { MainLayout } from "@/components/layout/main-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "@/components/hr/requests-management/header";
 import { TabsContent as RequestsTabsContent } from "@/components/hr/requests-management/tabs-content";
-import { RealtimeRequests } from "@/components/hr/requests-management/realtime-requests";
+import { RealTimeRequests } from "@/components/hr/requests-management/realtime-requests";
 import { useAuth } from "@/hooks/use-auth";
 import { User } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -101,7 +101,7 @@ export function RequestsManagementPage() {
               {tabs.map((tab) => (
                 <TabsContent key={tab.value} value={tab.value}>
                   {tab.value === "realtime" ? (
-                    <RealtimeRequests />
+                    <RealTimeRequests />
                   ) : (
                     <RequestsTabsContent
                       status={tab.value}

@@ -16,8 +16,10 @@ export const enableRealtimeForTable = async (
   config: RealtimeConfig
 ): Promise<{ success: boolean; error: Error | null }> => {
   try {
-    // Crear el canal para la tabla específica
+    // Create channel for the specific table
     const channelName = `channel_${config.table}`;
+    
+    // Create channel with correct configuration
     const channel = supabase
       .channel(channelName)
       .on(
