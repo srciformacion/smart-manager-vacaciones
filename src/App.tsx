@@ -1,7 +1,8 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { AuthProvider } from "@/hooks/auth/auth-provider"; // Import directly from the source
+import { AuthProvider } from "@/hooks/auth/auth-provider"; 
 import { Suspense, lazy } from "react";
 import { Loader } from "@/components/ui/loader";
 

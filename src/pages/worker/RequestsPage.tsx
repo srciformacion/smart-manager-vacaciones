@@ -23,7 +23,7 @@ export default function RequestsPage() {
       try {
         setLoading(true);
         
-        // Check if we're in demo mode (userId starts with "demo-" or is falsy)
+        // Check if we're in demo mode (userId starts with "demo-" or is undefined)
         if (!userId || (typeof userId === 'string' && userId.startsWith('demo-'))) {
           console.log("Using example requests for demo mode");
           // Use example data for demo purposes
@@ -82,7 +82,6 @@ export default function RequestsPage() {
   
   const handleViewDetails = (request: Request) => {
     console.log("Ver detalles de solicitud:", request);
-    // Implement view details functionality
     toast({
       title: "Ver detalles",
       description: `Solicitud: ${request.id.substring(0, 8)}...`
@@ -91,7 +90,6 @@ export default function RequestsPage() {
   
   const handleDownloadAttachment = (request: Request) => {
     if (request.attachmentUrl) {
-      // Handle attachment download
       window.open(request.attachmentUrl, '_blank');
       
       toast({

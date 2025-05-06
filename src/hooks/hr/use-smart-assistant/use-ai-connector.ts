@@ -11,20 +11,41 @@ export function useAIConnector() {
   const { toast } = useToast();
   
   useEffect(() => {
-    // Recuperar la configuración guardada
-    const savedType = localStorage.getItem('aiConnectorType') || 'mock';
-    const savedApiKey = localStorage.getItem('aiApiKey') || '';
-    
-    // Inicializar el conector
-    const aiConnector = getAIConnector(savedType, savedApiKey);
-    setConnector(aiConnector);
-    console.log("AI connector initialized:", savedType);
-  }, []);
+    try {
+      // Recuperar la configuración guardada
+      const savedType = localStorage.getItem('aiConnectorType') || 'mock';
+      const savedApiKey = localStorage.getItem('aiApiKey') || '';
+      
+      // Inicializar el conector
+      const aiConnector = getAIConnector(savedType, savedApiKey);
+      setConnector(aiConnector);
+      console.log("AI connector initialized:", savedType);
+    } catch (error) {
+      console.error("Error initializing AI connector:", error);
+      toast({
+        variant: "destructive",
+        title: "Error de configuración",
+        description: "No se pudo inicializar el conector de IA"
+      });
+    }
+  }, [toast]);
   
   const queryAI = async (prompt: string): Promise<AIQueryResponse> => {
     if (!connector) {
       console.error("AI connector not initialized");
-      throw new Error("El conector de IA no está inicializado");
+      toast({
+        variant: "destructive",
+        title: "Error de configuración",
+        description: "El conector de IA no está inicializado"
+      });
+      
+      // Devolvemos una respuesta de error
+      const errorResponse: AIQueryResponse = {
+        answer: "Lo siento, no he podido procesar tu consulta porque el sistema de IA no está configurado correctamente.",
+        confidence: 0
+      };
+      setLastResponse(errorResponse);
+      return errorResponse;
     }
     
     setIsLoading(true);
@@ -54,17 +75,27 @@ export function useAIConnector() {
   };
   
   const updateConnector = () => {
-    const savedType = localStorage.getItem('aiConnectorType') || 'mock';
-    const savedApiKey = localStorage.getItem('aiApiKey') || '';
-    const newConnector = getAIConnector(savedType, savedApiKey);
-    setConnector(newConnector);
-    
-    toast({
-      title: "Conector actualizado",
-      description: `Usando ahora: ${newConnector.name}`
-    });
-    
-    return newConnector;
+    try {
+      const savedType = localStorage.getItem('aiConnectorType') || 'mock';
+      const savedApiKey = localStorage.getItem('aiApiKey') || '';
+      const newConnector = getAIConnector(savedType, savedApiKey);
+      setConnector(newConnector);
+      
+      toast({
+        title: "Conector actualizado",
+        description: `Usando ahora: ${newConnector.name}`
+      });
+      
+      return newConnector;
+    } catch (error) {
+      console.error("Error updating AI connector:", error);
+      toast({
+        variant: "destructive",
+        title: "Error de configuración",
+        description: "No se pudo actualizar el conector de IA"
+      });
+      return null;
+    }
   };
   
   return {

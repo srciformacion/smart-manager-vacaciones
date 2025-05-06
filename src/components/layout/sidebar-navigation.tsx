@@ -14,14 +14,15 @@ import {
   History,
   BrainCircuit,
   BarChart4,
+  Bell
 } from "lucide-react";
-import { NavLink, NavLinkProps } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User as UserType, UserRole } from "@/types";
 
-const userLinks = [
+const workerLinks = [
   { name: "Dashboard", href: "/dashboard", icon: Home, ariaLabel: "Ir a Dashboard" },
   { name: "Mi Calendario", href: "/calendar", icon: CalendarDays, ariaLabel: "Ir a Mi Calendario" },
   { name: "Solicitudes", href: "/requests", icon: FilePen, ariaLabel: "Ir a Solicitudes" },
@@ -31,7 +32,7 @@ const userLinks = [
   { name: "Perfil", href: "/profile", icon: User, ariaLabel: "Ir a Perfil" },
 ];
 
-const adminLinks = [
+const hrLinks = [
   { name: "Dashboard", href: "/rrhh/dashboard", icon: Home, ariaLabel: "Ir a Dashboard" },
   { name: "Calendarios", href: "/rrhh/calendar", icon: CalendarCheck, ariaLabel: "Ir a Gestión de Calendarios" },
   { name: "Solicitudes", href: "/rrhh/requests", icon: FilePen, ariaLabel: "Ir a Gestión de Solicitudes" },
@@ -40,6 +41,7 @@ const adminLinks = [
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
   { name: "Asistente IA", href: "/rrhh/ai-assistant", icon: BrainCircuit, ariaLabel: "Ir a Asistente IA" },
   { name: "Informes", href: "/rrhh/reports", icon: BarChart4, ariaLabel: "Ir a Informes" },
+  { name: "Notificaciones", href: "/rrhh/notifications", icon: Bell, ariaLabel: "Ir a Notificaciones" },
   { name: "Configuración", href: "/rrhh/settings", icon: Settings, ariaLabel: "Ir a Configuración" }
 ];
 
@@ -62,7 +64,7 @@ export function SidebarNavigation({
   onClose,
   onCollapse,
 }: SidebarNavigationProps) {
-  const links = role === "hr" ? adminLinks : userLinks;
+  const links = role === "hr" ? hrLinks : workerLinks;
   
   // Extract initial for avatar fallback
   const getInitial = () => {
@@ -128,7 +130,7 @@ export function SidebarNavigation({
             {!collapsed ? (
               <>
                 <Avatar>
-                  <AvatarImage src={user.avatar || user.profilePicture} alt={`${user.name}`} />
+                  <AvatarImage src={user.profilePicture} alt={`${user.name}`} />
                   <AvatarFallback>{getInitial()}</AvatarFallback>
                 </Avatar>
                 <div className="space-y-1">
@@ -138,7 +140,7 @@ export function SidebarNavigation({
               </>
             ) : (
               <Avatar>
-                <AvatarImage src={user.avatar || user.profilePicture} alt={`${user.name}`} />
+                <AvatarImage src={user.profilePicture} alt={`${user.name}`} />
                 <AvatarFallback>{getInitial()}</AvatarFallback>
               </Avatar>
             )}
