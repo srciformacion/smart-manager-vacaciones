@@ -1,9 +1,11 @@
+
 import {
   CalendarCheck,
   CalendarDays,
   ChevronsLeft,
   CircleUser,
   FilePen,
+  FileText,
   Home,
   LogOut,
   MessageSquare,
@@ -20,6 +22,7 @@ const userLinks = [
   { name: "Dashboard", href: "/dashboard", icon: Home, ariaLabel: "Ir a Dashboard" },
   { name: "Mi Calendario", href: "/calendar", icon: CalendarDays, ariaLabel: "Ir a Mi Calendario" },
   { name: "Solicitudes", href: "/requests", icon: FilePen, ariaLabel: "Ir a Solicitudes" },
+  { name: "Documentos", href: "/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
   { name: "Perfil", href: "/profile", icon: User, ariaLabel: "Ir a Perfil" },
 ];
@@ -29,6 +32,7 @@ const adminLinks = [
   { name: "Calendarios", href: "/rrhh/calendar", icon: CalendarCheck, ariaLabel: "Ir a Gestión de Calendarios" },
   { name: "Solicitudes", href: "/rrhh/requests", icon: FilePen, ariaLabel: "Ir a Gestión de Solicitudes" },
   { name: "Personal", href: "/rrhh/workers", icon: User, ariaLabel: "Ir a Gestión de Personal" },
+  { name: "Documentos", href: "/rrhh/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
   { name: "Informes", href: "/rrhh/reports", icon: Settings, ariaLabel: "Ir a Informes" },
   { name: "Configuración", href: "/rrhh/settings", icon: Settings, ariaLabel: "Ir a Configuración" }

@@ -26,6 +26,7 @@ export function MainSidebar({ onNavigate }: MainSidebarProps) {
     name: user.user_metadata?.name || user.email?.split('@')[0] || "Usuario",
     email: user.email || "",
     role: userRole as UserRole || (user.user_metadata?.role as UserRole) || "worker",
+    profilePicture: user.user_metadata?.avatar_url || ""
   } as User : null;
 
   // Default role to 'worker' if nothing is available
