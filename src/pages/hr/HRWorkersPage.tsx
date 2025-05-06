@@ -67,7 +67,7 @@ export default function HRWorkersPage() {
               departments={departments}
               shifts={shifts}
               resetFilters={resetFilters}
-              showResetButton={showResetButton}
+              showResetButton={!!showResetButton}
               totalWorkers={exampleWorkers.length}
               filteredCount={filteredWorkers.length}
             />
