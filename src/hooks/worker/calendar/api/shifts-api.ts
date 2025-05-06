@@ -1,5 +1,5 @@
 
-import { format, parseISO } from "date-fns";
+import { format, parseISO, endOfMonth } from "date-fns";
 import { CalendarShift } from "@/types/calendar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
