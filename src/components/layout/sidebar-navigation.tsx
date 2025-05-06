@@ -6,7 +6,19 @@ import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { InstallPWAButton } from "@/components/pwa/install-pwa-button";
-import { Menu, LayoutDashboard, User as UserIcon, Calendar, Home, Settings } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  User as UserIcon, 
+  Calendar, 
+  Home, 
+  Settings, 
+  MenuSquare,
+  FileText,
+  Clock,
+  CalendarClock,
+  MessageSquare,
+  BrainCircuit
+} from "lucide-react";
 
 interface NavItem {
   to: string;
@@ -34,23 +46,23 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
     { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" />, requiredRole: 'worker' },
     { to: "/profile", label: "Mi Perfil", icon: <UserIcon className="h-4 w-4" /> },
     { to: "/calendar", label: "Calendario", icon: <Calendar className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/requests/vacation", label: "Solicitar Vacaciones", icon: <Menu className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/requests/personal-day", label: "Solicitar Día Personal", icon: <Menu className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/requests/leave", label: "Solicitar Permiso", icon: <Menu className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", icon: <Menu className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/history", label: "Historial", icon: <Menu className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/requests/vacation", label: "Solicitar Vacaciones", icon: <CalendarClock className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/requests/personal-day", label: "Solicitar Día Personal", icon: <Clock className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/requests/leave", label: "Solicitar Permiso", icon: <FileText className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", icon: <MenuSquare className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/history", label: "Historial", icon: <Clock className="h-4 w-4" />, requiredRole: 'worker' },
     { to: "/shift-profile", label: "Mi Perfil de Turno", icon: <UserIcon className="h-4 w-4" />, requiredRole: 'worker' },
     // HR navigation items
     { to: "/rrhh/dashboard", label: "Dashboard RRHH", icon: <LayoutDashboard className="h-4 w-4" />, requiredRole: 'hr' },
     { to: "/rrhh/calendar", label: "Calendario RRHH", icon: <Calendar className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/requests", label: "Gestionar Solicitudes", icon: <Menu className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/workers", label: "Gestionar Trabajadores", icon: <Menu className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/notification", label: "Enviar Notificación", icon: <Menu className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/calendar-notification", label: "Notificar Calendario", icon: <Menu className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/ai-assistant", label: "Asistente IA", icon: <Menu className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/requests", label: "Gestionar Solicitudes", icon: <FileText className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/workers", label: "Gestionar Trabajadores", icon: <UserIcon className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/notification", label: "Enviar Notificación", icon: <NotificationBell size={16} />, requiredRole: 'hr' },
+    { to: "/rrhh/calendar-notification", label: "Notificar Calendario", icon: <Calendar className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/ai-assistant", label: "Asistente IA", icon: <BrainCircuit className="h-4 w-4" />, requiredRole: 'hr' },
     { to: "/rrhh/ai-dashboard", label: "Dashboard IA", icon: <LayoutDashboard className="h-4 w-4" />, requiredRole: 'hr' },
     // Shared navigation items
-    { to: "/chat", label: "Chat", icon: <Menu className="h-4 w-4" /> },
+    { to: "/chat", label: "Chat", icon: <MessageSquare className="h-4 w-4" /> },
   ];
 
   // Ensure filteredNavigationItems is working correctly by showing all items when no role restrictions match

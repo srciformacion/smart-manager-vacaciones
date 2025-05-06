@@ -25,7 +25,7 @@ import { InstallPWAButton } from '@/components/pwa/install-pwa-button';
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User } from "@/types";
 import { useAuth } from "@/hooks/use-auth";
-import { Sidebar } from "lucide-react";
+import { ChevronLeft, Sidebar as SidebarIcon } from "lucide-react";
 
 export interface MainLayoutProps {
   children: React.ReactNode;
@@ -77,14 +77,14 @@ export function MainLayout({ children, user }: MainLayoutProps) {
           <div className="flex items-center">
             {/* Botón para mostrar/ocultar el sidebar en pantallas grandes */}
             <Button variant="ghost" size="sm" onClick={toggleSidebar} className="mr-2 hidden lg:flex">
-              <Sidebar className="w-5 h-5" />
+              <SidebarIcon className="w-5 h-5" />
             </Button>
             
             {/* Sheet para menú móvil */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm" className="mr-2 lg:hidden">
-                  <Sidebar className="w-4 h-4" />
+                  <SidebarIcon className="w-4 h-4" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-full sm:max-w-[300px]">
@@ -100,6 +100,7 @@ export function MainLayout({ children, user }: MainLayoutProps) {
             
             {/* Botón para regresar */}
             <Button variant="ghost" size="sm" onClick={handleGoBack} className="mr-2">
+              <ChevronLeft className="h-4 w-4 mr-1" />
               Atrás
             </Button>
           </div>
