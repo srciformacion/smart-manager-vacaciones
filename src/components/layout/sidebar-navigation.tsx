@@ -17,7 +17,8 @@ import {
   MailCheck,
   AlertTriangle,
   Clock,
-  Settings2
+  Settings2,
+  Database
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -48,6 +49,7 @@ const hrLinks = [
   { name: "Plantillas", href: "/rrhh/notification-templates", icon: MailCheck, ariaLabel: "Ir a Plantillas de Notificaciones" },
   { name: "Asistente IA", href: "/rrhh/ai-assistant", icon: BrainCircuit, ariaLabel: "Ir a Asistente IA" },
   { name: "Asistente Inteligente", href: "/rrhh/smart-assistant", icon: AlertTriangle, ariaLabel: "Ir a Asistente Inteligente" },
+  { name: "Generador de Datos", href: "/rrhh/data-generation", icon: Database, ariaLabel: "Ir a Generador de Datos" },
   { name: "Informes", href: "/rrhh/reports", icon: BarChart4, ariaLabel: "Ir a Informes" },
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
   { name: "Dashboard IA", href: "/rrhh/ai-dashboard", icon: BrainCircuit, ariaLabel: "Ir a Dashboard IA" },
