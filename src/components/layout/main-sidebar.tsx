@@ -26,8 +26,8 @@ export function MainSidebar() {
 
   // Función para manejar la navegación y cerrar el menú mobile si es necesario
   const handleNavigation = () => {
-    // En dispositivos móviles, podríamos cerrar el menú aquí
-    // Esto será manejado por el componente padre
+    // Esta función será implementada por el componente padre que utilice MainSidebar
+    // para cerrar el menú en dispositivos móviles cuando se navega
   };
 
   return (

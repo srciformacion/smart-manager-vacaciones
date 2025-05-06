@@ -10,15 +10,13 @@ import {
   LayoutDashboard, 
   User as UserIcon, 
   Calendar, 
-  Home, 
-  Settings, 
-  MenuSquare,
   FileText,
   Clock,
   CalendarClock,
   MessageSquare,
   BrainCircuit,
-  Bell
+  Bell,
+  LogOut
 } from "lucide-react";
 
 interface NavItem {
@@ -40,7 +38,6 @@ interface SidebarNavigationProps {
 export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarNavigationProps) {
   // Determine role from props - either directly provided or from user object
   const userRole = role || user?.role || 'worker';
-  console.log("SidebarNavigation - User role:", userRole);
   
   const navigationItems: NavItem[] = [
     // Worker navigation items
@@ -50,7 +47,7 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
     { to: "/requests/vacation", label: "Solicitar Vacaciones", icon: <CalendarClock className="h-4 w-4" />, requiredRole: 'worker' },
     { to: "/requests/personal-day", label: "Solicitar Día Personal", icon: <Clock className="h-4 w-4" />, requiredRole: 'worker' },
     { to: "/requests/leave", label: "Solicitar Permiso", icon: <FileText className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", icon: <MenuSquare className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", icon: <Clock className="h-4 w-4" />, requiredRole: 'worker' },
     { to: "/history", label: "Historial", icon: <Clock className="h-4 w-4" />, requiredRole: 'worker' },
     { to: "/shift-profile", label: "Mi Perfil de Turno", icon: <UserIcon className="h-4 w-4" />, requiredRole: 'worker' },
     // HR navigation items
@@ -81,12 +78,10 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
     }
   };
 
-  console.log("Filtered navigation items:", filteredNavigationItems.map(item => item.label));
-
   return (
     <div className="flex flex-col h-full bg-green-600 text-white">
       <div className="px-4 py-6">
-        <NavLink to={userRole === 'hr' ? "/rrhh/dashboard" : "/dashboard"}>
+        <NavLink to={userRole === 'hr' ? "/rrhh/dashboard" : "/dashboard"} onClick={handleNavClick}>
           <Button variant="ghost" className="font-bold text-lg w-full text-white hover:bg-green-700">
             La Rioja Cuida
           </Button>
@@ -119,26 +114,24 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
           )}
         </ul>
       </nav>
-      {onLogout && (
-        <>
-          <Separator className="bg-green-500" />
-          <div className="p-4">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={onLogout} 
-              className="w-full bg-green-700 text-white hover:bg-green-800"
-            >
-              Cerrar sesión
-            </Button>
-          </div>
-        </>
-      )}
       <Separator className="bg-green-500" />
-      <div className="flex items-center justify-center gap-2 p-4">
-        <ThemeToggle />
-        <NotificationBell />
-        <InstallPWAButton />
+      <div className="p-4">
+        {onLogout && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onLogout} 
+            className="w-full bg-green-700 text-white hover:bg-green-800 mb-4 flex items-center justify-center gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            Cerrar sesión
+          </Button>
+        )}
+        <div className="flex items-center justify-center gap-2">
+          <ThemeToggle />
+          <NotificationBell />
+          <InstallPWAButton />
+        </div>
       </div>
     </div>
   );

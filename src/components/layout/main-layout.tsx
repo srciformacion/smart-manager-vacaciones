@@ -1,5 +1,5 @@
 
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -11,7 +11,7 @@ import { InstallPWAButton } from '@/components/pwa/install-pwa-button';
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User } from "@/types";
 import { useAuth } from "@/hooks/use-auth";
-import { Sidebar as SidebarIcon } from "lucide-react";
+import { Menu as MenuIcon, X } from "lucide-react";
 
 export interface MainLayoutProps {
   children: React.ReactNode;
@@ -25,6 +25,7 @@ export function MainLayout({
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const {
     signOut
   } = useAuth();
@@ -35,7 +36,7 @@ export function MainLayout({
   
   async function logout() {
     await signOut();
-    navigate("/login");
+    navigate("/auth", { replace: true });
   }
 
   // Función para alternar la visibilidad del sidebar
@@ -43,34 +44,41 @@ export function MainLayout({
     setSidebarVisible(!sidebarVisible);
   };
 
+  // Función para cerrar el menú móvil
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
   return <div className="flex h-screen bg-background">
-      {/* Sidebar condicional */}
+      {/* Sidebar condicional para pantallas grandes */}
+      {sidebarVisible && (
+        <div className="hidden lg:block w-64">
+          <MainSidebar />
+        </div>
+      )}
       
       <div className="flex flex-col flex-1">
         <header className="z-10 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-secondary">
           <div className="flex items-center">
             {/* Botón para mostrar/ocultar el sidebar en pantallas grandes */}
             <Button variant="ghost" size="sm" onClick={toggleSidebar} className="mr-2 hidden lg:flex">
-              <SidebarIcon className="w-5 h-5" />
+              <MenuIcon className="w-5 h-5" />
             </Button>
             
             {/* Sheet para menú móvil */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="mr-2 lg:hidden">
-                  <SidebarIcon className="w-4 h-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-full sm:max-w-[300px]">
-                <SheetHeader>
-                  <SheetTitle>Menú</SheetTitle>
-                  <SheetDescription>
-                    Navega a través de las diferentes opciones.
-                  </SheetDescription>
-                </SheetHeader>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetContent side="left" className="p-0 w-[85%] sm:w-[300px] border-r border-sidebar-border">
                 <MainSidebar />
               </SheetContent>
             </Sheet>
+            
+            {/* Botón hamburguesa para dispositivos móviles */}
+            <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(true)} className="mr-2 lg:hidden">
+              <MenuIcon className="w-5 h-5" />
+            </Button>
+            
+            {/* Título o logo de la aplicación */}
+            <div className="font-bold text-lg">La Rioja Cuida</div>
           </div>
           <div className="flex items-center gap-2 ml-auto">
             <InstallPWAButton />
@@ -96,12 +104,12 @@ export function MainLayout({
                     Salir
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu> : <Link to="/login">
+              </DropdownMenu> : <Link to="/auth">
                 <Button>Login</Button>
               </Link>}
           </div>
         </header>
-        <main className="flex-1 p-4">{children}</main>
+        <main className="flex-1 p-4 overflow-y-auto">{children}</main>
       </div>
     </div>;
 }
