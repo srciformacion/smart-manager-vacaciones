@@ -3,6 +3,7 @@ import { SidebarNavigation } from "./sidebar-navigation";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/auth";
 import { User, UserRole } from "@/types";
+import { useToast } from "@/components/ui/use-toast";
 
 interface MainSidebarProps {
   onNavigate?: () => void;
@@ -11,6 +12,7 @@ interface MainSidebarProps {
 export function MainSidebar({ onNavigate }: MainSidebarProps) {
   const { user, signOut, userRole } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const handleLogout = async () => {
     try {
@@ -25,6 +27,11 @@ export function MainSidebar({ onNavigate }: MainSidebarProps) {
       }
     } catch (error) {
       console.error("Error during logout:", error);
+      toast({
+        variant: "destructive",
+        title: "Error al cerrar sesión",
+        description: "No se pudo cerrar la sesión correctamente"
+      });
     }
   };
 
@@ -43,6 +50,8 @@ export function MainSidebar({ onNavigate }: MainSidebarProps) {
                        localStorage.getItem("userRole") as UserRole || 
                        "worker";
 
+  console.log("Current user role:", effectiveRole);
+  
   // Handle navigation and close the mobile menu if needed
   const handleNavigation = () => {
     if (onNavigate) {

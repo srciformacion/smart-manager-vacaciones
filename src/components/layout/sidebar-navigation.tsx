@@ -65,6 +65,7 @@ export function SidebarNavigation({
   onCollapse,
 }: SidebarNavigationProps) {
   const links = role === "hr" ? hrLinks : workerLinks;
+  console.log("SidebarNavigation rendering with role:", role, "showing links:", links.map(l => l.name).join(", "));
   
   // Extract initial for avatar fallback
   const getInitial = () => {
@@ -136,6 +137,9 @@ export function SidebarNavigation({
                 <div className="space-y-1">
                   <p className="text-sm font-medium">{user.name}</p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
+                  <p className="text-xs font-medium bg-primary/10 inline-block px-2 py-0.5 rounded-full">
+                    {role === "hr" ? "RRHH" : "Trabajador"}
+                  </p>
                 </div>
               </>
             ) : (
