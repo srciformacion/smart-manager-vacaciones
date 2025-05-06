@@ -1,94 +1,76 @@
 
-import { ReactNode, useState } from "react";
+import { useState } from "react";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { SidebarNavigation } from "./sidebar-navigation";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { useAuth } from "@/hooks/auth";
 import { User, UserRole } from "@/types";
-import { cn } from "@/lib/utils";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Menu, LogOut } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { useNavigate } from "react-router-dom";
-import { InstallPWAButton } from "@/components/pwa/install-pwa-button";
-import { useAuth } from "@/hooks/use-auth";
 
 interface MainLayoutMobileProps {
-  children: ReactNode;
-  user?: User | null;
-  className?: string;
+  user: User | null;
+  role?: UserRole;
+  children: React.ReactNode;
 }
 
-export function MainLayoutMobile({ children, user, className }: MainLayoutMobileProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const isMobile = useIsMobile();
-  const navigate = useNavigate();
+export function MainLayoutMobile({
+  user,
+  role = "worker",
+  children,
+}: MainLayoutMobileProps) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { signOut } = useAuth();
-  
-  const handleLogout = () => {
-    signOut();
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
   };
 
-  if (!isMobile) {
-    return null;
-  }
+  const handleLogout = async () => {
+    await signOut();
+    closeSidebar();
+  };
+
+  const handleNavigation = () => {
+    closeSidebar();
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          {user && (
-            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="mr-2">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="p-0">
-                <SidebarNavigation 
-                  role={user.role as UserRole} 
-                  onLogout={handleLogout}
-                  onNavigate={() => setSidebarOpen(false)}
-                />
-              </SheetContent>
-            </Sheet>
-          )}
-          <div className="flex flex-1 items-center justify-between space-x-2">
-            <div className="flex items-center">
-              <span 
-                className="font-bold cursor-pointer" 
-                onClick={() => user ? navigate(user.role === "hr" ? "/rrhh/dashboard" : "/dashboard") : navigate("/")}
-              >
-                La Rioja Cuida
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <InstallPWAButton />
-              {user && <NotificationBell />}
-              <ThemeToggle />
-              {user && (
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={handleLogout}
-                  className="text-muted-foreground hover:text-foreground"
-                  aria-label="Cerrar sesión"
-                >
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen w-full bg-background flex flex-col">
+      <header className="sticky top-0 z-40 border-b h-14 flex items-center px-4 md:hidden bg-background">
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="w-8 h-8 flex items-center justify-center"
+          aria-label="Abrir menú"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="4" x2="20" y1="12" y2="12" />
+            <line x1="4" x2="20" y1="6" y2="6" />
+            <line x1="4" x2="20" y1="18" y2="18" />
+          </svg>
+        </button>
+        <div className="ml-4 text-lg font-bold">TurnoSync</div>
       </header>
 
-      <main className={cn(
-        "flex-1 container py-4",
-        "max-w-full overflow-x-hidden",
-        className
-      )}>
-        {children}
-      </main>
+      <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-[240px] sm:w-[300px]">
+          <SidebarNavigation
+            user={user}
+            role={role}
+            onLogout={handleLogout}
+            onNavigate={handleNavigation}
+          />
+        </SheetContent>
+      </Sheet>
+
+      <main className="flex-1">{children}</main>
     </div>
   );
 }

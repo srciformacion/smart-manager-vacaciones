@@ -26,7 +26,7 @@ export function useWorkCalendar(userId: string) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   
   // Check if we're dealing with a demo user
-  const isDemoUser = userId.startsWith('demo-') || userId === "1";
+  const isDemoUser = userId.startsWith('demo-') || userId === "1" || userId === "demo-user";
 
   // Función para obtener turnos desde Supabase o generar datos de demo
   const fetchShifts = async (userId: string, year: number, month: number) => {
@@ -83,9 +83,10 @@ export function useWorkCalendar(userId: string) {
     try {
       // Para usuarios demo, simplemente actualizamos el estado local
       if (isDemoUser) {
+        // Generate stable UUIDs for demo users to avoid generation errors
         const updatedShift = {
           ...shift,
-          id: shift.id.startsWith('temp-') ? uuidv4() : shift.id
+          id: shift.id.startsWith('temp-') ? `demo-${uuidv4()}` : shift.id
         };
         
         setShifts(prevShifts => {
@@ -460,6 +461,11 @@ export function useWorkCalendar(userId: string) {
       days.push(new Date(day));
     }
     
+    // Generate stable IDs for demo shifts
+    const generateStableId = (day: Date) => {
+      return `demo-${userId}-${day.toISOString().split('T')[0]}`;
+    };
+    
     // Patrón básico de turnos basado en el día de la semana
     return days.map(day => {
       const weekday = day.getDay(); // 0 = domingo, 1 = lunes, ...
@@ -513,9 +519,9 @@ export function useWorkCalendar(userId: string) {
           hours = 0;
       }
       
-      // Crear el turno
+      // Crear el turno con ID estable para demos
       return {
-        id: `${userId}-${day.toISOString()}`,
+        id: generateStableId(day),
         userId,
         date: day,
         type: shiftType,

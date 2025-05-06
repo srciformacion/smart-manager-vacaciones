@@ -4,29 +4,33 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RequestTableActions } from "./request-table-actions";
-import { Request, RequestStatus } from "@/types";
-import { StatusBadge } from "./status-badge";
+import { Request, RequestStatus, User } from "@/types";
+import { StatusBadge } from "@/components/ui/status-badge"; // Using the existing status badge
 import { Badge } from "@/components/ui/badge";
-import { TableCell } from "@/components/ui/table"; // Added missing import
+import { TableCell } from "@/components/ui/table"; 
 
 interface RequestTableProps {
   requests: Request[];
+  users?: User[]; // Make users optional to handle both HR and worker views
   isHRView?: boolean;
   isLoading?: boolean;
   onViewDetails: (request: Request) => void;
   onStatusChange?: (request: Request, newStatus: RequestStatus) => void;
+  onDownloadAttachment?: (request: Request) => void;
 }
 
 export function RequestTable({
   requests,
+  users,
   isHRView = false,
   isLoading = false,
   onViewDetails,
   onStatusChange,
+  onDownloadAttachment,
 }: RequestTableProps) {
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | Date) => {
     try {
-      const date = new Date(dateString);
+      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
       return format(date, "d 'de' MMMM 'de' yyyy", { locale: es });
     } catch (error) {
       return "Fecha inválida";
@@ -86,6 +90,7 @@ export function RequestTable({
                     isHRView={isHRView}
                     onViewDetails={onViewDetails}
                     onStatusChange={onStatusChange}
+                    onDownloadAttachment={onDownloadAttachment}
                   />
                 </TableCell>
               </TableRow>

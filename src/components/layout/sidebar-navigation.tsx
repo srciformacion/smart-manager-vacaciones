@@ -130,7 +130,7 @@ export function SidebarNavigation({
                     }`
                   }
                   onClick={handleNavigation}
-                  aria-current={({ isActive }) => isActive ? "page" : false}
+                  aria-current={({ isActive }) => isActive ? "page" : undefined}
                 >
                   {item.icon}
                   <span>{item.name}</span>

@@ -23,7 +23,7 @@ export default function WorkCalendarPage() {
   const [vacationDays, setVacationDays] = useState({ used: 0, total: 22 });
   
   // Generate a stable user ID for demo use
-  const userId = user?.id || "1";
+  const userId = user?.id || "demo-user"; // Changed from "1" to "demo-user" for clarity
   
   // Inicializamos el hook del calendario
   const {
@@ -53,7 +53,7 @@ export default function WorkCalendarPage() {
         }
         
         // Para usuarios de demostración, usamos datos predeterminados
-        if (authUser.id.startsWith('demo-')) {
+        if (authUser.id.startsWith('demo-') || userId === "demo-user") {
           setVacationDays({
             used: 5,
             total: 22
@@ -69,9 +69,9 @@ export default function WorkCalendarPage() {
             .select('*')
             .eq('userid', authUser.id)
             .eq('year', new Date().getFullYear())
-            .single();
+            .maybeSingle(); // Using maybeSingle instead of single to avoid errors
           
-          if (balanceError && balanceError.code !== 'PGRST116') {
+          if (balanceError) {
             console.error("Error fetching balance:", balanceError);
           }
           
@@ -113,7 +113,7 @@ export default function WorkCalendarPage() {
     };
     
     checkAuth();
-  }, [fetchAuthUser, navigate]);
+  }, [fetchAuthUser, navigate, userId]);
 
   // Estadísticas mensuales y anuales
   const monthStats = calculateMonthStats();
