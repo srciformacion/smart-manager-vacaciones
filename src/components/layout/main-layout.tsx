@@ -10,7 +10,7 @@ import { MainSidebar } from "./main-sidebar";
 import { InstallPWAButton } from '@/components/pwa/install-pwa-button';
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User } from "@/types";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth";
 import { Menu as MenuIcon, X } from "lucide-react";
 
 export interface MainLayoutProps {
@@ -53,7 +53,7 @@ export function MainLayout({
       {/* Sidebar condicional para pantallas grandes */}
       {sidebarVisible && (
         <div className="hidden lg:block w-64">
-          <MainSidebar />
+          <MainSidebar onNavigate={closeMobileMenu} />
         </div>
       )}
       
@@ -68,7 +68,7 @@ export function MainLayout({
             {/* Sheet para menú móvil */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetContent side="left" className="p-0 w-[85%] sm:w-[300px] border-r border-sidebar-border">
-                <MainSidebar />
+                <MainSidebar onNavigate={closeMobileMenu} />
               </SheetContent>
             </Sheet>
             
