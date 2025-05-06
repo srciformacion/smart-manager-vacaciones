@@ -13,10 +13,18 @@ export function MainSidebar({ onNavigate }: MainSidebarProps) {
   const navigate = useNavigate();
   
   const handleLogout = async () => {
-    await signOut();
-    navigate("/auth", { replace: true });
-    if (onNavigate) {
-      onNavigate();
+    try {
+      await signOut();
+      // Clear any local storage data related to the user
+      localStorage.removeItem("user");
+      localStorage.removeItem("userRole");
+      
+      navigate("/auth", { replace: true });
+      if (onNavigate) {
+        onNavigate();
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
     }
   };
 
@@ -30,7 +38,13 @@ export function MainSidebar({ onNavigate }: MainSidebarProps) {
   } as User : null;
 
   // Default role to 'worker' if nothing is available
-  const effectiveRole = userRole as UserRole || (user?.user_metadata?.role as UserRole) || localStorage.getItem("userRole") as UserRole || "worker";
+  const effectiveRole = userRole as UserRole || 
+                       (user?.user_metadata?.role as UserRole) || 
+                       localStorage.getItem("userRole") as UserRole || 
+                       "worker";
+
+  console.log("User in sidebar:", typedUser);
+  console.log("Effective role:", effectiveRole);
 
   // Handle navigation and close the mobile menu if needed
   const handleNavigation = () => {

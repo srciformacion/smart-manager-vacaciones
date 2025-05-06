@@ -2,12 +2,13 @@
 import { useState, useEffect } from "react";
 import { getAIConnector, AIConnector } from "@/utils/ai/ai-connector";
 import { AIQueryResponse } from "@/utils/ai/types";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 export function useAIConnector() {
   const [connector, setConnector] = useState<AIConnector | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [lastResponse, setLastResponse] = useState<AIQueryResponse | null>(null);
+  const { toast } = useToast();
   
   useEffect(() => {
     // Recuperar la configuración guardada
@@ -17,15 +18,18 @@ export function useAIConnector() {
     // Inicializar el conector
     const aiConnector = getAIConnector(savedType, savedApiKey);
     setConnector(aiConnector);
+    console.log("AI connector initialized:", savedType);
   }, []);
   
   const queryAI = async (prompt: string): Promise<AIQueryResponse> => {
     if (!connector) {
+      console.error("AI connector not initialized");
       throw new Error("El conector de IA no está inicializado");
     }
     
     setIsLoading(true);
     try {
+      console.log("Querying AI with prompt:", prompt);
       const response = await connector.query(prompt);
       setLastResponse(response);
       return response;

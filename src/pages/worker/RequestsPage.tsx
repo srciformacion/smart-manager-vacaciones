@@ -4,24 +4,27 @@ import { MainLayout } from "@/components/layout/main-layout";
 import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { RequestList } from "@/components/requests/request-list";
 import { exampleRequests } from "@/data/example-requests";
+import { exampleUser } from "@/data/example-users";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Request } from "@/types";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function RequestsPage() {
   const { user, userId } = useProfileAuth();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
   
   useEffect(() => {
     async function fetchRequests() {
       try {
         setLoading(true);
         
-        // Check if we're in demo mode (userId starts with "demo-")
-        if (!userId || userId.toString().startsWith('demo-')) {
+        // Check if we're in demo mode (userId starts with "demo-" or is falsy)
+        if (!userId || (typeof userId === 'string' && userId.startsWith('demo-'))) {
           console.log("Using example requests for demo mode");
           // Use example data for demo purposes
           setRequests(exampleRequests);
@@ -63,28 +66,43 @@ export default function RequestsPage() {
         // Fallback to example data in case of error
         setRequests(exampleRequests);
         setError("No se pudieron cargar las solicitudes desde la base de datos. Mostrando datos de ejemplo.");
+        
+        toast({
+          variant: "destructive",
+          title: "Error al cargar solicitudes",
+          description: err.message || "No se pudieron cargar las solicitudes"
+        });
       } finally {
         setLoading(false);
       }
     }
     
     fetchRequests();
-  }, [userId]);
+  }, [userId, toast]);
   
   const handleViewDetails = (request: Request) => {
     console.log("Ver detalles de solicitud:", request);
     // Implement view details functionality
+    toast({
+      title: "Ver detalles",
+      description: `Solicitud: ${request.id.substring(0, 8)}...`
+    });
   };
   
   const handleDownloadAttachment = (request: Request) => {
     if (request.attachmentUrl) {
       // Handle attachment download
       window.open(request.attachmentUrl, '_blank');
+      
+      toast({
+        title: "Descargando adjunto",
+        description: "Se ha abierto el archivo adjunto en una nueva ventana"
+      });
     }
   };
   
   return (
-    <MainLayout user={user}>
+    <MainLayout user={user || exampleUser}>
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">Mis solicitudes</h1>
         <p className="text-muted-foreground">Gestiona tus solicitudes de permisos, vacaciones y cambios de turno</p>
