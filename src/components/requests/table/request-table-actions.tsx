@@ -38,7 +38,7 @@ export function RequestTableActions({
           <span>Ver detalles</span>
         </DropdownMenuItem>
         
-        {request.attachmenturl && onDownloadAttachment && (
+        {request.attachmentUrl && onDownloadAttachment && (
           <DropdownMenuItem onClick={() => onDownloadAttachment(request)}>
             <Download className="mr-2 h-4 w-4" />
             <span>Descargar adjunto</span>
