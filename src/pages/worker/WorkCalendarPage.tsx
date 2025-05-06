@@ -12,9 +12,11 @@ import { CorrectionRequest } from "@/components/worker/calendar/correction-reque
 import { ExportForm } from "@/components/worker/calendar/export-form";
 import { CalendarSync } from "@/components/worker/calendar/calendar-sync";
 import { exampleUser } from "@/data/example-users";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { MessageCircle } from "lucide-react";
 
 export default function WorkCalendarPage() {
   const { user, fetchAuthUser } = useProfileAuth();
@@ -145,14 +147,23 @@ export default function WorkCalendarPage() {
   return (
     <MainLayout user={user || exampleUser}>
       <div className="space-y-6">
-        <WorkCalendarHeader
-          currentDate={currentDate}
-          onPreviousMonth={previousMonth}
-          onNextMonth={nextMonth}
-          onDateSelect={selectDate}
-          onExport={exportData}
-          onNavigate={navigateCalendar}
-        />
+        <div className="flex justify-between items-center">
+          <WorkCalendarHeader
+            currentDate={currentDate}
+            onPreviousMonth={previousMonth}
+            onNextMonth={nextMonth}
+            onDateSelect={selectDate}
+            onExport={exportData}
+            onNavigate={navigateCalendar}
+          />
+          
+          <Link to="/chat">
+            <Button variant="outline" className="flex items-center gap-2">
+              <MessageCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Mensajes</span>
+            </Button>
+          </Link>
+        </div>
 
         <HoursSummary
           monthStats={monthStats}

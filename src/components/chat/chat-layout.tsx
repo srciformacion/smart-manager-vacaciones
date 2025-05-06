@@ -23,7 +23,7 @@ export function ChatLayout() {
       if (userRole === 'hr') {
         navigate('/rrhh/dashboard');
       } else {
-        navigate('/dashboard');
+        navigate('/calendar');
       }
     }
   };

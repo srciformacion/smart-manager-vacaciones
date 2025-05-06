@@ -1,10 +1,13 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { ChatMessage, ChatConversation } from "@/types/chat";
-import { exampleMessages, exampleConversations } from "@/data/example-chats";
 import { v4 as uuidv4 } from "uuid";
 import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { toast } from "sonner";
+import { ChatMessage, ChatConversation } from "@/types/chat";
+
+// Mock data for initial chat conversations and messages
+const exampleMessages: ChatMessage[] = [];
+const exampleConversations: ChatConversation[] = [];
 
 interface ChatContextType {
   messages: ChatMessage[];

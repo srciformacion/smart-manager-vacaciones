@@ -1,224 +1,64 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme/theme-provider";
+import { AuthProvider } from "@/context/auth-context";
+import { Suspense, lazy } from "react";
+import { Loader } from "@/components/ui/loader";
 
-import React, { Suspense, lazy, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Toaster } from "@/components/ui/sonner";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AuthProvider } from "@/hooks/auth";
-import { ProtectedRoute } from "@/components/auth/protected-route";
-import { UpdateNotification } from "@/components/pwa/update-notification";
-import { supabase } from '@/integrations/supabase/client';
-
-// Páginas principales
-const Index = lazy(() => import('@/pages/Index'));
-const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
-const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+// Lazy-loaded pages
 const AuthPage = lazy(() => import('@/pages/auth/AuthPage'));
-const WelcomePage = lazy(() => import('@/pages/auth/WelcomePage'));
-const ResetPasswordPage = lazy(() => import('@/pages/auth/ResetPasswordPage'));
-const NotFound = lazy(() => import('@/pages/NotFound'));
-
-// Páginas del Trabajador
 const DashboardPage = lazy(() => import('@/pages/worker/DashboardPage'));
 const WorkCalendarPage = lazy(() => import('@/pages/worker/WorkCalendarPage'));
-const VacationRequestPage = lazy(() => import('@/pages/worker/VacationRequestPage'));
-const PersonalDayRequestPage = lazy(() => import('@/pages/worker/PersonalDayRequestPage'));
-const LeaveRequestPage = lazy(() => import('@/pages/worker/LeaveRequestPage'));
-const ShiftChangeRequestPage = lazy(() => import('@/pages/worker/ShiftChangeRequestPage'));
-const HistoryPage = lazy(() => import('@/pages/worker/HistoryPage'));
-const ShiftProfilePage = lazy(() => import('@/pages/worker/ShiftProfilePage'));
-const ChatPage = lazy(() => import('@/pages/ChatPage'));
-
-// Páginas de RRHH
+const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
+const RequestsPage = lazy(() => import('@/pages/worker/RequestsPage'));
+const DocumentsPage = lazy(() => import('@/pages/worker/DocumentsPage'));
 const HRDashboardPage = lazy(() => import('@/pages/hr/HRDashboardPage'));
-const RequestsManagementPage = lazy(() => import('@/pages/hr/RequestsManagementPage'));
-const WorkersManagementPage = lazy(() => import('@/pages/hr/WorkersManagementPage'));
-const CalendarManagementPage = lazy(() => import('@/pages/hr/CalendarManagementPage'));
-const SendNotificationPage = lazy(() => import('@/pages/hr/SendNotificationPage'));
-const CalendarNotificationPage = lazy(() => import('@/pages/hr/CalendarNotificationPage'));
-const AIAssistantPage = lazy(() => import('@/pages/hr/AIAssistantPage'));
-const AIDashboardPage = lazy(() => import('@/pages/hr/AIDashboardPage'));
-
-const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center p-4">
-    <div className="w-full max-w-md space-y-4">
-      <Skeleton className="h-10 w-[200px]" />
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-10 w-full" />
-    </div>
-  </div>
-);
-
-// Componente para la sincronización de datos en segundo plano
-const BackgroundSync = () => {
-  useEffect(() => {
-    // Función para sincronizar datos pendientes cuando se recupera la conexión
-    const syncPendingData = async () => {
-      const pendingData = localStorage.getItem('pendingRequests');
-      
-      if (pendingData) {
-        try {
-          const requests = JSON.parse(pendingData);
-          console.log('Intentando sincronizar datos pendientes:', requests);
-          
-          // Procesar cada solicitud pendiente
-          for (const request of requests) {
-            const { error } = await supabase
-              .from('requests')
-              .insert(request);
-              
-            if (!error) {
-              console.log('Solicitud sincronizada exitosamente:', request);
-            } else {
-              console.error('Error al sincronizar solicitud:', error);
-            }
-          }
-          
-          // Limpiar datos pendientes después de sincronizar
-          localStorage.removeItem('pendingRequests');
-        } catch (error) {
-          console.error('Error al sincronizar datos pendientes:', error);
-        }
-      }
-    };
-    
-    // Comprobar estado de la conexión y sincronizar cuando vuelva online
-    window.addEventListener('online', syncPendingData);
-    
-    // Si estamos online al cargar, intentar sincronizar
-    if (navigator.onLine) {
-      syncPendingData();
-    }
-    
-    return () => {
-      window.removeEventListener('online', syncPendingData);
-    };
-  }, []);
-  
-  return null; // Este componente no renderiza nada
-};
+const HRWorkersPage = lazy(() => import('@/pages/hr/HRWorkersPage'));
+const HRRequestsPage = lazy(() => import('@/pages/hr/HRRequestsPage'));
+const HRCalendarPage = lazy(() => import('@/pages/hr/HRCalendarPage'));
+const HRDocumentsPage = lazy(() => import('@/pages/hr/HRDocumentsPage'));
+const HRReportsPage = lazy(() => import('@/pages/hr/HRReportsPage'));
+const HRSettingsPage = lazy(() => import('@/pages/hr/HRSettingsPage'));
+const ChatPage = lazy(() => import('@/pages/chat/ChatPage'));
 
 function App() {
   return (
-    <Router>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <AuthProvider>
-        <BackgroundSync />
-        <UpdateNotification />
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            {/* Rutas públicas */}
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<LoginPage />} />
-            <Route path="/auth/login" element={<LoginPage />} />
-            <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-
-            {/* Nueva ruta para la página de bienvenida */}
-            <Route path="/welcome" element={
-              <ProtectedRoute>
-                <WelcomePage />
-              </ProtectedRoute>
-            } />
-
-            {/* Rutas de trabajador protegidas */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute requiredRole="worker">
-                <DashboardPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/calendar" element={
-              <ProtectedRoute requiredRole="worker">
-                <WorkCalendarPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/requests/vacation" element={
-              <ProtectedRoute requiredRole="worker">
-                <VacationRequestPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/requests/personal-day" element={
-              <ProtectedRoute requiredRole="worker">
-                <PersonalDayRequestPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/requests/leave" element={
-              <ProtectedRoute requiredRole="worker">
-                <LeaveRequestPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/requests/shift-change" element={
-              <ProtectedRoute requiredRole="worker">
-                <ShiftChangeRequestPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/history" element={
-              <ProtectedRoute requiredRole="worker">
-                <HistoryPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/shift-profile" element={
-              <ProtectedRoute requiredRole="worker">
-                <ShiftProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/chat" element={
-              <ProtectedRoute>
-                <ChatPage />
-              </ProtectedRoute>
-            } />
-
-            {/* Rutas de RRHH protegidas */}
-            <Route path="/rrhh/dashboard" element={
-              <ProtectedRoute requiredRole="hr">
-                <HRDashboardPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/rrhh/requests" element={
-              <ProtectedRoute requiredRole="hr">
-                <RequestsManagementPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/rrhh/workers" element={
-              <ProtectedRoute requiredRole="hr">
-                <WorkersManagementPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/rrhh/calendar" element={
-              <ProtectedRoute requiredRole="hr">
-                <CalendarManagementPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/rrhh/notification" element={
-              <ProtectedRoute requiredRole="hr">
-                <SendNotificationPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/rrhh/calendar-notification" element={
-              <ProtectedRoute requiredRole="hr">
-                <CalendarNotificationPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/rrhh/ai-assistant" element={
-              <ProtectedRoute requiredRole="hr">
-                <AIAssistantPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/rrhh/ai-dashboard" element={
-              <ProtectedRoute requiredRole="hr">
-                <AIDashboardPage />
-              </ProtectedRoute>
-            } />
-
-            {/* Rutas de error */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+        <Router>
+          <Suspense fallback={<Loader />}>
+            <Routes>
+              {/* Auth routes */}
+              <Route path="/auth" element={<AuthPage />} />
+              
+              {/* Worker routes */}
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/calendar" element={<WorkCalendarPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/requests" element={<RequestsPage />} />
+              <Route path="/documents" element={<DocumentsPage />} />
+              
+              {/* HR routes */}
+              <Route path="/rrhh/dashboard" element={<HRDashboardPage />} />
+              <Route path="/rrhh/workers" element={<HRWorkersPage />} />
+              <Route path="/rrhh/requests" element={<HRRequestsPage />} />
+              <Route path="/rrhh/calendar" element={<HRCalendarPage />} />
+              <Route path="/rrhh/documents" element={<HRDocumentsPage />} />
+              <Route path="/rrhh/reports" element={<HRReportsPage />} />
+              <Route path="/rrhh/settings" element={<HRSettingsPage />} />
+              
+              {/* Chat route */}
+              <Route path="/chat" element={<ChatPage />} />
+              
+              {/* Default redirect */}
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </Suspense>
+        </Router>
         <Toaster />
       </AuthProvider>
-    </Router>
+    </ThemeProvider>
   );
 }
 
