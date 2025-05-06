@@ -91,7 +91,7 @@ export function useRealtimeData<T>(
           table: subscription.tableName,
           ...(subscription.filter ? { filter: subscription.filter } : {})
         },
-        async (payload) => {
+        async (payload: any) => {
           console.log(`Realtime update for ${subscription.tableName}:`, payload);
           
           // Refrescar datos después de un cambio
@@ -99,12 +99,14 @@ export function useRealtimeData<T>(
           
           // Notificar al usuario sobre el cambio
           // Fixed: Access the correct property based on payload type
-          const event = payload.type || '*'; // Use payload.type instead of eventType
-          if (event === 'INSERT') {
+          const eventType = payload.type || '*';
+          
+          // Use postgres event types for comparisons
+          if (eventType === 'INSERT') {
             toast.info('Se ha recibido una nueva solicitud');
-          } else if (event === 'UPDATE') {
+          } else if (eventType === 'UPDATE') {
             toast.info('Una solicitud ha sido actualizada');
-          } else if (event === 'DELETE') {
+          } else if (eventType === 'DELETE') {
             toast.info('Una solicitud ha sido eliminada');
           }
         }
