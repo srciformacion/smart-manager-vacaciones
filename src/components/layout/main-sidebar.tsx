@@ -10,7 +10,7 @@ export function MainSidebar() {
   
   const handleLogout = async () => {
     await signOut();
-    navigate("/login");
+    navigate("/auth", { replace: true });
   };
 
   // Convert the user object to our User type or use null
