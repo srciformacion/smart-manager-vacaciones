@@ -1,7 +1,8 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { AuthProvider } from "@/context/auth-context";
+import { AuthProvider } from "@/hooks/auth/auth-provider"; // Import directly from the source
 import { Suspense, lazy } from "react";
 import { Loader } from "@/components/ui/loader";
 
@@ -24,8 +25,8 @@ const ChatPage = lazy(() => import('@/pages/chat/ChatPage'));
 function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <AuthProvider>
-        <Router>
+      <Router>
+        <AuthProvider>
           <Suspense fallback={<Loader />}>
             <Routes>
               {/* Auth routes */}
@@ -55,9 +56,9 @@ function App() {
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </Suspense>
-        </Router>
-        <Toaster />
-      </AuthProvider>
+          <Toaster />
+        </AuthProvider>
+      </Router>
     </ThemeProvider>
   );
 }

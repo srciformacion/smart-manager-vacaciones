@@ -1,28 +1,15 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from '@/hooks/auth';
+import React, { ReactNode } from 'react';
+import { AuthProvider as AuthProviderOriginal } from '@/hooks/auth/auth-provider';
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const AuthContext = createContext<ReturnType<typeof useAuth> | undefined>(undefined);
-
+// Simple wrapper around the original AuthProvider to maintain compatibility
 export function AuthProvider({ children }: AuthProviderProps) {
-  // Re-export the functionality from the auth hook
-  const auth = useAuth();
-  
-  return (
-    <AuthContext.Provider value={auth}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthProviderOriginal>{children}</AuthProviderOriginal>;
 }
 
-export const useAuthContext = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuthContext must be used within an AuthProvider');
-  }
-  return context;
-};
+// Re-export the useAuth hook from the original auth provider
+export { useAuth } from '@/hooks/auth/auth-provider';

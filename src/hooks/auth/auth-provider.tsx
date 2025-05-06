@@ -5,6 +5,7 @@ import { AuthContextType } from './types';
 import { useAuthState } from './use-auth-state';
 import { signIn, signOut, signUp } from './auth-actions';
 
+// Create the auth context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -49,6 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// Export the hook to use the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
