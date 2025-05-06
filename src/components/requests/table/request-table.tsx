@@ -35,7 +35,7 @@ export function RequestTable({
 
   return (
     <div className="overflow-x-auto">
-      <Table>
+      <Table aria-label={isHRView ? "Tabla de solicitudes de trabajadores" : "Tabla de mis solicitudes"}>
         <TableHeader>
           <TableRow>
             {isHRView && <TableHead>Trabajador</TableHead>}
@@ -48,17 +48,28 @@ export function RequestTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {requests.map((request) => (
-            <RequestTableRow
-              key={request.id}
-              request={request}
-              isHRView={isHRView}
-              getUserName={getUserName}
-              onViewDetails={onViewDetails}
-              onStatusChange={onStatusChange}
-              onDownloadAttachment={onDownloadAttachment}
-            />
-          ))}
+          {requests.length > 0 ? (
+            requests.map((request) => (
+              <RequestTableRow
+                key={request.id}
+                request={request}
+                isHRView={isHRView}
+                getUserName={getUserName}
+                onViewDetails={onViewDetails}
+                onStatusChange={onStatusChange}
+                onDownloadAttachment={onDownloadAttachment}
+              />
+            ))
+          ) : (
+            <TableRow>
+              <TableCell 
+                colSpan={isHRView ? 7 : 5} 
+                className="h-24 text-center"
+              >
+                No hay solicitudes disponibles.
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </div>

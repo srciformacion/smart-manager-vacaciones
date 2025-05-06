@@ -41,26 +41,26 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
   
   const navigationItems: NavItem[] = [
     // Worker navigation items
-    { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/profile", label: "Mi Perfil", icon: <UserIcon className="h-4 w-4" /> },
-    { to: "/calendar", label: "Calendario", icon: <Calendar className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/requests/vacation", label: "Solicitar Vacaciones", icon: <CalendarClock className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/requests/personal-day", label: "Solicitar Día Personal", icon: <Clock className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/requests/leave", label: "Solicitar Permiso", icon: <FileText className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", icon: <Clock className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/history", label: "Historial", icon: <Clock className="h-4 w-4" />, requiredRole: 'worker' },
-    { to: "/shift-profile", label: "Mi Perfil de Turno", icon: <UserIcon className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
+    { to: "/profile", label: "Mi Perfil", icon: <UserIcon className="h-4 w-4" aria-hidden="true" /> },
+    { to: "/calendar", label: "Calendario", icon: <Calendar className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
+    { to: "/requests/vacation", label: "Solicitar Vacaciones", icon: <CalendarClock className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
+    { to: "/requests/personal-day", label: "Solicitar Día Personal", icon: <Clock className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
+    { to: "/requests/leave", label: "Solicitar Permiso", icon: <FileText className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
+    { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", icon: <Clock className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
+    { to: "/history", label: "Historial", icon: <Clock className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
+    { to: "/shift-profile", label: "Mi Perfil de Turno", icon: <UserIcon className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
     // HR navigation items
-    { to: "/rrhh/dashboard", label: "Dashboard RRHH", icon: <LayoutDashboard className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/calendar", label: "Calendario RRHH", icon: <Calendar className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/requests", label: "Gestionar Solicitudes", icon: <FileText className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/workers", label: "Gestionar Trabajadores", icon: <UserIcon className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/notification", label: "Enviar Notificación", icon: <Bell className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/calendar-notification", label: "Notificar Calendario", icon: <Calendar className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/ai-assistant", label: "Asistente IA", icon: <BrainCircuit className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/ai-dashboard", label: "Dashboard IA", icon: <LayoutDashboard className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/dashboard", label: "Dashboard RRHH", icon: <LayoutDashboard className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
+    { to: "/rrhh/calendar", label: "Calendario RRHH", icon: <Calendar className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
+    { to: "/rrhh/requests", label: "Gestionar Solicitudes", icon: <FileText className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
+    { to: "/rrhh/workers", label: "Gestionar Trabajadores", icon: <UserIcon className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
+    { to: "/rrhh/notification", label: "Enviar Notificación", icon: <Bell className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
+    { to: "/rrhh/calendar-notification", label: "Notificar Calendario", icon: <Calendar className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
+    { to: "/rrhh/ai-assistant", label: "Asistente IA", icon: <BrainCircuit className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
+    { to: "/rrhh/ai-dashboard", label: "Dashboard IA", icon: <LayoutDashboard className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
     // Shared navigation items
-    { to: "/chat", label: "Chat", icon: <MessageSquare className="h-4 w-4" /> },
+    { to: "/chat", label: "Chat", icon: <MessageSquare className="h-4 w-4" aria-hidden="true" /> },
   ];
 
   // Ensure filteredNavigationItems is working correctly by showing all items when no role restrictions match
@@ -79,16 +79,16 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
   };
 
   return (
-    <div className="flex flex-col h-full bg-green-600 text-white">
+    <div className="flex flex-col h-full bg-green-700 text-white">
       <div className="px-4 py-6">
         <NavLink to={userRole === 'hr' ? "/rrhh/dashboard" : "/dashboard"} onClick={handleNavClick}>
-          <Button variant="ghost" className="font-bold text-lg w-full text-white hover:bg-green-700">
+          <Button variant="ghost" className="font-bold text-lg w-full text-white hover:bg-green-800">
             La Rioja Cuida
           </Button>
         </NavLink>
       </div>
-      <Separator className="bg-green-500" />
-      <nav className="flex-1 px-2 py-4 overflow-y-auto">
+      <Separator className="bg-green-600" />
+      <nav className="flex-1 px-2 py-4 overflow-y-auto" aria-label="Menú principal">
         <ul className="space-y-1">
           {filteredNavigationItems.length > 0 ? (
             filteredNavigationItems.map((item) => (
@@ -98,13 +98,14 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
                   className={({ isActive }) =>
                     `flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors
                     ${isActive 
-                      ? 'bg-green-800 text-white font-bold' 
-                      : 'text-white hover:bg-green-700 hover:text-white'
+                      ? 'bg-green-900 text-white font-bold' 
+                      : 'text-white hover:bg-green-800 hover:text-white'
                     }`
                   }
                   onClick={handleNavClick}
+                  aria-current={({ isActive }) => isActive ? "page" : undefined}
                 >
-                  <span className="mr-2 flex items-center justify-center">{item.icon}</span>
+                  <span className="mr-2 flex items-center justify-center" aria-hidden="true">{item.icon}</span>
                   <span>{item.label}</span>
                 </NavLink>
               </li>
@@ -114,16 +115,17 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
           )}
         </ul>
       </nav>
-      <Separator className="bg-green-500" />
+      <Separator className="bg-green-600" />
       <div className="p-4">
         {onLogout && (
           <Button 
             variant="outline" 
             size="sm" 
             onClick={onLogout} 
-            className="w-full bg-green-700 text-white hover:bg-green-800 mb-4 flex items-center justify-center gap-2"
+            className="w-full bg-green-800 text-white hover:bg-green-900 mb-4 flex items-center justify-center gap-2"
+            aria-label="Cerrar sesión"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-4 w-4" aria-hidden="true" />
             Cerrar sesión
           </Button>
         )}

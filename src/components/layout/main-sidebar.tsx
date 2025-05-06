@@ -39,7 +39,7 @@ export function MainSidebar({ onNavigate }: MainSidebarProps) {
   };
 
   return (
-    <aside className="h-full border-r border-sidebar-border bg-sidebar">
+    <aside className="h-full border-r border-sidebar-border bg-sidebar" role="navigation" aria-label="Menú principal">
       <SidebarNavigation 
         user={typedUser}
         role={effectiveRole}

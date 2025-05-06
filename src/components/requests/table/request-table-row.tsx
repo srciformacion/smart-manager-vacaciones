@@ -51,8 +51,9 @@ export function RequestTableRow({
               variant="ghost"
               size="sm"
               onClick={() => onDownloadAttachment?.(request)}
+              aria-label={`Descargar justificante de solicitud ${request.id}`}
             >
-              <Download className="h-4 w-4 mr-1" />
+              <Download className="h-4 w-4 mr-1" aria-hidden="true" />
               Descargar
             </Button>
           ) : (

@@ -61,7 +61,13 @@ export function MainLayout({
         <header className="z-10 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-secondary">
           <div className="flex items-center">
             {/* Botón para mostrar/ocultar el sidebar en pantallas grandes */}
-            <Button variant="ghost" size="sm" onClick={toggleSidebar} className="mr-2 hidden lg:flex">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={toggleSidebar} 
+              className="mr-2 hidden lg:flex"
+              aria-label={sidebarVisible ? "Ocultar menú lateral" : "Mostrar menú lateral"}
+            >
               <MenuIcon className="w-5 h-5" />
             </Button>
             
@@ -73,7 +79,15 @@ export function MainLayout({
             </Sheet>
             
             {/* Botón hamburguesa para dispositivos móviles */}
-            <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(true)} className="mr-2 lg:hidden">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setMobileMenuOpen(true)} 
+              className="mr-2 lg:hidden"
+              aria-label="Abrir menú de navegación"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
+            >
               <MenuIcon className="w-5 h-5" />
             </Button>
             
@@ -85,7 +99,11 @@ export function MainLayout({
             <ThemeToggle />
             {mounted && user ? <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative w-8 h-8 rounded-full">
+                  <Button 
+                    variant="ghost" 
+                    className="relative w-8 h-8 rounded-full" 
+                    aria-label="Opciones de usuario"
+                  >
                     <Avatar className="w-8 h-8">
                       <AvatarImage src={user.profilePicture} alt={user.name || 'Usuario'} />
                       <AvatarFallback>{user.name ? user.name.charAt(0) : 'U'}</AvatarFallback>

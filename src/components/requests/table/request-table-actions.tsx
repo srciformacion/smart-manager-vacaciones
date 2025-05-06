@@ -22,6 +22,7 @@ export function RequestTableActions({
         variant="outline"
         size="sm"
         onClick={() => onViewDetails(request)}
+        aria-label={`Ver detalles de solicitud ${request.id}`}
       >
         Detalles
       </Button>
@@ -33,6 +34,7 @@ export function RequestTableActions({
             size="sm"
             className="bg-success/10 text-success hover:bg-success/20"
             onClick={() => onStatusChange?.(request, "approved")}
+            aria-label={`Aprobar solicitud ${request.id}`}
           >
             Aprobar
           </Button>
@@ -41,6 +43,7 @@ export function RequestTableActions({
             size="sm"
             className="bg-danger/10 text-danger hover:bg-danger/20"
             onClick={() => onStatusChange?.(request, "rejected")}
+            aria-label={`Rechazar solicitud ${request.id}`}
           >
             Rechazar
           </Button>

@@ -2,7 +2,7 @@
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth";
 
 const NotFound = () => {
   const location = useLocation();
@@ -32,7 +32,7 @@ const NotFound = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="min-h-screen flex items-center justify-center bg-background" role="alert">
       <div className="text-center max-w-lg px-4">
         <h1 className="text-6xl font-bold mb-6 text-primary">404</h1>
         <p className="text-2xl font-medium mb-2">Página no encontrada</p>
