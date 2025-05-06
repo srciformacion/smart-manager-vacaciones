@@ -64,8 +64,11 @@ export function SidebarNavigation({
   onClose,
   onCollapse,
 }: SidebarNavigationProps) {
-  const links = role === "hr" ? hrLinks : workerLinks;
-  console.log("SidebarNavigation rendering with role:", role, "showing links:", links.map(l => l.name).join(", "));
+  // Ensure we're using the correct role - use specific role passed or fall back to defaults
+  const effectiveRole = role || (user?.role || "worker");
+  const links = effectiveRole === "hr" ? hrLinks : workerLinks;
+  
+  console.log("SidebarNavigation rendering with role:", effectiveRole, "showing links:", links.map(l => l.name).join(", "));
   
   // Extract initial for avatar fallback
   const getInitial = () => {
@@ -138,7 +141,7 @@ export function SidebarNavigation({
                   <p className="text-sm font-medium">{user.name}</p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                   <p className="text-xs font-medium bg-primary/10 inline-block px-2 py-0.5 rounded-full">
-                    {role === "hr" ? "RRHH" : "Trabajador"}
+                    {effectiveRole === "hr" ? "RRHH" : "Trabajador"}
                   </p>
                 </div>
               </>

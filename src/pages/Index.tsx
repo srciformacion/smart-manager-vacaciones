@@ -17,9 +17,11 @@ export default function Index() {
   const checkUser = () => {
     setChecking(true);
     try {
-      const user = localStorage.getItem("user");
-      if (user) {
-        const userRole = localStorage.getItem("userRole") as UserRole;
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        // Attempt to parse the user object
+        const userData = JSON.parse(userStr);
+        const userRole = localStorage.getItem("userRole") as UserRole || userData.role as UserRole;
         console.log("Found user in storage with role:", userRole);
         
         if (userRole === "hr") {

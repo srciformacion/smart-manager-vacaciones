@@ -35,22 +35,44 @@ export function MainSidebar({ onNavigate }: MainSidebarProps) {
     }
   };
 
-  // Convert the user object to our User type or use null
-  const typedUser = user ? {
-    id: user.id || "demo-user",
-    name: user.user_metadata?.name || user.email?.split('@')[0] || "Usuario",
-    email: user.email || "",
-    role: userRole as UserRole || (user.user_metadata?.role as UserRole) || "worker",
-    profilePicture: user.user_metadata?.avatar_url || ""
-  } as User : null;
+  // First try to get user from auth context
+  let typedUser: User | null = null;
+  let effectiveRole: UserRole = "worker";
 
-  // Default role to 'worker' if nothing is available
-  const effectiveRole = userRole as UserRole || 
-                       (user?.user_metadata?.role as UserRole) || 
-                       localStorage.getItem("userRole") as UserRole || 
-                       "worker";
+  // If we have user data from auth context
+  if (user) {
+    typedUser = {
+      id: user.id || "demo-user",
+      name: user.user_metadata?.name || user.email?.split('@')[0] || "Usuario",
+      email: user.email || "",
+      role: userRole as UserRole || (user.user_metadata?.role as UserRole) || "worker",
+      profilePicture: user.user_metadata?.avatar_url || ""
+    };
+    effectiveRole = userRole as UserRole || (user.user_metadata?.role as UserRole) || "worker";
+  } 
+  // If no user in auth context, try localStorage (for demo users)
+  else {
+    const storedUserData = localStorage.getItem("user");
+    if (storedUserData) {
+      try {
+        const parsedUser = JSON.parse(storedUserData);
+        typedUser = {
+          id: parsedUser.id || "demo-user",
+          name: parsedUser.name || "Usuario",
+          email: parsedUser.email || "",
+          role: parsedUser.role || "worker",
+          profilePicture: parsedUser.profilePicture || ""
+        };
+        // Get role from localStorage or default to what's in the user object
+        effectiveRole = (localStorage.getItem("userRole") as UserRole) || parsedUser.role || "worker";
+      } catch (e) {
+        console.error("Error parsing stored user data:", e);
+      }
+    }
+  }
 
-  console.log("Current user role:", effectiveRole);
+  console.log("MainSidebar - User:", typedUser);
+  console.log("MainSidebar - Role:", effectiveRole);
   
   // Handle navigation and close the mobile menu if needed
   const handleNavigation = () => {
