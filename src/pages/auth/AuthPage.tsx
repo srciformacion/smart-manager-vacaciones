@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
-// Demo users for testing - Asegurando que el usuario RRHH (admin) funcione correctamente
+// Demo users for testing
 const DEMO_USERS = [
   { email: "usuario@example.com", password: "password", role: "worker" },
   { email: "rrhh@example.com", password: "password", role: "hr" }
@@ -31,6 +32,8 @@ export default function AuthPage() {
       if (user) {
         // If there's an active session, redirect based on stored role
         const storedRole = localStorage.getItem("userRole") as UserRole || "worker";
+        console.log("Found existing session, redirecting to", storedRole === "hr" ? "/rrhh/dashboard" : "/dashboard");
+        
         if (storedRole === "hr") {
           navigate("/rrhh/dashboard");
         } else {
@@ -49,19 +52,29 @@ export default function AuthPage() {
     setIsSubmitting(true);
 
     try {
-      // Find the user in our demo users array - Verificamos la coincidencia exacta
+      // Find the user in our demo users array - verificamos la coincidencia exacta
       const user = DEMO_USERS.find(u => u.email === email && u.password === password);
       
       if (!user) {
         throw new Error("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
       }
 
-      // Usamos el rol del usuario encontrado, no el seleccionado en la interfaz
+      // Usamos el rol del usuario encontrado
       const role = user.role as UserRole;
       
+      // Create a user object with necessary fields
+      const userData = {
+        id: `demo-${Date.now().toString()}`,
+        name: role === "hr" ? "Administrador RRHH" : "Usuario Demo",
+        email: user.email,
+        user_metadata: { role },
+        role: role
+      };
+      
       // Store auth info in localStorage
-      localStorage.setItem("user", JSON.stringify({ email, id: `user-${Date.now()}` }));
+      localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("userRole", role);
+      localStorage.setItem("userEmail", email);
       
       // Dispatch storage event to notify other tabs
       window.dispatchEvent(new Event("storage"));
@@ -86,16 +99,20 @@ export default function AuthPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#003366]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="absolute top-4 right-4 flex gap-2">
+        <ThemeToggle />
+      </div>
+      
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#003366]">La Rioja Cuida</h1>
+          <h1 className="text-3xl font-bold text-primary">La Rioja Cuida</h1>
           <p className="mt-2 text-muted-foreground">
             Sistema de gestión de vacaciones y permisos
           </p>
@@ -103,7 +120,7 @@ export default function AuthPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-[#003366] mb-6">Iniciar sesión</h2>
+            <h2 className="text-2xl font-bold text-primary mb-6">Iniciar sesión</h2>
           </div>
 
           <div className="space-y-2">
@@ -150,17 +167,17 @@ export default function AuthPage() {
 
           <Button 
             type="submit" 
-            className="w-full bg-[#003366] hover:bg-[#002347]" 
+            className="w-full bg-primary hover:bg-primary/90" 
             disabled={isSubmitting}
           >
             {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
           </Button>
 
           <div className="flex justify-between text-sm">
-            <Link to="/auth/register" className="text-[#003366] hover:underline">
+            <Link to="/auth/register" className="text-primary hover:underline">
               Registrarse
             </Link>
-            <Link to="/auth/reset-password" className="text-[#003366] hover:underline">
+            <Link to="/auth/reset-password" className="text-primary hover:underline">
               ¿Olvidaste tu contraseña?
             </Link>
           </div>

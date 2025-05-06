@@ -1,5 +1,5 @@
 
-import { useAuth } from "@/hooks/auth/auth-provider";
+import { useAuth } from "@/hooks/auth";
 import { User } from "@/types";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,9 +11,9 @@ export function useProfileAuth() {
   // Convert auth user to app User type
   const user: User | null = authUser ? {
     id: authUser.id,
-    name: authUser.user_metadata?.name || "Usuario",
+    name: authUser.user_metadata?.name || authUser.name || "Usuario",
     email: authUser.email || "",
-    role: userRole || authUser.user_metadata?.role || "worker",
+    role: userRole || authUser.user_metadata?.role || authUser.role || "worker",
   } : null;
   
   // Add userId property for convenience
