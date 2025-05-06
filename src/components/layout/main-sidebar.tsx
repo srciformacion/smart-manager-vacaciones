@@ -23,7 +23,7 @@ export function MainSidebar({ onNavigate }: MainSidebarProps) {
   // Convert the user object to our User type or use null
   const typedUser = user ? {
     id: user.id,
-    name: user.user_metadata?.name || "Usuario",
+    name: user.user_metadata?.name || user.email?.split('@')[0] || "Usuario",
     email: user.email || "",
     role: userRole as UserRole || (user.user_metadata?.role as UserRole) || "worker",
   } as User : null;

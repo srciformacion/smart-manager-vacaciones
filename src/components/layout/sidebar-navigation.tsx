@@ -79,7 +79,7 @@ export function SidebarNavigation({
         "flex h-14 items-center border-b px-4",
         collapsed ? "justify-center" : "justify-between"
       )}>
-        {!collapsed && <span className="text-lg font-bold">TurnoSync</span>}
+        {!collapsed && <span className="text-lg font-bold">La Rioja Cuida</span>}
         {onCollapse && (
           <Button variant="ghost" size="icon" onClick={onCollapse} aria-label="Colapsar menú">
             <ChevronsLeft className="h-4 w-4" />

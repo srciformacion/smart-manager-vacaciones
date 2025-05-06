@@ -11,7 +11,7 @@ import { InstallPWAButton } from '@/components/pwa/install-pwa-button';
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User } from "@/types";
 import { useAuth } from "@/hooks/auth";
-import { Menu as MenuIcon, X } from "lucide-react";
+import { Menu as MenuIcon } from "lucide-react";
 
 export interface MainLayoutProps {
   children: React.ReactNode;
