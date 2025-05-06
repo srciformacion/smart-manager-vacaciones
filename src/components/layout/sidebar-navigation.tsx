@@ -17,7 +17,8 @@ import {
   Clock,
   CalendarClock,
   MessageSquare,
-  BrainCircuit
+  BrainCircuit,
+  Bell
 } from "lucide-react";
 
 interface NavItem {
@@ -57,7 +58,7 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
     { to: "/rrhh/calendar", label: "Calendario RRHH", icon: <Calendar className="h-4 w-4" />, requiredRole: 'hr' },
     { to: "/rrhh/requests", label: "Gestionar Solicitudes", icon: <FileText className="h-4 w-4" />, requiredRole: 'hr' },
     { to: "/rrhh/workers", label: "Gestionar Trabajadores", icon: <UserIcon className="h-4 w-4" />, requiredRole: 'hr' },
-    { to: "/rrhh/notification", label: "Enviar Notificación", icon: <NotificationBell />, requiredRole: 'hr' },
+    { to: "/rrhh/notification", label: "Enviar Notificación", icon: <Bell className="h-4 w-4" />, requiredRole: 'hr' },
     { to: "/rrhh/calendar-notification", label: "Notificar Calendario", icon: <Calendar className="h-4 w-4" />, requiredRole: 'hr' },
     { to: "/rrhh/ai-assistant", label: "Asistente IA", icon: <BrainCircuit className="h-4 w-4" />, requiredRole: 'hr' },
     { to: "/rrhh/ai-dashboard", label: "Dashboard IA", icon: <LayoutDashboard className="h-4 w-4" />, requiredRole: 'hr' },
@@ -108,8 +109,8 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
                   }
                   onClick={handleNavClick}
                 >
-                  <span className="mr-2">{item.icon}</span>
-                  {item.label}
+                  <span className="mr-2 flex items-center justify-center">{item.icon}</span>
+                  <span>{item.label}</span>
                 </NavLink>
               </li>
             ))
@@ -134,7 +135,7 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
         </>
       )}
       <Separator className="bg-sidebar-border" />
-      <div className="flex items-center gap-2 p-4">
+      <div className="flex items-center justify-center gap-2 p-4">
         <ThemeToggle />
         <NotificationBell />
         <InstallPWAButton />
@@ -142,4 +143,3 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
     </div>
   );
 }
-
