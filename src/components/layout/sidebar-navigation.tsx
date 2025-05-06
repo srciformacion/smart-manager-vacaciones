@@ -1,170 +1,170 @@
 
-import { Link, NavLink, useLocation } from "react-router-dom";
-import { Fragment } from "react";
-import { User, UserRole } from "@/types";
-import { 
-  LogOut, 
-  User as UserIcon, 
-  Calendar, 
-  FileText, 
-  Bell, 
-  Briefcase,
+import {
+  CalendarCheck,
+  CalendarDays,
+  ChevronsLeft,
+  CircleUser,
+  FilePen,
   Home,
-  Info,
+  LogOut,
+  MessageSquare,
   Settings,
-  Users,
-  Bot,
-  Clock
+  User,
 } from "lucide-react";
+import { NavLink, NavLinkProps } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User as UserType, UserRole } from "@/types";
+
+const userLinks = [
+  { name: "Dashboard", href: "/", icon: Home, ariaLabel: "Ir a Dashboard" },
+  { name: "Mi Calendario", href: "/calendar", icon: CalendarDays, ariaLabel: "Ir a Mi Calendario" },
+  { name: "Solicitudes", href: "/requests", icon: FilePen, ariaLabel: "Ir a Solicitudes" },
+  { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
+  { name: "Perfil", href: "/profile", icon: User, ariaLabel: "Ir a Perfil" },
+];
+
+const adminLinks = [
+  { name: "Dashboard", href: "/hr", icon: Home, ariaLabel: "Ir a Dashboard" },
+  { name: "Calendarios", href: "/hr/calendar", icon: CalendarCheck, ariaLabel: "Ir a Gestión de Calendarios" },
+  { name: "Solicitudes", href: "/hr/requests", icon: FilePen, ariaLabel: "Ir a Gestión de Solicitudes" },
+  { name: "Personal", href: "/hr/workers", icon: User, ariaLabel: "Ir a Gestión de Personal" },
+  { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
+  { name: "Asistente IA", href: "/hr/ai", icon: Settings, ariaLabel: "Ir a Asistente IA" },
+  { name: "Notificaciones", href: "/hr/notifications", icon: Settings, ariaLabel: "Ir a Notificaciones" }
+];
 
 interface SidebarNavigationProps {
-  user: User | null;
-  role: UserRole;
-  onLogout: () => void;
+  user: UserType | null;
+  role?: UserRole;
+  collapsed?: boolean;
+  onLogout?: () => Promise<void>;
   onNavigate?: () => void;
+  onClose?: () => void;
+  onCollapse?: () => void;
 }
 
-export function SidebarNavigation({ 
-  user, 
-  role, 
+export function SidebarNavigation({
+  user,
+  role = "worker",
+  collapsed = false,
   onLogout,
-  onNavigate 
+  onNavigate,
+  onClose,
+  onCollapse,
 }: SidebarNavigationProps) {
-  const location = useLocation();
+  const links = role === "hr" ? adminLinks : userLinks;
   
-  const handleNavigation = () => {
-    if (onNavigate) {
-      onNavigate();
+  // Extract initial for avatar fallback
+  const getInitial = () => {
+    if (user?.name) {
+      return user.name.charAt(0).toUpperCase();
     }
+    return "U";
   };
-  
-  const workerNav = [
-    {
-      name: "Inicio",
-      to: "/worker/dashboard",
-      icon: <Home className="h-5 w-5" aria-hidden="true" />
-    },
-    {
-      name: "Calendario",
-      to: "/worker/calendar",
-      icon: <Calendar className="h-5 w-5" aria-hidden="true" />
-    },
-    {
-      name: "Solicitudes",
-      to: "/worker/requests",
-      icon: <FileText className="h-5 w-5" aria-hidden="true" />
-    },
-    {
-      name: "Notificaciones",
-      to: "/worker/notifications",
-      icon: <Bell className="h-5 w-5" aria-hidden="true" />
-    },
-  ];
-  
-  const hrNav = [
-    {
-      name: "Inicio",
-      to: "/hr/dashboard",
-      icon: <Home className="h-5 w-5" aria-hidden="true" />
-    },
-    {
-      name: "Gestión",
-      to: "/hr/management",
-      icon: <Briefcase className="h-5 w-5" aria-hidden="true" />
-    },
-    {
-      name: "Personal",
-      to: "/hr/staff",
-      icon: <Users className="h-5 w-5" aria-hidden="true" />
-    },
-    {
-      name: "Calendarios",
-      to: "/hr/calendars",
-      icon: <Calendar className="h-5 w-5" aria-hidden="true" />
-    },
-    {
-      name: "Solicitudes",
-      to: "/hr/requests",
-      icon: <FileText className="h-5 w-5" aria-hidden="true" />
-    },
-    {
-      name: "Asistente IA",
-      to: "/hr/ai",
-      icon: <Bot className="h-5 w-5" aria-hidden="true" />
-    },
-    {
-      name: "Notificaciones",
-      to: "/hr/notifications",
-      icon: <Bell className="h-5 w-5" aria-hidden="true" />
-    }
-  ];
 
-  const navItems = role === "hr" ? hrNav : workerNav;
-  
+  const handleNavigation = () => {
+    if (onNavigate) onNavigate();
+    if (onClose) onClose();
+  };
+
+  const handleLogout = async () => {
+    if (onLogout) await onLogout();
+  };
+
   return (
-    <div className="flex h-full flex-col justify-between py-4">
-      <div>
-        <div className="px-3 py-2 mb-6">
-          <Link
-            to={role === "hr" ? "/hr/dashboard" : "/worker/dashboard"}
-            onClick={handleNavigation}
-            className="flex items-center gap-2 text-xl font-bold text-primary"
-            aria-label="Ir al tablero principal"
-          >
-            <Clock className="h-6 w-6" aria-hidden="true" />
-            <span>TurnoSync</span>
-          </Link>
-        </div>
+    <div className="h-full flex flex-col bg-background border-r">
+      <div className={cn(
+        "flex h-14 items-center border-b px-4",
+        collapsed ? "justify-center" : "justify-between"
+      )}>
+        {!collapsed && <span className="text-lg font-bold">TurnoSync</span>}
+        {onCollapse && (
+          <Button variant="ghost" size="icon" onClick={onCollapse} aria-label="Colapsar menú">
+            <ChevronsLeft className="h-4 w-4" />
+            <span className="sr-only">Colapsar menú</span>
+          </Button>
+        )}
+      </div>
 
-        <nav aria-label="Navegación principal">
-          <ul className="space-y-1 px-2">
-            {navItems.map((item) => (
-              <li key={item.name}>
-                <NavLink
-                  to={item.to}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                      isActive 
-                        ? "bg-primary text-primary-foreground" 
-                        : "hover:bg-accent hover:text-accent-foreground"
-                    }`
-                  }
-                  onClick={handleNavigation}
-                  aria-current={({ isActive }) => isActive ? "page" : undefined}
-                >
-                  {item.icon}
-                  <span>{item.name}</span>
-                </NavLink>
-              </li>
-            ))}
-          </ul>
+      <div className="flex-1 overflow-auto py-2">
+        <nav className="grid items-start px-2 gap-1">
+          {links.map((link) => (
+            <NavLink
+              key={link.href}
+              to={link.href}
+              className={(props) => cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-accent hover:text-accent-foreground",
+                props.isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                collapsed && "justify-center p-0 h-9 w-9",
+              )}
+              onClick={handleNavigation}
+              aria-current={(props) => props.isActive ? "page" : undefined}
+              aria-label={link.ariaLabel}
+            >
+              <link.icon className={cn("h-4 w-4", collapsed ? "h-5 w-5" : "")} aria-hidden="true" />
+              {!collapsed && <span>{link.name}</span>}
+            </NavLink>
+          ))}
         </nav>
       </div>
 
-      <div className="space-y-1 px-3">
+      <div className={cn(
+        "mt-auto border-t p-4",
+        collapsed ? "flex justify-center" : ""
+      )}>
         {user && (
-          <Link 
-            to="/profile" 
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-            onClick={handleNavigation}
-            aria-label="Ver tu perfil"
-          >
-            <UserIcon className="h-5 w-5" aria-hidden="true" />
-            <span className="truncate">{user.name || 'Mi perfil'}</span>
-          </Link>
+          <div className={cn(
+            collapsed ? "" : "flex items-center gap-3 mb-4"
+          )}>
+            {!collapsed ? (
+              <>
+                <Avatar>
+                  <AvatarImage src={user.avatarUrl} alt={`${user.name} ${user.lastName || ""}`} />
+                  <AvatarFallback>{getInitial()}</AvatarFallback>
+                </Avatar>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">{user.name} {user.lastName || ""}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+              </>
+            ) : (
+              <Avatar>
+                <AvatarImage src={user.avatarUrl} alt={`${user.name} ${user.lastName || ""}`} />
+                <AvatarFallback>{getInitial()}</AvatarFallback>
+              </Avatar>
+            )}
+          </div>
         )}
         
-        <button
-          onClick={() => {
-            onLogout();
-            if (onNavigate) onNavigate();
-          }}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-          aria-label="Cerrar sesión"
-        >
-          <LogOut className="h-5 w-5" aria-hidden="true" />
-          <span>Cerrar sesión</span>
-        </button>
+        {!collapsed && (
+          <div className="flex items-center gap-2">
+            <NavLink
+              to="/profile"
+              className={({ isActive }) => cn(
+                "w-full flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent hover:text-accent-foreground",
+                isActive ? "bg-accent text-accent-foreground" : ""
+              )}
+              onClick={handleNavigation}
+            >
+              <CircleUser className="h-4 w-4" />
+              Mi Perfil
+            </NavLink>
+          </div>
+        )}
+        
+        {onLogout && (
+          <Button 
+            variant="outline" 
+            className={cn("w-full mt-2", collapsed && "p-2")} 
+            onClick={handleLogout}
+            aria-label="Cerrar sesión"
+          >
+            <LogOut className={cn("h-4 w-4", collapsed && "mr-0")} aria-hidden="true" />
+            {!collapsed && <span className="ml-2">Cerrar sesión</span>}
+          </Button>
+        )}
       </div>
     </div>
   );

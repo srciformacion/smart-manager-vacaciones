@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,7 +24,7 @@ export default function WorkCalendarPage() {
   // Generate a stable user ID for demo use
   const userId = user?.id || "demo-user"; // Changed from "1" to "demo-user" for clarity
   
-  // Inicializamos el hook del calendario
+  // Initialize the calendar hook
   const {
     currentDate,
     shifts,
