@@ -188,6 +188,43 @@ export default function AuthPage() {
           <p>Usuario: usuario@example.com / Contraseña: password</p>
           <p>RRHH: rrhh@example.com / Contraseña: password</p>
         </div>
+
+        <div className="mt-6 text-center">
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => {
+              // Create user data
+              const userData = {
+                id: `demo-${Date.now().toString()}`,
+                name: userRole === "hr" ? "Administrador RRHH" : "Usuario Demo",
+                email: userRole === "hr" ? "rrhh@example.com" : "usuario@example.com",
+                user_metadata: { role: userRole },
+                role: userRole
+              };
+              
+              // Store auth info
+              localStorage.setItem("user", JSON.stringify(userData));
+              localStorage.setItem("userRole", userRole);
+              localStorage.setItem("userEmail", userData.email);
+              
+              toast.success(`Has iniciado sesión como ${userRole === "hr" ? "RRHH" : "Trabajador"} en modo demo`);
+              
+              // Redirect based on role
+              if (userRole === "hr") {
+                navigate("/rrhh/dashboard");
+              } else {
+                navigate("/dashboard");
+              }
+            }}
+          >
+            Entrar con credenciales de prueba
+          </Button>
+        </div>
+        
+        <div className="mt-4 text-xs text-center text-muted-foreground">
+          <p>Versión 1.0.0 • La Rioja Cuida © 2025</p>
+        </div>
       </div>
     </div>
   );
