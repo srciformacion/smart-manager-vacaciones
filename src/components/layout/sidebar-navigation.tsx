@@ -93,14 +93,14 @@ export function SidebarNavigation({
   };
 
   return (
-    <div className="h-full flex flex-col bg-background border-r">
+    <div className="h-full flex flex-col bg-sidebar border-r border-sidebar-border">
       <div className={cn(
-        "flex h-14 items-center border-b px-4",
+        "flex h-14 items-center border-b border-sidebar-border px-4",
         collapsed ? "justify-center" : "justify-between"
       )}>
-        {!collapsed && <span className="text-lg font-bold">La Rioja Cuida</span>}
+        {!collapsed && <span className="text-lg font-bold text-sidebar-foreground">La Rioja Cuida</span>}
         {onCollapse && (
-          <Button variant="ghost" size="icon" onClick={onCollapse} aria-label="Colapsar menú">
+          <Button variant="ghost" size="icon" onClick={onCollapse} aria-label="Colapsar menú" className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
             <ChevronsLeft className="h-4 w-4" />
             <span className="sr-only">Colapsar menú</span>
           </Button>
@@ -114,8 +114,8 @@ export function SidebarNavigation({
               key={link.href}
               to={link.href}
               className={(props) => cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-accent hover:text-accent-foreground",
-                props.isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                props.isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground",
                 collapsed && "justify-center p-0 h-9 w-9",
               )}
               onClick={handleNavigation}
@@ -129,7 +129,7 @@ export function SidebarNavigation({
       </div>
 
       <div className={cn(
-        "mt-auto border-t p-4",
+        "mt-auto border-t border-sidebar-border p-4",
         collapsed ? "flex justify-center" : ""
       )}>
         {user && (
@@ -143,9 +143,9 @@ export function SidebarNavigation({
                   <AvatarFallback>{getInitial()}</AvatarFallback>
                 </Avatar>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">{user.name}</p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
-                  <p className="text-xs font-medium bg-primary/10 inline-block px-2 py-0.5 rounded-full">
+                  <p className="text-sm font-medium text-sidebar-foreground">{user.name}</p>
+                  <p className="text-xs text-sidebar-foreground/70">{user.email}</p>
+                  <p className="text-xs font-medium bg-sidebar-primary/20 text-sidebar-foreground inline-block px-2 py-0.5 rounded-full">
                     {effectiveRole === "hr" ? "RRHH" : "Trabajador"}
                   </p>
                 </div>
@@ -164,8 +164,8 @@ export function SidebarNavigation({
             <NavLink
               to="/profile"
               className={({ isActive }) => cn(
-                "w-full flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent hover:text-accent-foreground",
-                isActive ? "bg-accent text-accent-foreground" : ""
+                "w-full flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground"
               )}
               onClick={handleNavigation}
             >
@@ -178,7 +178,7 @@ export function SidebarNavigation({
         {onLogout && (
           <Button 
             variant="outline" 
-            className={cn("w-full mt-2", collapsed && "p-2")} 
+            className={cn("w-full mt-2 border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", collapsed && "p-2")} 
             onClick={handleLogout}
             aria-label="Cerrar sesión"
           >

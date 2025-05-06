@@ -60,7 +60,7 @@ export function MainLayoutMobile({
       </header>
 
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-[240px] sm:w-[300px]">
+        <SheetContent side="left" className="p-0 w-[240px] sm:w-[300px] bg-sidebar border-r border-sidebar-border">
           <SidebarNavigation
             user={user}
             role={role}
