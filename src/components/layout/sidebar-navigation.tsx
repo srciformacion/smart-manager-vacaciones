@@ -84,15 +84,15 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
   console.log("Filtered navigation items:", filteredNavigationItems.map(item => item.label));
 
   return (
-    <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
+    <div className="flex flex-col h-full bg-blue-600 text-white">
       <div className="px-4 py-6">
         <NavLink to={userRole === 'hr' ? "/rrhh/dashboard" : "/dashboard"}>
-          <Button variant="ghost" className="font-bold text-lg w-full text-sidebar-foreground">
+          <Button variant="ghost" className="font-bold text-lg w-full text-white hover:bg-blue-700">
             La Rioja Cuida
           </Button>
         </NavLink>
       </div>
-      <Separator className="bg-sidebar-border" />
+      <Separator className="bg-blue-500" />
       <nav className="flex-1 px-2 py-4 overflow-y-auto">
         <ul className="space-y-1">
           {filteredNavigationItems.length > 0 ? (
@@ -103,8 +103,8 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
                   className={({ isActive }) =>
                     `flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors
                     ${isActive 
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-bold' 
-                      : 'text-sidebar-foreground hover:bg-sidebar-primary/20 hover:text-sidebar-foreground'
+                      ? 'bg-blue-800 text-white font-bold' 
+                      : 'text-white hover:bg-blue-700 hover:text-white'
                     }`
                   }
                   onClick={handleNavClick}
@@ -121,20 +121,20 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
       </nav>
       {onLogout && (
         <>
-          <Separator className="bg-sidebar-border" />
+          <Separator className="bg-blue-500" />
           <div className="p-4">
             <Button 
               variant="outline" 
               size="sm" 
               onClick={onLogout} 
-              className="w-full bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90"
+              className="w-full bg-blue-700 text-white hover:bg-blue-800"
             >
               Cerrar sesión
             </Button>
           </div>
         </>
       )}
-      <Separator className="bg-sidebar-border" />
+      <Separator className="bg-blue-500" />
       <div className="flex items-center justify-center gap-2 p-4">
         <ThemeToggle />
         <NotificationBell />
@@ -143,3 +143,4 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
     </div>
   );
 }
+

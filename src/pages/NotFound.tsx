@@ -21,16 +21,6 @@ const NotFound = () => {
     return userRole === 'hr' ? "/rrhh/dashboard" : "/dashboard";
   };
 
-  // Función para manejar la navegación hacia atrás
-  const handleGoBack = () => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      // Si no hay historial, navega al dashboard según el rol
-      navigate(getDashboardRoute());
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center max-w-lg px-4">
@@ -39,10 +29,7 @@ const NotFound = () => {
         <p className="text-muted-foreground mb-8">
           Lo sentimos, la página que estás buscando no existe o ha sido movida.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button onClick={handleGoBack} variant="outline">
-            Volver atrás
-          </Button>
+        <div className="flex justify-center">
           <Button asChild>
             <Button onClick={() => navigate(getDashboardRoute())}>Ir al dashboard</Button>
           </Button>
