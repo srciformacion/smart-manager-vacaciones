@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { WorkerList } from "@/components/hr/worker-list";
@@ -6,102 +5,28 @@ import { WorkerForm } from "@/components/hr/worker-form/worker-form";
 import { BalanceForm } from "@/components/hr/balance-form";
 import { User, Balance, ShiftType, WorkdayType, Department, WorkGroup, UserRole } from "@/types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { exampleUser, exampleWorkers } from "@/data/example-users";
 
-// Datos de ejemplo para demostración
-const exampleUser: User = {
-  id: "rrhh-user",
-  name: "Carlos Rodríguez", 
-  email: "rrhh@email.com",
-  role: "hr",
-  shift: "Programado",
-  workGroup: "Grupo Programado",
-  workday: "Completa",
-  department: "Recursos Humanos",
-  seniority: 5,
+// Create example balances for all workers
+const generateExampleBalances = (): Record<string, Balance> => {
+  const balances: Record<string, Balance> = {};
+  
+  exampleWorkers.forEach(worker => {
+    balances[worker.id] = {
+      id: `balance-${worker.id}`,
+      userId: worker.id,
+      vacationDays: Math.floor(Math.random() * 10) + 15, // Random between 15-25
+      personalDays: Math.floor(Math.random() * 3) + 4, // Random between 4-6
+      leaveDays: 3,
+      year: 2023,
+    };
+  });
+  
+  return balances;
 };
 
-const exampleWorkers: User[] = [
-  {
-    id: "1",
-    name: "Ana Martínez",
-    email: "ana.martinez@empresa.com",
-    role: "worker",
-    shift: "Programado",
-    workGroup: "Grupo Programado",
-    workday: "Completa",
-    department: "Atención al cliente",
-    seniority: 3,
-  },
-  {
-    id: "2",
-    name: "Luis García",
-    email: "luis.garcia@empresa.com",
-    role: "worker",
-    shift: "Urgente 24h",
-    workGroup: "Urgente 24h",
-    workday: "Completa",
-    department: "Operaciones",
-    seniority: 2,
-  },
-  {
-    id: "3",
-    name: "Elena Sánchez",
-    email: "elena.sanchez@empresa.com",
-    role: "worker",
-    shift: "Localizado",
-    workGroup: "Grupo Localizado",
-    workday: "Completa",
-    department: "Administración",
-    seniority: 5,
-  },
-  // Actualizado según tu petición
-  {
-    id: "4",
-    name: "Francisco José Fernández López",
-    email: "fjflopez@larioja.org",
-    role: "worker",
-    shift: "Urgente 24h",
-    workGroup: "Urgente 24h",
-    workday: "Completa",
-    department: "Personal de movimiento",
-    seniority: 24,
-  },
-];
-
-const exampleBalances: Record<string, Balance> = {
-  "1": {
-    id: "balance-1",
-    userId: "1",
-    vacationDays: 22,
-    personalDays: 6,
-    leaveDays: 3,
-    year: 2023,
-  },
-  "2": {
-    id: "balance-2",
-    userId: "2",
-    vacationDays: 15,
-    personalDays: 4,
-    leaveDays: 3,
-    year: 2023,
-  },
-  "3": {
-    id: "balance-3",
-    userId: "3",
-    vacationDays: 25,
-    personalDays: 6,
-    leaveDays: 3,
-    year: 2023,
-  },
-  "4": {
-    id: "balance-4",
-    userId: "4",
-    vacationDays: 30,
-    personalDays: 5,
-    leaveDays: 3,
-    year: 2023,
-  },
-};
+// Generate example balances for all workers
+const exampleBalances = generateExampleBalances();
 
 // Estados posibles para la interfaz
 type PageState = 
