@@ -1,6 +1,25 @@
-import React, { createContext, useState, useContext } from 'react';
+
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { CalendarShift } from '@/types/calendar';
 import { toast } from 'sonner';
+
+// Función auxiliar para obtener el color del turno según su tipo
+export function getShiftColor(type: string) {
+  switch (type) {
+    case "morning": return "blue";
+    case "afternoon": return "amber";
+    case "night": return "indigo";
+    case "24h": return "red";
+    case "free": return "green";
+    case "guard": return "purple";
+    case "unassigned": return "gray";
+    case "training": return "orange";
+    case "special": return "yellow";
+    case "oncall": return "teal";
+    case "custom": return "pink";
+    default: return "gray";
+  }
+}
 
 type CalendarContextType = {
   selectedShift: CalendarShift | null;
@@ -44,7 +63,7 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({
   const [localShifts, setLocalShifts] = useState<CalendarShift[]>(shifts);
   
   // Update local shifts when prop changes
-  React.useEffect(() => {
+  useEffect(() => {
     setLocalShifts(shifts);
   }, [shifts]);
 
@@ -96,9 +115,17 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({
       setIsSaving(true);
       
       try {
+        console.log("Saving shift:", editedShift);
         const result = await onShiftEdit(editedShift);
         
         if (result) {
+          // Update the local state with the saved shift
+          setLocalShifts(prevShifts => {
+            const otherShifts = prevShifts.filter(s => s.id !== editedShift.id);
+            return [...otherShifts, result];
+          });
+          
+          // Update the selected shift
           setSelectedShift(result);
           toast.success("Turno guardado correctamente");
         } else {
@@ -152,23 +179,6 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({
       {children}
     </CalendarContext.Provider>
   );
-
-  function getShiftColor(type: string) {
-    switch (type) {
-      case "morning": return "blue";
-      case "afternoon": return "amber";
-      case "night": return "indigo";
-      case "24h": return "red";
-      case "free": return "green";
-      case "guard": return "purple";
-      case "unassigned": return "gray";
-      case "training": return "orange";
-      case "special": return "yellow";
-      case "oncall": return "teal";
-      case "custom": return "pink";
-      default: return "gray";
-    }
-  }
 };
 
 export const useCalendarContext = () => {

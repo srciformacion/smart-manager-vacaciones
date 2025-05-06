@@ -3,10 +3,10 @@ import { format, parseISO, endOfMonth } from "date-fns";
 import { CalendarShift } from "@/types/calendar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { getShiftColor } from "../calendar-utils";
 import { v4 as uuidv4 } from 'uuid';
 import { FetchShiftsResponse, SaveShiftResponse } from "./types";
 import { generateMonthlyShifts, isDemoUser } from "./demo-data";
+import { getShiftColor } from "@/components/worker/calendar/context/CalendarContext";
 
 // Function to fetch shifts from Supabase or generate demo data
 export const fetchShifts = async (userId: string, year: number, month: number): Promise<CalendarShift[]> => {
@@ -61,15 +61,23 @@ export const fetchShifts = async (userId: string, year: number, month: number): 
 // Function to save a shift to Supabase or simulate saving for demo
 export const saveShift = async (shift: CalendarShift): Promise<CalendarShift | null> => {
   try {
+    console.log("saveShift called with:", shift);
+    
     // For demo users, just update the local state
     if (isDemoUser(shift.userId)) {
+      console.log("Using demo mode saving");
+      
       // Generate stable UUIDs for demo users to avoid generation errors
       const updatedShift = {
         ...shift,
-        id: shift.id.startsWith('temp-') ? `demo-${uuidv4()}` : shift.id
+        id: shift.id.startsWith('temp-') ? `demo-${uuidv4().substring(0, 8)}` : shift.id
       };
       
+      // Simulate a delay for the API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       toast.success("Turno guardado correctamente");
+      console.log("Demo shift saved:", updatedShift);
       return updatedShift;
     }
     

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getShiftColor } from '../context/CalendarContext';
 
 interface ShiftEditFormProps {
   shift: CalendarShift;
@@ -140,21 +141,4 @@ export function ShiftEditForm({ shift, isLoading, onShiftChange, onSave, onCance
       </div>
     </div>
   );
-  
-  function getShiftColor(type: ShiftType) {
-    switch (type) {
-      case "morning": return "blue";
-      case "afternoon": return "amber";
-      case "night": return "indigo";
-      case "24h": return "red";
-      case "free": return "green";
-      case "guard": return "purple";
-      case "unassigned": return "gray";
-      case "training": return "orange";
-      case "special": return "yellow";
-      case "oncall": return "teal";
-      case "custom": return "pink";
-      default: return "gray";
-    }
-  }
 }

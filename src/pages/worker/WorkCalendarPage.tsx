@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,9 +21,7 @@ export default function WorkCalendarPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [vacationDays, setVacationDays] = useState({ used: 0, total: 22 });
-  
-  // Generate a stable user ID for demo use
-  const userId = user?.id || "demo-user"; // Changed from "1" to "demo-user" for clarity
+  const [userId, setUserId] = useState<string>("demo-user");
   
   // Initialize the calendar hook
   const {
@@ -46,13 +45,22 @@ export default function WorkCalendarPage() {
       try {
         const authUser = await fetchAuthUser();
         if (!authUser) {
-          toast.error("Por favor inicia sesión para acceder a tu calendario");
-          navigate('/auth');
+          // Usamos un ID estable para demo en vez de redirigir
+          console.log("No authenticated user, using demo mode");
+          setUserId("demo-user");
+          setVacationDays({
+            used: 5,
+            total: 22
+          });
+          setLoading(false);
           return;
         }
         
+        // Establecer el ID de usuario una vez
+        setUserId(authUser.id);
+        
         // Para usuarios de demostración, usamos datos predeterminados
-        if (authUser.id.startsWith('demo-') || userId === "demo-user") {
+        if (authUser.id.startsWith('demo-')) {
           setVacationDays({
             used: 5,
             total: 22
@@ -112,7 +120,7 @@ export default function WorkCalendarPage() {
     };
     
     checkAuth();
-  }, [fetchAuthUser, navigate, userId]);
+  }, [fetchAuthUser]);
 
   // Estadísticas mensuales y anuales
   const monthStats = calculateMonthStats();
