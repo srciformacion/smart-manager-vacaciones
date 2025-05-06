@@ -100,7 +100,6 @@ export function SidebarNavigation({
                 collapsed && "justify-center p-0 h-9 w-9",
               )}
               onClick={handleNavigation}
-              aria-current={(props) => props.isActive ? "page" : undefined}
               aria-label={link.ariaLabel}
             >
               <link.icon className={cn("h-4 w-4", collapsed ? "h-5 w-5" : "")} aria-hidden="true" />
@@ -121,17 +120,17 @@ export function SidebarNavigation({
             {!collapsed ? (
               <>
                 <Avatar>
-                  <AvatarImage src={user.avatarUrl} alt={`${user.name} ${user.lastName || ""}`} />
+                  <AvatarImage src={user.avatar} alt={`${user.name}`} />
                   <AvatarFallback>{getInitial()}</AvatarFallback>
                 </Avatar>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">{user.name} {user.lastName || ""}</p>
+                  <p className="text-sm font-medium">{user.name}</p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </div>
               </>
             ) : (
               <Avatar>
-                <AvatarImage src={user.avatarUrl} alt={`${user.name} ${user.lastName || ""}`} />
+                <AvatarImage src={user.avatar} alt={`${user.name}`} />
                 <AvatarFallback>{getInitial()}</AvatarFallback>
               </Avatar>
             )}
