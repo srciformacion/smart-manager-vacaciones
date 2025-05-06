@@ -1,4 +1,3 @@
-
 import {
   CalendarDays,
   ChevronsLeft,
@@ -15,7 +14,9 @@ import {
   BarChart4,
   Bell,
   MailCheck,
-  AlertTriangle
+  AlertTriangle,
+  Clock,
+  Settings2
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,8 @@ const workerLinks = [
   { name: "Mi Calendario", href: "/calendar", icon: CalendarDays, ariaLabel: "Ir a Mi Calendario" },
   { name: "Solicitudes", href: "/requests", icon: FilePen, ariaLabel: "Ir a Solicitudes" },
   { name: "Documentos", href: "/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
+  { name: "Permisos", href: "/leave-request", icon: Clock, ariaLabel: "Ir a Permisos" },
+  { name: "Perfiles de turno", href: "/shift-profile", icon: Settings2, ariaLabel: "Ir a Perfiles de turno" },
   { name: "Historial", href: "/history", icon: History, ariaLabel: "Ir a Historial" },
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
   { name: "Perfil", href: "/profile", icon: User, ariaLabel: "Ir a Perfil" },
