@@ -1,3 +1,4 @@
+
 import {
   CalendarDays,
   ChevronsLeft,
@@ -30,6 +31,7 @@ const workerLinks = [
   { name: "Solicitudes", href: "/requests", icon: FilePen, ariaLabel: "Ir a Solicitudes" },
   { name: "Documentos", href: "/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
   { name: "Permisos", href: "/leave-request", icon: Clock, ariaLabel: "Ir a Permisos" },
+  { name: "Cambios de turno", href: "/shift-change-request", icon: History, ariaLabel: "Ir a Cambios de turno" },
   { name: "Perfiles de turno", href: "/shift-profile", icon: Settings2, ariaLabel: "Ir a Perfiles de turno" },
   { name: "Historial", href: "/history", icon: History, ariaLabel: "Ir a Historial" },
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
