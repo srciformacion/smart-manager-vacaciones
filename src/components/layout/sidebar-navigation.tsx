@@ -6,11 +6,12 @@ import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { InstallPWAButton } from "@/components/pwa/install-pwa-button";
+import { Menu, LayoutDashboard, User as UserIcon, Calendar, Home, Settings } from "lucide-react";
 
 interface NavItem {
   to: string;
   label: string;
-  icon?: React.ReactNode;
+  icon: React.ReactNode;
   requiredRole?: UserRole;
   visible?: boolean;
 }
@@ -30,33 +31,35 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
   
   const navigationItems: NavItem[] = [
     // Worker navigation items
-    { to: "/dashboard", label: "Dashboard", requiredRole: 'worker' },
-    { to: "/profile", label: "Mi Perfil" },
-    { to: "/calendar", label: "Calendario", requiredRole: 'worker' },
-    { to: "/requests/vacation", label: "Solicitar Vacaciones", requiredRole: 'worker' },
-    { to: "/requests/personal-day", label: "Solicitar Día Personal", requiredRole: 'worker' },
-    { to: "/requests/leave", label: "Solicitar Permiso", requiredRole: 'worker' },
-    { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", requiredRole: 'worker' },
-    { to: "/history", label: "Historial", requiredRole: 'worker' },
-    { to: "/shift-profile", label: "Mi Perfil de Turno", requiredRole: 'worker' },
+    { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/profile", label: "Mi Perfil", icon: <UserIcon className="h-4 w-4" /> },
+    { to: "/calendar", label: "Calendario", icon: <Calendar className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/requests/vacation", label: "Solicitar Vacaciones", icon: <Menu className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/requests/personal-day", label: "Solicitar Día Personal", icon: <Menu className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/requests/leave", label: "Solicitar Permiso", icon: <Menu className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", icon: <Menu className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/history", label: "Historial", icon: <Menu className="h-4 w-4" />, requiredRole: 'worker' },
+    { to: "/shift-profile", label: "Mi Perfil de Turno", icon: <UserIcon className="h-4 w-4" />, requiredRole: 'worker' },
     // HR navigation items
-    { to: "/rrhh/dashboard", label: "Dashboard RRHH", requiredRole: 'hr' },
-    { to: "/rrhh/calendar", label: "Calendario RRHH", requiredRole: 'hr' },
-    { to: "/rrhh/requests", label: "Gestionar Solicitudes", requiredRole: 'hr' },
-    { to: "/rrhh/workers", label: "Gestionar Trabajadores", requiredRole: 'hr' },
-    { to: "/rrhh/notification", label: "Enviar Notificación", requiredRole: 'hr' },
-    { to: "/rrhh/calendar-notification", label: "Notificar Calendario", requiredRole: 'hr' },
-    { to: "/rrhh/ai-assistant", label: "Asistente IA", requiredRole: 'hr' },
-    { to: "/rrhh/ai-dashboard", label: "Dashboard IA", requiredRole: 'hr' },
+    { to: "/rrhh/dashboard", label: "Dashboard RRHH", icon: <LayoutDashboard className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/calendar", label: "Calendario RRHH", icon: <Calendar className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/requests", label: "Gestionar Solicitudes", icon: <Menu className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/workers", label: "Gestionar Trabajadores", icon: <Menu className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/notification", label: "Enviar Notificación", icon: <Menu className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/calendar-notification", label: "Notificar Calendario", icon: <Menu className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/ai-assistant", label: "Asistente IA", icon: <Menu className="h-4 w-4" />, requiredRole: 'hr' },
+    { to: "/rrhh/ai-dashboard", label: "Dashboard IA", icon: <LayoutDashboard className="h-4 w-4" />, requiredRole: 'hr' },
     // Shared navigation items
-    { to: "/chat", label: "Chat" },
+    { to: "/chat", label: "Chat", icon: <Menu className="h-4 w-4" /> },
   ];
 
-  // Filter navigation items based on user role
+  // Ensure filteredNavigationItems is working correctly by showing all items when no role restrictions match
   const filteredNavigationItems = navigationItems.filter(item => {
-    if (!item.requiredRole) return true; // Always show items without a required role
-    if (item.requiredRole === userRole) return true; // Show items matching the user's role
-    return false; // Don't show items for other roles
+    // If no role requirement or always visible, show the item
+    if (!item.requiredRole) return true;
+    
+    // Show items matching the user's role
+    return item.requiredRole === userRole;
   });
 
   const handleNavClick = () => {
@@ -79,23 +82,28 @@ export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarN
       <Separator className="bg-sidebar-border" />
       <nav className="flex-1 px-2 py-4 overflow-y-auto">
         <ul className="space-y-1">
-          {filteredNavigationItems.map((item) => (
-            <li key={item.to}>
-              <NavLink
-                to={item.to}
-                className={({ isActive }) =>
-                  `block rounded-md px-3 py-2 text-sm font-medium transition-colors
-                  ${isActive 
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground font-bold' 
-                    : 'text-sidebar-foreground hover:bg-sidebar-primary/20 hover:text-sidebar-foreground'
-                  }`
-                }
-                onClick={handleNavClick}
-              >
-                {item.label}
-              </NavLink>
-            </li>
-          ))}
+          {filteredNavigationItems.length > 0 ? (
+            filteredNavigationItems.map((item) => (
+              <li key={item.to}>
+                <NavLink
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors
+                    ${isActive 
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-bold' 
+                      : 'text-sidebar-foreground hover:bg-sidebar-primary/20 hover:text-sidebar-foreground'
+                    }`
+                  }
+                  onClick={handleNavClick}
+                >
+                  <span className="mr-2">{item.icon}</span>
+                  {item.label}
+                </NavLink>
+              </li>
+            ))
+          ) : (
+            <li className="px-3 py-2 text-sm">No hay elementos de navegación disponibles</li>
+          )}
         </ul>
       </nav>
       {onLogout && (

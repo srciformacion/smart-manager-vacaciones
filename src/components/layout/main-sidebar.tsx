@@ -18,18 +18,20 @@ export function MainSidebar() {
     id: user.id,
     name: user.user_metadata?.name || "Usuario",
     email: user.email || "",
-    role: userRole || (user.user_metadata?.role as UserRole) || "worker",
+    role: userRole as UserRole || (user.user_metadata?.role as UserRole) || "worker",
   } as User : null;
 
-  // Debug log to see what's being passed to SidebarNavigation
+  // Default role to 'worker' if nothing is available
+  const effectiveRole = userRole as UserRole || (user?.user_metadata?.role as UserRole) || localStorage.getItem("userRole") as UserRole || "worker";
+
   console.log("MainSidebar - User:", typedUser);
-  console.log("MainSidebar - Role:", userRole || localStorage.getItem("userRole"));
+  console.log("MainSidebar - Role:", effectiveRole);
 
   return (
     <aside className="hidden lg:block w-64 border-r border-sidebar-border bg-sidebar">
       <SidebarNavigation 
         user={typedUser}
-        role={userRole as UserRole || localStorage.getItem("userRole") as UserRole} 
+        role={effectiveRole}
         onLogout={handleLogout}
       />
     </aside>
