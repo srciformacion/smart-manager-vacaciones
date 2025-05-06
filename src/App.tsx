@@ -13,6 +13,9 @@ const WorkCalendarPage = lazy(() => import('@/pages/worker/WorkCalendarPage'));
 const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
 const RequestsPage = lazy(() => import('@/pages/worker/RequestsPage'));
 const DocumentsPage = lazy(() => import('@/pages/worker/DocumentsPage'));
+const ChatPage = lazy(() => import('@/pages/chat/ChatPage'));
+
+// HR pages
 const HRDashboardPage = lazy(() => import('@/pages/hr/HRDashboardPage'));
 const HRWorkersPage = lazy(() => import('@/pages/hr/HRWorkersPage'));
 const HRRequestsPage = lazy(() => import('@/pages/hr/HRRequestsPage'));
@@ -20,7 +23,6 @@ const HRCalendarPage = lazy(() => import('@/pages/hr/HRCalendarPage'));
 const HRDocumentsPage = lazy(() => import('@/pages/hr/HRDocumentsPage'));
 const HRReportsPage = lazy(() => import('@/pages/hr/HRReportsPage'));
 const HRSettingsPage = lazy(() => import('@/pages/hr/HRSettingsPage'));
-const ChatPage = lazy(() => import('@/pages/chat/ChatPage'));
 
 function App() {
   return (
@@ -38,6 +40,7 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/requests" element={<RequestsPage />} />
               <Route path="/documents" element={<DocumentsPage />} />
+              <Route path="/chat" element={<ChatPage />} />
               
               {/* HR routes */}
               <Route path="/rrhh/dashboard" element={<HRDashboardPage />} />
@@ -47,9 +50,6 @@ function App() {
               <Route path="/rrhh/documents" element={<HRDocumentsPage />} />
               <Route path="/rrhh/reports" element={<HRReportsPage />} />
               <Route path="/rrhh/settings" element={<HRSettingsPage />} />
-              
-              {/* Chat route */}
-              <Route path="/chat" element={<ChatPage />} />
               
               {/* Default redirect */}
               <Route path="/" element={<Navigate to="/dashboard" replace />} />

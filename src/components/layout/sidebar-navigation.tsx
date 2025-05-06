@@ -1,4 +1,3 @@
-
 import {
   CalendarCheck,
   CalendarDays,
@@ -18,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User as UserType, UserRole } from "@/types";
 
 const userLinks = [
-  { name: "Dashboard", href: "/", icon: Home, ariaLabel: "Ir a Dashboard" },
+  { name: "Dashboard", href: "/dashboard", icon: Home, ariaLabel: "Ir a Dashboard" },
   { name: "Mi Calendario", href: "/calendar", icon: CalendarDays, ariaLabel: "Ir a Mi Calendario" },
   { name: "Solicitudes", href: "/requests", icon: FilePen, ariaLabel: "Ir a Solicitudes" },
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
@@ -26,13 +25,13 @@ const userLinks = [
 ];
 
 const adminLinks = [
-  { name: "Dashboard", href: "/hr", icon: Home, ariaLabel: "Ir a Dashboard" },
-  { name: "Calendarios", href: "/hr/calendar", icon: CalendarCheck, ariaLabel: "Ir a Gestión de Calendarios" },
-  { name: "Solicitudes", href: "/hr/requests", icon: FilePen, ariaLabel: "Ir a Gestión de Solicitudes" },
-  { name: "Personal", href: "/hr/workers", icon: User, ariaLabel: "Ir a Gestión de Personal" },
+  { name: "Dashboard", href: "/rrhh/dashboard", icon: Home, ariaLabel: "Ir a Dashboard" },
+  { name: "Calendarios", href: "/rrhh/calendar", icon: CalendarCheck, ariaLabel: "Ir a Gestión de Calendarios" },
+  { name: "Solicitudes", href: "/rrhh/requests", icon: FilePen, ariaLabel: "Ir a Gestión de Solicitudes" },
+  { name: "Personal", href: "/rrhh/workers", icon: User, ariaLabel: "Ir a Gestión de Personal" },
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
-  { name: "Asistente IA", href: "/hr/ai", icon: Settings, ariaLabel: "Ir a Asistente IA" },
-  { name: "Notificaciones", href: "/hr/notifications", icon: Settings, ariaLabel: "Ir a Notificaciones" }
+  { name: "Informes", href: "/rrhh/reports", icon: Settings, ariaLabel: "Ir a Informes" },
+  { name: "Configuración", href: "/rrhh/settings", icon: Settings, ariaLabel: "Ir a Configuración" }
 ];
 
 interface SidebarNavigationProps {
@@ -120,7 +119,7 @@ export function SidebarNavigation({
             {!collapsed ? (
               <>
                 <Avatar>
-                  <AvatarImage src={user.avatar} alt={`${user.name}`} />
+                  <AvatarImage src={user.avatar || user.profilePicture} alt={`${user.name}`} />
                   <AvatarFallback>{getInitial()}</AvatarFallback>
                 </Avatar>
                 <div className="space-y-1">
@@ -130,7 +129,7 @@ export function SidebarNavigation({
               </>
             ) : (
               <Avatar>
-                <AvatarImage src={user.avatar} alt={`${user.name}`} />
+                <AvatarImage src={user.avatar || user.profilePicture} alt={`${user.name}`} />
                 <AvatarFallback>{getInitial()}</AvatarFallback>
               </Avatar>
             )}

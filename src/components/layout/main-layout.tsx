@@ -1,3 +1,4 @@
+
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,10 +12,12 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User } from "@/types";
 import { useAuth } from "@/hooks/auth";
 import { Menu as MenuIcon } from "lucide-react";
+
 export interface MainLayoutProps {
   children: React.ReactNode;
   user?: User | null;
 }
+
 export function MainLayout({
   children,
   user
@@ -23,12 +26,12 @@ export function MainLayout({
   const [mounted, setMounted] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const {
-    signOut
-  } = useAuth();
+  const { signOut } = useAuth();
+  
   useEffect(() => {
     setMounted(true);
   }, []);
+  
   async function logout() {
     await signOut();
     navigate("/auth", {
@@ -45,7 +48,9 @@ export function MainLayout({
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
-  return <div className="flex h-screen bg-background">
+  
+  return (
+    <div className="flex h-screen bg-background">
       {/* Sidebar condicional para pantallas grandes */}
       {sidebarVisible && <div className="hidden lg:block w-64">
           <MainSidebar onNavigate={closeMobileMenu} />
@@ -72,7 +77,7 @@ export function MainLayout({
             </Button>
             
             {/* Título o logo de la aplicación */}
-            
+            <span className="text-lg font-bold">La Rioja Cuida</span>
           </div>
           <div className="flex items-center gap-2 ml-auto">
             <InstallPWAButton />
@@ -105,5 +110,6 @@ export function MainLayout({
         </header>
         <main className="flex-1 p-4 overflow-y-auto">{children}</main>
       </div>
-    </div>;
+    </div>
+  );
 }
