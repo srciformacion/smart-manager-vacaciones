@@ -14,10 +14,11 @@ export function DataGenerationPage() {
   const { user } = useProfileAuth();
   const [previewData, setPreviewData] = useState<any[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [previewCount, setPreviewCount] = useState(10); // Default to 10 records in preview
 
   const generatePreviewData = () => {
-    // Generate just a few records for the preview
-    const sampleData = generateEmployeeData(3);
+    // Generate preview records
+    const sampleData = generateEmployeeData(previewCount);
     setPreviewData(sampleData);
     setShowPreview(true);
   };
@@ -54,14 +55,39 @@ export function DataGenerationPage() {
               
               <EmployeeDataGenerator />
               
-              <div className="flex justify-center mt-4">
+              <div className="flex flex-col md:flex-row justify-center gap-4 mt-4">
                 <Button 
                   variant="outline" 
-                  onClick={generatePreviewData}
+                  onClick={() => {
+                    setPreviewCount(10);
+                    generatePreviewData();
+                  }}
                   className="flex items-center gap-2"
                 >
                   <FileJson className="h-4 w-4" />
-                  Ver muestra de datos
+                  Ver 10 perfiles
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setPreviewCount(50);
+                    generatePreviewData();
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <FileJson className="h-4 w-4" />
+                  Ver 50 perfiles
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setPreviewCount(300);
+                    generatePreviewData();
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <FileJson className="h-4 w-4" />
+                  Ver todos (300 perfiles)
                 </Button>
               </div>
               
@@ -114,9 +140,9 @@ export function DataGenerationPage() {
           <TabsContent value="preview">
             {showPreview ? (
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Muestra de datos generados</h2>
+                <h2 className="text-lg font-semibold">Muestra de datos generados ({previewData.length} registros)</h2>
                 <p className="text-sm text-muted-foreground">
-                  A continuación se muestra una muestra de 3 registros para que puedas ver el formato de los datos generados.
+                  A continuación se muestra una muestra de {previewData.length} registros para que puedas ver el formato de los datos generados.
                 </p>
                 
                 <ScrollArea className="h-[500px] border rounded-lg p-4 bg-muted/30">
@@ -139,14 +165,36 @@ export function DataGenerationPage() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p>Haz clic en "Ver muestra de datos" en la pestaña Generador para visualizar una muestra.</p>
-                <Button 
-                  variant="outline" 
-                  onClick={generatePreviewData}
-                  className="mt-4"
-                >
-                  Generar muestra ahora
-                </Button>
+                <p>Haz clic en uno de los botones de vista previa en la pestaña Generador para visualizar los datos.</p>
+                <div className="flex justify-center gap-4 mt-6">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setPreviewCount(10);
+                      generatePreviewData();
+                    }}
+                  >
+                    Ver 10 perfiles
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setPreviewCount(50);
+                      generatePreviewData();
+                    }}
+                  >
+                    Ver 50 perfiles
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setPreviewCount(300);
+                      generatePreviewData();
+                    }}
+                  >
+                    Ver todos (300 perfiles)
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>
