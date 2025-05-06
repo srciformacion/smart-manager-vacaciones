@@ -8,10 +8,10 @@ export function useProfileAuth() {
   const { user: authUser, userRole } = useAuth();
   const [loading, setLoading] = useState(false);
   
-  // Convert auth user to app User type
+  // Convert auth user to app User type with proper type checking for name
   const user: User | null = authUser ? {
     id: authUser.id,
-    name: authUser.user_metadata?.name || authUser.name || "Usuario",
+    name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || "Usuario",
     email: authUser.email || "",
     role: userRole || authUser.user_metadata?.role || authUser.role || "worker",
   } : null;

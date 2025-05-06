@@ -31,13 +31,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return signOut(navigate);
   };
 
+  // Fix the error by ensuring error has the correct type
+  const errorMessage = error ? error.message || 'An unknown error occurred' : null;
+
   return (
     <AuthContext.Provider
       value={{ 
         user, 
         session, 
         loading, 
-        error, 
+        error: errorMessage, 
         signIn: handleSignIn, 
         signUp: handleSignUp, 
         signOut: handleSignOut, 
