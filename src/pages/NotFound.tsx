@@ -1,10 +1,13 @@
 
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 
 const NotFound = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { userRole } = useAuth();
 
   useEffect(() => {
     console.error(
@@ -12,6 +15,21 @@ const NotFound = () => {
       location.pathname
     );
   }, [location.pathname]);
+
+  // Función para determinar la ruta del dashboard según el rol
+  const getDashboardRoute = () => {
+    return userRole === 'hr' ? "/rrhh/dashboard" : "/dashboard";
+  };
+
+  // Función para manejar la navegación hacia atrás
+  const handleGoBack = () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Si no hay historial, navega al dashboard según el rol
+      navigate(getDashboardRoute());
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -22,11 +40,11 @@ const NotFound = () => {
           Lo sentimos, la página que estás buscando no existe o ha sido movida.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button onClick={() => window.history.back()} variant="outline">
+          <Button onClick={handleGoBack} variant="outline">
             Volver atrás
           </Button>
           <Button asChild>
-            <Link to="/dashboard">Ir al dashboard</Link>
+            <Button onClick={() => navigate(getDashboardRoute())}>Ir al dashboard</Button>
           </Button>
         </div>
       </div>

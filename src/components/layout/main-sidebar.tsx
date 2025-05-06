@@ -24,15 +24,19 @@ export function MainSidebar() {
   // Default role to 'worker' if nothing is available
   const effectiveRole = userRole as UserRole || (user?.user_metadata?.role as UserRole) || localStorage.getItem("userRole") as UserRole || "worker";
 
-  console.log("MainSidebar - User:", typedUser);
-  console.log("MainSidebar - Role:", effectiveRole);
+  // Función para manejar la navegación y cerrar el menú mobile si es necesario
+  const handleNavigation = () => {
+    // En dispositivos móviles, podríamos cerrar el menú aquí
+    // Esto será manejado por el componente padre
+  };
 
   return (
-    <aside className="hidden lg:block w-64 border-r border-sidebar-border bg-sidebar">
+    <aside className="h-full border-r border-sidebar-border bg-sidebar">
       <SidebarNavigation 
         user={typedUser}
         role={effectiveRole}
         onLogout={handleLogout}
+        onNavigate={handleNavigation}
       />
     </aside>
   );
