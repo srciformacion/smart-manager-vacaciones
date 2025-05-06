@@ -1,22 +1,7 @@
-
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -25,23 +10,24 @@ import { InstallPWAButton } from '@/components/pwa/install-pwa-button';
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User } from "@/types";
 import { useAuth } from "@/hooks/use-auth";
-import { Sidebar as SidebarIcon } from "lucide-react";
-
+import { ChevronLeft, Sidebar as SidebarIcon } from "lucide-react";
 export interface MainLayoutProps {
   children: React.ReactNode;
   user?: User | null;
 }
-
-export function MainLayout({ children, user }: MainLayoutProps) {
+export function MainLayout({
+  children,
+  user
+}: MainLayoutProps) {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
-  const { signOut } = useAuth();
-
+  const {
+    signOut
+  } = useAuth();
   useEffect(() => {
     setMounted(true);
   }, []);
-
   async function logout() {
     await signOut();
     navigate("/login");
@@ -52,17 +38,29 @@ export function MainLayout({ children, user }: MainLayoutProps) {
     setSidebarVisible(!sidebarVisible);
   };
 
-  return (
-    <div className="flex h-screen bg-background">
+  // Función para manejar la navegación hacia atrás
+  const handleGoBack = () => {
+    const {
+      userRole
+    } = useAuth();
+    const defaultRoute = userRole === 'hr' ? '/rrhh/dashboard' : '/dashboard';
+
+    // Si hay historial, regresa a la página anterior
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Si no hay historial, navega a la ruta predeterminada
+      navigate(defaultRoute);
+    }
+  };
+  return <div className="flex h-screen bg-background">
       {/* Sidebar condicional */}
-      <div className={`transition-all duration-300 ${sidebarVisible ? 'w-64' : 'w-0 overflow-hidden'}`}>
-        <MainSidebar />
-      </div>
+      
       <div className="flex flex-col flex-1">
         <header className="z-10 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-secondary">
           <div className="flex items-center">
             {/* Botón para mostrar/ocultar el sidebar en pantallas grandes */}
-            <Button variant="ghost" size="sm" onClick={toggleSidebar} className="mr-2">
+            <Button variant="ghost" size="sm" onClick={toggleSidebar} className="mr-2 hidden lg:flex">
               <SidebarIcon className="w-5 h-5" />
             </Button>
             
@@ -83,12 +81,17 @@ export function MainLayout({ children, user }: MainLayoutProps) {
                 <MainSidebar />
               </SheetContent>
             </Sheet>
+            
+            {/* Botón para regresar */}
+            <Button variant="ghost" size="sm" onClick={handleGoBack} className="mr-2">
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Atrás
+            </Button>
           </div>
           <div className="flex items-center gap-2 ml-auto">
             <InstallPWAButton />
             <ThemeToggle />
-            {mounted && user ? (
-              <DropdownMenu>
+            {mounted && user ? <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative w-8 h-8 rounded-full">
                     <Avatar className="w-8 h-8">
@@ -109,16 +112,12 @@ export function MainLayout({ children, user }: MainLayoutProps) {
                     Salir
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Link to="/login">
+              </DropdownMenu> : <Link to="/login">
                 <Button>Login</Button>
-              </Link>
-            )}
+              </Link>}
           </div>
         </header>
         <main className="flex-1 p-4">{children}</main>
       </div>
-    </div>
-  );
+    </div>;
 }
