@@ -1,139 +1,170 @@
 
-import { NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { Fragment } from "react";
 import { User, UserRole } from "@/types";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { InstallPWAButton } from "@/components/pwa/install-pwa-button";
 import { 
-  LayoutDashboard, 
+  LogOut, 
   User as UserIcon, 
   Calendar, 
-  FileText,
-  Clock,
-  CalendarClock,
-  MessageSquare,
-  BrainCircuit,
-  Bell,
-  LogOut
+  FileText, 
+  Bell, 
+  Briefcase,
+  Home,
+  Info,
+  Settings,
+  Users,
+  Bot,
+  Clock
 } from "lucide-react";
 
-interface NavItem {
-  to: string;
-  label: string;
-  icon: React.ReactNode;
-  requiredRole?: UserRole;
-  visible?: boolean;
-}
-
-// Update the props interface to accept either user or role and optional callbacks
 interface SidebarNavigationProps {
-  user?: User | null;
-  role?: UserRole;
-  onLogout?: () => void | Promise<void>;
+  user: User | null;
+  role: UserRole;
+  onLogout: () => void;
   onNavigate?: () => void;
 }
 
-export function SidebarNavigation({ user, role, onLogout, onNavigate }: SidebarNavigationProps) {
-  // Determine role from props - either directly provided or from user object
-  const userRole = role || user?.role || 'worker';
+export function SidebarNavigation({ 
+  user, 
+  role, 
+  onLogout,
+  onNavigate 
+}: SidebarNavigationProps) {
+  const location = useLocation();
   
-  const navigationItems: NavItem[] = [
-    // Worker navigation items
-    { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
-    { to: "/profile", label: "Mi Perfil", icon: <UserIcon className="h-4 w-4" aria-hidden="true" /> },
-    { to: "/calendar", label: "Calendario", icon: <Calendar className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
-    { to: "/requests/vacation", label: "Solicitar Vacaciones", icon: <CalendarClock className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
-    { to: "/requests/personal-day", label: "Solicitar Día Personal", icon: <Clock className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
-    { to: "/requests/leave", label: "Solicitar Permiso", icon: <FileText className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
-    { to: "/requests/shift-change", label: "Solicitar Cambio de Turno", icon: <Clock className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
-    { to: "/history", label: "Historial", icon: <Clock className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
-    { to: "/shift-profile", label: "Mi Perfil de Turno", icon: <UserIcon className="h-4 w-4" aria-hidden="true" />, requiredRole: 'worker' },
-    // HR navigation items
-    { to: "/rrhh/dashboard", label: "Dashboard RRHH", icon: <LayoutDashboard className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
-    { to: "/rrhh/calendar", label: "Calendario RRHH", icon: <Calendar className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
-    { to: "/rrhh/requests", label: "Gestionar Solicitudes", icon: <FileText className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
-    { to: "/rrhh/workers", label: "Gestionar Trabajadores", icon: <UserIcon className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
-    { to: "/rrhh/notification", label: "Enviar Notificación", icon: <Bell className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
-    { to: "/rrhh/calendar-notification", label: "Notificar Calendario", icon: <Calendar className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
-    { to: "/rrhh/ai-assistant", label: "Asistente IA", icon: <BrainCircuit className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
-    { to: "/rrhh/ai-dashboard", label: "Dashboard IA", icon: <LayoutDashboard className="h-4 w-4" aria-hidden="true" />, requiredRole: 'hr' },
-    // Shared navigation items
-    { to: "/chat", label: "Chat", icon: <MessageSquare className="h-4 w-4" aria-hidden="true" /> },
-  ];
-
-  // Ensure filteredNavigationItems is working correctly by showing all items when no role restrictions match
-  const filteredNavigationItems = navigationItems.filter(item => {
-    // If no role requirement or always visible, show the item
-    if (!item.requiredRole) return true;
-    
-    // Show items matching the user's role
-    return item.requiredRole === userRole;
-  });
-
-  const handleNavClick = () => {
+  const handleNavigation = () => {
     if (onNavigate) {
       onNavigate();
     }
   };
+  
+  const workerNav = [
+    {
+      name: "Inicio",
+      to: "/worker/dashboard",
+      icon: <Home className="h-5 w-5" aria-hidden="true" />
+    },
+    {
+      name: "Calendario",
+      to: "/worker/calendar",
+      icon: <Calendar className="h-5 w-5" aria-hidden="true" />
+    },
+    {
+      name: "Solicitudes",
+      to: "/worker/requests",
+      icon: <FileText className="h-5 w-5" aria-hidden="true" />
+    },
+    {
+      name: "Notificaciones",
+      to: "/worker/notifications",
+      icon: <Bell className="h-5 w-5" aria-hidden="true" />
+    },
+  ];
+  
+  const hrNav = [
+    {
+      name: "Inicio",
+      to: "/hr/dashboard",
+      icon: <Home className="h-5 w-5" aria-hidden="true" />
+    },
+    {
+      name: "Gestión",
+      to: "/hr/management",
+      icon: <Briefcase className="h-5 w-5" aria-hidden="true" />
+    },
+    {
+      name: "Personal",
+      to: "/hr/staff",
+      icon: <Users className="h-5 w-5" aria-hidden="true" />
+    },
+    {
+      name: "Calendarios",
+      to: "/hr/calendars",
+      icon: <Calendar className="h-5 w-5" aria-hidden="true" />
+    },
+    {
+      name: "Solicitudes",
+      to: "/hr/requests",
+      icon: <FileText className="h-5 w-5" aria-hidden="true" />
+    },
+    {
+      name: "Asistente IA",
+      to: "/hr/ai",
+      icon: <Bot className="h-5 w-5" aria-hidden="true" />
+    },
+    {
+      name: "Notificaciones",
+      to: "/hr/notifications",
+      icon: <Bell className="h-5 w-5" aria-hidden="true" />
+    }
+  ];
 
+  const navItems = role === "hr" ? hrNav : workerNav;
+  
   return (
-    <div className="flex flex-col h-full bg-green-700 text-white">
-      <div className="px-4 py-6">
-        <NavLink to={userRole === 'hr' ? "/rrhh/dashboard" : "/dashboard"} onClick={handleNavClick}>
-          <Button variant="ghost" className="font-bold text-lg w-full text-white hover:bg-green-800">
-            La Rioja Cuida
-          </Button>
-        </NavLink>
-      </div>
-      <Separator className="bg-green-600" />
-      <nav className="flex-1 px-2 py-4 overflow-y-auto" aria-label="Menú principal">
-        <ul className="space-y-1">
-          {filteredNavigationItems.length > 0 ? (
-            filteredNavigationItems.map((item) => (
-              <li key={item.to}>
+    <div className="flex h-full flex-col justify-between py-4">
+      <div>
+        <div className="px-3 py-2 mb-6">
+          <Link
+            to={role === "hr" ? "/hr/dashboard" : "/worker/dashboard"}
+            onClick={handleNavigation}
+            className="flex items-center gap-2 text-xl font-bold text-primary"
+            aria-label="Ir al tablero principal"
+          >
+            <Clock className="h-6 w-6" aria-hidden="true" />
+            <span>TurnoSync</span>
+          </Link>
+        </div>
+
+        <nav aria-label="Navegación principal">
+          <ul className="space-y-1 px-2">
+            {navItems.map((item) => (
+              <li key={item.name}>
                 <NavLink
                   to={item.to}
                   className={({ isActive }) =>
-                    `flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors
-                    ${isActive 
-                      ? 'bg-green-900 text-white font-bold' 
-                      : 'text-white hover:bg-green-800 hover:text-white'
+                    `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                      isActive 
+                        ? "bg-primary text-primary-foreground" 
+                        : "hover:bg-accent hover:text-accent-foreground"
                     }`
                   }
-                  onClick={handleNavClick}
-                  aria-current={({ isActive }) => isActive ? "page" : undefined}
+                  onClick={handleNavigation}
+                  aria-current={({ isActive }) => isActive ? "page" : false}
                 >
-                  <span className="mr-2 flex items-center justify-center" aria-hidden="true">{item.icon}</span>
-                  <span>{item.label}</span>
+                  {item.icon}
+                  <span>{item.name}</span>
                 </NavLink>
               </li>
-            ))
-          ) : (
-            <li className="px-3 py-2 text-sm">No hay elementos de navegación disponibles</li>
-          )}
-        </ul>
-      </nav>
-      <Separator className="bg-green-600" />
-      <div className="p-4">
-        {onLogout && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onLogout} 
-            className="w-full bg-green-800 text-white hover:bg-green-900 mb-4 flex items-center justify-center gap-2"
-            aria-label="Cerrar sesión"
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      <div className="space-y-1 px-3">
+        {user && (
+          <Link 
+            to="/profile" 
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+            onClick={handleNavigation}
+            aria-label="Ver tu perfil"
           >
-            <LogOut className="h-4 w-4" aria-hidden="true" />
-            Cerrar sesión
-          </Button>
+            <UserIcon className="h-5 w-5" aria-hidden="true" />
+            <span className="truncate">{user.name || 'Mi perfil'}</span>
+          </Link>
         )}
-        <div className="flex items-center justify-center gap-2">
-          <ThemeToggle />
-          <NotificationBell />
-          <InstallPWAButton />
-        </div>
+        
+        <button
+          onClick={() => {
+            onLogout();
+            if (onNavigate) onNavigate();
+          }}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+          aria-label="Cerrar sesión"
+        >
+          <LogOut className="h-5 w-5" aria-hidden="true" />
+          <span>Cerrar sesión</span>
+        </button>
       </div>
     </div>
   );

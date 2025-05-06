@@ -17,18 +17,27 @@ import {
   isSameDay 
 } from "date-fns";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from 'uuid';
 
 export function useWorkCalendar(userId: string) {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [shifts, setShifts] = useState<CalendarShift[]>([]);
   const [annualHours, setAnnualHours] = useState<AnnualHours | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  // Check if we're dealing with a demo user
+  const isDemoUser = userId.startsWith('demo-') || userId === "1";
 
-  // Función para obtener turnos desde Supabase
+  // Función para obtener turnos desde Supabase o generar datos de demo
   const fetchShifts = async (userId: string, year: number, month: number) => {
     try {
-      // Obtenemos los turnos de Supabase
-      const startDate = new Date(year, month - 1, 1); // Month is 0-indexed in JS
+      // Si es un usuario demo, generamos datos de ejemplo
+      if (isDemoUser) {
+        return generateMonthlyShifts(userId, year, month);
+      }
+      
+      // Obtenemos los turnos de Supabase para usuarios reales
+      const startDate = new Date(year, month - 1, 1);
       const endDate = endOfMonth(startDate);
       
       const { data, error } = await supabase
@@ -40,7 +49,6 @@ export function useWorkCalendar(userId: string) {
         
       if (error) {
         console.error("Error fetching shifts:", error);
-        // Si hay error, generamos datos de ejemplo
         return generateMonthlyShifts(userId, year, month);
       }
       
@@ -70,9 +78,25 @@ export function useWorkCalendar(userId: string) {
     }
   };
 
-  // Función para guardar un turno en Supabase
+  // Función para guardar un turno en Supabase o simular guardado para demo
   const saveShift = async (shift: CalendarShift) => {
     try {
+      // Para usuarios demo, simplemente actualizamos el estado local
+      if (isDemoUser) {
+        const updatedShift = {
+          ...shift,
+          id: shift.id.startsWith('temp-') ? uuidv4() : shift.id
+        };
+        
+        setShifts(prevShifts => {
+          const otherShifts = prevShifts.filter(s => s.id !== shift.id);
+          return [...otherShifts, updatedShift];
+        });
+        
+        toast.success("Turno guardado correctamente");
+        return updatedShift;
+      }
+      
       // Preparamos los datos para Supabase
       const shiftData = {
         user_id: shift.userId,
@@ -86,20 +110,65 @@ export function useWorkCalendar(userId: string) {
         exception_reason: shift.exceptionReason
       };
       
+      let result;
+      
       // Insertamos o actualizamos el turno
-      const { data, error } = await supabase
-        .from('calendar_shifts')
-        .upsert(shiftData)
-        .select();
+      if (shift.id.startsWith('temp-')) {
+        const { data, error } = await supabase
+          .from('calendar_shifts')
+          .insert(shiftData)
+          .select();
+          
+        if (error) {
+          console.error("Error saving shift:", error);
+          toast.error("Error al guardar el turno");
+          return null;
+        }
         
-      if (error) {
-        console.error("Error saving shift:", error);
-        toast.error("Error al guardar el turno");
-        return null;
+        result = data[0];
+      } else {
+        const { data, error } = await supabase
+          .from('calendar_shifts')
+          .update(shiftData)
+          .eq('id', shift.id)
+          .select();
+          
+        if (error) {
+          console.error("Error updating shift:", error);
+          toast.error("Error al actualizar el turno");
+          return null;
+        }
+        
+        result = data[0];
       }
       
       toast.success("Turno guardado correctamente");
-      return data[0];
+      
+      // Actualizamos el estado local
+      if (result) {
+        const savedShift: CalendarShift = {
+          id: result.id,
+          userId: result.user_id,
+          date: new Date(result.date),
+          type: result.type,
+          startTime: result.start_time,
+          endTime: result.end_time,
+          color: getShiftColor(result.type),
+          hours: result.hours || 0,
+          notes: result.notes,
+          isException: result.is_exception,
+          exceptionReason: result.exception_reason
+        };
+        
+        setShifts(prevShifts => {
+          const otherShifts = prevShifts.filter(s => s.id !== shift.id);
+          return [...otherShifts, savedShift];
+        });
+        
+        return savedShift;
+      }
+      
+      return null;
     } catch (error) {
       console.error("Error in saveShift:", error);
       toast.error("Error al guardar el turno");
@@ -137,7 +206,24 @@ export function useWorkCalendar(userId: string) {
       const monthlyShifts = await fetchShifts(userId, year, month);
       setShifts(monthlyShifts);
       
-      // Cargamos datos de horas anuales
+      // Para usuarios demo, creamos datos simulados
+      if (isDemoUser) {
+        setAnnualHours({
+          userId,
+          year,
+          baseHours: 1700,
+          workedHours: 450,
+          vacationHours: 40,
+          sickLeaveHours: 0,
+          personalLeaveHours: 8,
+          seniorityAdjustment: 16,
+          remainingHours: 1186,
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // Cargamos datos de horas anuales para usuarios reales
       const { data: annualHoursData, error } = await supabase
         .from('annual_hours')
         .select('*')
@@ -176,28 +262,31 @@ export function useWorkCalendar(userId: string) {
           remaining_hours: 1700
         };
         
-        const { data: newHoursData, error: insertError } = await supabase
-          .from('annual_hours')
-          .insert(defaultHours)
-          .select();
+        try {
+          const { data: newHoursData, error: insertError } = await supabase
+            .from('annual_hours')
+            .insert(defaultHours)
+            .select();
+            
+          if (insertError) {
+            console.error("Error creating annual hours:", insertError);
+          }
           
-        if (insertError) {
-          console.error("Error creating annual hours:", insertError);
-        }
-        
-        if (newHoursData && newHoursData.length > 0) {
-          setAnnualHours({
-            userId,
-            year,
-            baseHours: 1700,
-            workedHours: 0,
-            vacationHours: 0,
-            sickLeaveHours: 0,
-            personalLeaveHours: 0,
-            seniorityAdjustment: 0,
-            remainingHours: 1700,
-          });
-        } else {
+          if (newHoursData && newHoursData.length > 0) {
+            setAnnualHours({
+              userId,
+              year,
+              baseHours: 1700,
+              workedHours: 0,
+              vacationHours: 0,
+              sickLeaveHours: 0,
+              personalLeaveHours: 0,
+              seniorityAdjustment: 0,
+              remainingHours: 1700,
+            });
+          } 
+        } catch (error) {
+          console.error("Error creating annual hours entry:", error);
           // Usamos datos de ejemplo si hay error
           setAnnualHours({
             userId,
@@ -215,6 +304,19 @@ export function useWorkCalendar(userId: string) {
     } catch (error) {
       console.error("Error loading calendar data:", error);
       toast.error("No se pudieron cargar los datos del calendario");
+      
+      // Datos de ejemplo en caso de error
+      setAnnualHours({
+        userId,
+        year: new Date().getFullYear(),
+        baseHours: 1700,
+        workedHours: 450,
+        vacationHours: 40,
+        sickLeaveHours: 0,
+        personalLeaveHours: 8,
+        seniorityAdjustment: 16,
+        remainingHours: 1186,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -223,6 +325,16 @@ export function useWorkCalendar(userId: string) {
   // Actualiza las horas trabajadas en la base de datos
   const updateWorkedHours = async (hours: number) => {
     if (!annualHours) return null;
+    
+    // Para usuarios demo, actualizamos solo el estado local
+    if (isDemoUser) {
+      const updatedHours = {
+        ...annualHours,
+        workedHours: hours
+      };
+      setAnnualHours(updatedHours);
+      return updatedHours;
+    }
     
     try {
       const { data, error } = await supabase
@@ -337,14 +449,7 @@ export function useWorkCalendar(userId: string) {
     }, 1500);
   };
 
-  // Cargar datos iniciales
-  useEffect(() => {
-    if (userId) {
-      loadCalendarData(currentDate);
-    }
-  }, [userId]);
-
-  // Generar turnos mensuales para un usuario específico (función de fallback)
+  // Generar turnos mensuales para un usuario específico
   const generateMonthlyShifts = (userId: string, year: number, month: number): CalendarShift[] => {
     const startDate = startOfMonth(new Date(year, month - 1));
     const endDate = endOfMonth(startDate);
@@ -409,7 +514,7 @@ export function useWorkCalendar(userId: string) {
       }
       
       // Crear el turno
-      const shift: CalendarShift = {
+      return {
         id: `${userId}-${day.toISOString()}`,
         userId,
         date: day,
@@ -419,13 +524,15 @@ export function useWorkCalendar(userId: string) {
         color: getShiftColor(shiftType),
         hours,
       };
-      
-      // Guardar el turno en Supabase para futuras consultas
-      saveShift(shift).catch(console.error);
-      
-      return shift;
     });
   };
+
+  // Cargar datos iniciales
+  useEffect(() => {
+    if (userId) {
+      loadCalendarData(currentDate);
+    }
+  }, [userId]);
 
   return {
     currentDate,

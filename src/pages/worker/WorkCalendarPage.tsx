@@ -22,6 +22,9 @@ export default function WorkCalendarPage() {
   const [loading, setLoading] = useState(true);
   const [vacationDays, setVacationDays] = useState({ used: 0, total: 22 });
   
+  // Generate a stable user ID for demo use
+  const userId = user?.id || "1";
+  
   // Inicializamos el hook del calendario
   const {
     currentDate,
@@ -36,7 +39,7 @@ export default function WorkCalendarPage() {
     calculateAnnualStats,
     exportData,
     saveShift
-  } = useWorkCalendar(user?.id || "1");
+  } = useWorkCalendar(userId);
   
   // Verificamos autenticación y cargamos datos adicionales
   useEffect(() => {
@@ -49,38 +52,57 @@ export default function WorkCalendarPage() {
           return;
         }
         
+        // Para usuarios de demostración, usamos datos predeterminados
+        if (authUser.id.startsWith('demo-')) {
+          setVacationDays({
+            used: 5,
+            total: 22
+          });
+          setLoading(false);
+          return;
+        }
+        
         // Obtener días de vacaciones usados
-        const { data: balanceData, error: balanceError } = await supabase
-          .from('balances')
-          .select('*')
-          .eq('userid', authUser.id)
-          .eq('year', new Date().getFullYear())
-          .single();
-        
-        if (balanceError && balanceError.code !== 'PGRST116') {
-          console.error("Error fetching balance:", balanceError);
-        }
-        
-        // Obtener solicitudes de vacaciones aprobadas
-        const { data: vacationRequests, error: requestsError } = await supabase
-          .from('requests')
-          .select('*')
-          .eq('userid', authUser.id)
-          .eq('type', 'vacation')
-          .eq('status', 'approved');
+        try {
+          const { data: balanceData, error: balanceError } = await supabase
+            .from('balances')
+            .select('*')
+            .eq('userid', authUser.id)
+            .eq('year', new Date().getFullYear())
+            .single();
           
-        if (requestsError) {
-          console.error("Error fetching vacation requests:", requestsError);
+          if (balanceError && balanceError.code !== 'PGRST116') {
+            console.error("Error fetching balance:", balanceError);
+          }
+          
+          // Obtener solicitudes de vacaciones aprobadas
+          const { data: vacationRequests, error: requestsError } = await supabase
+            .from('requests')
+            .select('*')
+            .eq('userid', authUser.id)
+            .eq('type', 'vacation')
+            .eq('status', 'approved');
+            
+          if (requestsError) {
+            console.error("Error fetching vacation requests:", requestsError);
+          }
+          
+          // Calcular días usados
+          const usedDays = vacationRequests ? vacationRequests.length : 0;
+          const totalDays = balanceData ? balanceData.vacationdays : 22;
+          
+          setVacationDays({
+            used: usedDays,
+            total: totalDays
+          });
+        } catch (error) {
+          console.error("Error fetching vacation data:", error);
+          // Usar valores predeterminados si hay error
+          setVacationDays({
+            used: 0,
+            total: 22
+          });
         }
-        
-        // Calcular días usados
-        const usedDays = vacationRequests ? vacationRequests.length : 0;
-        const totalDays = balanceData ? balanceData.vacationdays : 22;
-        
-        setVacationDays({
-          used: usedDays,
-          total: totalDays
-        });
         
         setLoading(false);
       } catch (error) {
@@ -144,7 +166,7 @@ export default function WorkCalendarPage() {
             <TabsTrigger value="sync">Sincronización</TabsTrigger>
           </TabsList>
           <TabsContent value="corrections" className="mt-0">
-            <CorrectionRequest userId={user?.id} />
+            <CorrectionRequest userId={userId} />
           </TabsContent>
           <TabsContent value="export" className="mt-0">
             <ExportForm onExport={exportData} />

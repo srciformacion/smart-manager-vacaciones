@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pen, X, Clock, Calendar, Briefcase } from 'lucide-react';
+import { Pen, Clock, Calendar, Briefcase } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -30,9 +30,22 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [localShifts, setLocalShifts] = useState<CalendarShift[]>(shifts);
-
-  // Escuchar cambios en los turnos desde Supabase
+  
+  // Update local shifts when prop changes
   useEffect(() => {
+    setLocalShifts(shifts);
+  }, [shifts]);
+
+  // Determinar si estamos usando datos demo
+  const isDemoData = shifts.some(shift => 
+    shift.id.startsWith('demo-') || shift.id.startsWith('1-'));
+
+  // Escuchar cambios en los turnos desde Supabase (solo para usuarios no demo)
+  useEffect(() => {
+    if (isDemoData) {
+      return; // No escuchamos cambios en tiempo real para datos de demostración
+    }
+    
     // Configurar canal para escuchar cambios en tiempo real
     const channel = supabase
       .channel('calendar-shifts-changes')
@@ -44,62 +57,15 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
         }, 
         (payload) => {
           console.log('Cambio detectado en turnos:', payload);
-          
-          // Refrescar los turnos cuando haya cambios
-          fetchShiftsForMonth();
         }
       )
       .subscribe();
       
-    // Cargar turnos iniciales
-    fetchShiftsForMonth();
-    
     // Limpiar suscripción al desmontar
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentDate]);
-
-  // Función para obtener turnos del mes actual
-  const fetchShiftsForMonth = async () => {
-    try {
-      const month = currentDate.getMonth() + 1;
-      const year = currentDate.getFullYear();
-      const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
-      const lastDay = new Date(year, month, 0).getDate();
-      const endDate = `${year}-${month.toString().padStart(2, '0')}-${lastDay}`;
-      
-      const { data, error } = await supabase
-        .from('calendar_shifts')
-        .select('*')
-        .gte('date', startDate)
-        .lte('date', endDate);
-        
-      if (error) throw error;
-      
-      if (data) {
-        const mappedShifts: CalendarShift[] = data.map(shift => ({
-          id: shift.id,
-          userId: shift.user_id,
-          date: new Date(shift.date),
-          type: shift.type as ShiftType,
-          startTime: shift.start_time,
-          endTime: shift.end_time,
-          color: getShiftColor(shift.type as ShiftType),
-          hours: shift.hours || 0,
-          notes: shift.notes,
-          isException: shift.is_exception,
-          exceptionReason: shift.exception_reason
-        }));
-        
-        setLocalShifts(mappedShifts);
-      }
-    } catch (error) {
-      console.error("Error fetching shifts:", error);
-      toast.error("Error al cargar los turnos");
-      // Si falla, mantenemos los turnos actuales
-    }
-  };
+  }, [isDemoData, currentDate]);
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -136,7 +102,7 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
       // Crear un nuevo shift si no existe
       const newShift: CalendarShift = {
         id: `temp-${Date.now()}`,
-        userId: "current-user", // Esto se actualizará con el ID real
+        userId: shifts[0]?.userId || "current-user", // Usar el userId del primer turno o valor predeterminado
         date,
         type: "unassigned" as ShiftType,
         color: getShiftColor("unassigned"),
@@ -160,76 +126,21 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
   };
 
   const handleSaveClick = async () => {
-    if (editedShift) {
+    if (editedShift && onShiftEdit) {
       setIsSaving(true);
       
       try {
-        // Preparar datos para Supabase
-        const shiftData = {
-          user_id: editedShift.userId,
-          date: format(editedShift.date, 'yyyy-MM-dd'),
-          type: editedShift.type,
-          start_time: editedShift.startTime,
-          end_time: editedShift.endTime,
-          hours: parseFloat(editedShift.hours?.toString() || "0"),
-          notes: editedShift.notes,
-          is_exception: editedShift.isException || false,
-          exception_reason: editedShift.exceptionReason
-        };
+        const result = await onShiftEdit(editedShift);
         
-        let result;
-        
-        if (editedShift.id.startsWith('temp-')) {
-          // Es un nuevo turno, hacemos insert
-          const { data, error } = await supabase
-            .from('calendar_shifts')
-            .insert(shiftData)
-            .select();
-            
-          if (error) throw error;
-          result = data?.[0];
-        } else {
-          // Es un turno existente, hacemos update
-          const { data, error } = await supabase
-            .from('calendar_shifts')
-            .update(shiftData)
-            .eq('id', editedShift.id)
-            .select();
-            
-          if (error) throw error;
-          result = data?.[0];
-        }
-        
-        // Si hay una función onShiftEdit proporcionada, la llamamos
-        if (onShiftEdit) {
-          await onShiftEdit({
-            ...editedShift,
-            id: result?.id || editedShift.id
-          });
-        }
-        
-        // Actualizar el estado local después de guardar
         if (result) {
-          const updatedShifts = localShifts.filter(s => s.id !== editedShift.id);
-          const savedShift: CalendarShift = {
-            id: result.id,
-            userId: result.user_id,
-            date: new Date(result.date),
-            type: result.type as ShiftType,
-            startTime: result.start_time,
-            endTime: result.end_time,
-            color: getShiftColor(result.type as ShiftType),
-            hours: result.hours || 0,
-            notes: result.notes,
-            isException: result.is_exception,
-            exceptionReason: result.exception_reason
-          };
-          
-          setLocalShifts([...updatedShifts, savedShift]);
-          setSelectedShift(savedShift);
+          setSelectedShift(result);
+          toast.success("Turno guardado correctamente");
+        } else {
+          // Si onShiftEdit ya maneja toasts de error, esto es redundante
+          // pero lo dejamos por seguridad
+          toast.error("No se pudo guardar el turno");
         }
         
-        toast.success("Turno guardado correctamente");
         setIsEditMode(false);
       } catch (error) {
         console.error("Error al guardar turno:", error);
@@ -283,6 +194,7 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
                     ${isToday(date) ? "border-blue-500 border-2" : "border-gray-200"}
                     hover:border-blue-300
                   `}
+                  aria-label={`Día ${format(date, 'd')} de ${format(date, 'MMMM', { locale: es })}`}
                 >
                   <div className="text-right text-sm">
                     <span className={`
@@ -296,7 +208,7 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
                   {shift && (
                     <div className={`
                       mt-1 p-1 text-xs rounded-sm flex-grow flex flex-col
-                      ${`bg-${shift.color}-100 text-${shift.color}-800`}
+                      bg-${shift.color}-100 text-${shift.color}-800
                       ${shift.isException && "border border-red-500"}
                     `}>
                       <span className="font-medium">{
@@ -327,9 +239,9 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
 
       {/* Diálogo de detalle/edición de turno */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px]" aria-labelledby="shift-dialog-title">
           <DialogHeader>
-            <DialogTitle className="flex justify-between items-center">
+            <DialogTitle id="shift-dialog-title" className="flex justify-between items-center">
               <div>
                 {isEditMode 
                   ? "Editar turno" 
@@ -337,8 +249,13 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
                 }
               </div>
               {!isEditMode && selectedShift && (
-                <Button variant="ghost" size="icon" onClick={handleEditClick}>
-                  <Pen className="h-4 w-4" />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleEditClick}
+                  aria-label="Editar turno"
+                >
+                  <Pen className="h-4 w-4" aria-hidden="true" />
                 </Button>
               )}
             </DialogTitle>
@@ -347,13 +264,13 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
           {selectedShift && !isEditMode && (
             <div className="space-y-4">
               <div className="flex items-center">
-                <Calendar className="mr-2 h-5 w-5 text-muted-foreground" />
+                <Calendar className="mr-2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
                 <span>{format(selectedShift.date, 'EEEE, d MMMM yyyy', { locale: es })}</span>
               </div>
               
               <div className="flex items-center">
-                <Briefcase className="mr-2 h-5 w-5 text-muted-foreground" />
-                <Badge className={`bg-${selectedShift.color}-100 text-${selectedShift.color}-800 hover:bg-${selectedShift.color}-200`}>
+                <Briefcase className="mr-2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                <Badge>
                   {selectedShift.type === "morning" ? "Mañana" :
                    selectedShift.type === "afternoon" ? "Tarde" :
                    selectedShift.type === "night" ? "Noche" :
@@ -369,14 +286,14 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
               
               {selectedShift.startTime && selectedShift.endTime && (
                 <div className="flex items-center">
-                  <Clock className="mr-2 h-5 w-5 text-muted-foreground" />
+                  <Clock className="mr-2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
                   <span>{selectedShift.startTime} - {selectedShift.endTime}</span>
                 </div>
               )}
               
               {selectedShift.hours !== undefined && selectedShift.hours > 0 && (
                 <div className="flex items-center">
-                  <Clock className="mr-2 h-5 w-5 text-muted-foreground" />
+                  <Clock className="mr-2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
                   <span>{selectedShift.hours} horas</span>
                 </div>
               )}
@@ -406,7 +323,7 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
                       setEditedShift({...editedShift, type: value, color: getShiftColor(value)})
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="type">
                       <SelectValue placeholder="Seleccionar tipo" />
                     </SelectTrigger>
                     <SelectContent>
@@ -467,10 +384,19 @@ export function MonthCalendar({ currentDate, shifts, onShiftEdit }: MonthCalenda
               </div>
               
               <div className="flex justify-between mt-4">
-                <Button variant="outline" onClick={handleCancelClick} disabled={isSaving}>
+                <Button 
+                  variant="outline" 
+                  onClick={handleCancelClick} 
+                  disabled={isSaving}
+                  aria-label="Cancelar edición"
+                >
                   Cancelar
                 </Button>
-                <Button onClick={handleSaveClick} disabled={isSaving}>
+                <Button 
+                  onClick={handleSaveClick} 
+                  disabled={isSaving}
+                  aria-label="Guardar cambios del turno"
+                >
                   {isSaving ? "Guardando..." : "Guardar"}
                 </Button>
               </div>
