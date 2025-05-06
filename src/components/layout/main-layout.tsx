@@ -67,7 +67,9 @@ export function MainLayout({
             {/* Sheet para menú móvil */}
             <Sheet>
               <SheetTrigger asChild>
-                
+                <Button variant="ghost" size="sm" className="mr-2 lg:hidden">
+                  <SidebarIcon className="w-4 h-4" />
+                </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-full sm:max-w-[300px]">
                 <SheetHeader>
