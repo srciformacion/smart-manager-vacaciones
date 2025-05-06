@@ -1,3 +1,4 @@
+
 import {
   CalendarDays,
   ChevronsLeft,
@@ -34,7 +35,7 @@ const workerLinks = [
 
 const hrLinks = [
   { name: "Dashboard", href: "/rrhh/dashboard", icon: Home, ariaLabel: "Ir a Dashboard" },
-  { name: "Calendarios", href: "/rrhh/calendar", icon: CalendarCheck, ariaLabel: "Ir a Gestión de Calendarios" },
+  { name: "Calendarios", href: "/rrhh/calendar", icon: CalendarDays, ariaLabel: "Ir a Gestión de Calendarios" },
   { name: "Solicitudes", href: "/rrhh/requests", icon: FilePen, ariaLabel: "Ir a Gestión de Solicitudes" },
   { name: "Personal", href: "/rrhh/workers", icon: User, ariaLabel: "Ir a Gestión de Personal" },
   { name: "Documentos", href: "/rrhh/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
