@@ -15,7 +15,8 @@ import {
   BrainCircuit,
   BarChart4,
   Bell,
-  MailCheck
+  MailCheck,
+  AlertTriangle
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -41,9 +42,11 @@ const hrLinks = [
   { name: "Documentos", href: "/rrhh/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
   { name: "Notificaciones", href: "/rrhh/notifications", icon: Bell, ariaLabel: "Ir a Notificaciones" },
   { name: "Plantillas", href: "/rrhh/notification-templates", icon: MailCheck, ariaLabel: "Ir a Plantillas de Notificaciones" },
-  { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
   { name: "Asistente IA", href: "/rrhh/ai-assistant", icon: BrainCircuit, ariaLabel: "Ir a Asistente IA" },
+  { name: "Asistente Inteligente", href: "/rrhh/smart-assistant", icon: AlertTriangle, ariaLabel: "Ir a Asistente Inteligente" },
   { name: "Informes", href: "/rrhh/reports", icon: BarChart4, ariaLabel: "Ir a Informes" },
+  { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
+  { name: "Dashboard IA", href: "/rrhh/ai-dashboard", icon: BrainCircuit, ariaLabel: "Ir a Dashboard IA" },
   { name: "Configuración", href: "/rrhh/settings", icon: Settings, ariaLabel: "Ir a Configuración" }
 ];
 
