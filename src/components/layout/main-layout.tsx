@@ -1,3 +1,4 @@
+
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,11 +11,13 @@ import { InstallPWAButton } from '@/components/pwa/install-pwa-button';
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User } from "@/types";
 import { useAuth } from "@/hooks/use-auth";
-import { ChevronLeft, Sidebar as SidebarIcon } from "lucide-react";
+import { Sidebar as SidebarIcon } from "lucide-react";
+
 export interface MainLayoutProps {
   children: React.ReactNode;
   user?: User | null;
 }
+
 export function MainLayout({
   children,
   user
@@ -25,9 +28,11 @@ export function MainLayout({
   const {
     signOut
   } = useAuth();
+  
   useEffect(() => {
     setMounted(true);
   }, []);
+  
   async function logout() {
     await signOut();
     navigate("/login");
@@ -38,21 +43,6 @@ export function MainLayout({
     setSidebarVisible(!sidebarVisible);
   };
 
-  // Función para manejar la navegación hacia atrás
-  const handleGoBack = () => {
-    const {
-      userRole
-    } = useAuth();
-    const defaultRoute = userRole === 'hr' ? '/rrhh/dashboard' : '/dashboard';
-
-    // Si hay historial, regresa a la página anterior
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      // Si no hay historial, navega a la ruta predeterminada
-      navigate(defaultRoute);
-    }
-  };
   return <div className="flex h-screen bg-background">
       {/* Sidebar condicional */}
       
@@ -81,12 +71,6 @@ export function MainLayout({
                 <MainSidebar />
               </SheetContent>
             </Sheet>
-            
-            {/* Botón para regresar */}
-            <Button variant="ghost" size="sm" onClick={handleGoBack} className="mr-2">
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Atrás
-            </Button>
           </div>
           <div className="flex items-center gap-2 ml-auto">
             <InstallPWAButton />

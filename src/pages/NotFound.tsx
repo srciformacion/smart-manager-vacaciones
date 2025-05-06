@@ -30,8 +30,8 @@ const NotFound = () => {
           Lo sentimos, la página que estás buscando no existe o ha sido movida.
         </p>
         <div className="flex justify-center">
-          <Button asChild>
-            <Button onClick={() => navigate(getDashboardRoute())}>Ir al dashboard</Button>
+          <Button onClick={() => navigate(getDashboardRoute())}>
+            Ir al dashboard
           </Button>
         </div>
       </div>
