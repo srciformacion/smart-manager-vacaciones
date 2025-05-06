@@ -17,16 +17,20 @@ export default function RequestsPage() {
   
   useEffect(() => {
     async function fetchRequests() {
-      if (!userId) {
-        // If no user, use example data for demo purposes
-        setRequests(exampleRequests);
-        setLoading(false);
-        return;
-      }
-      
       try {
         setLoading(true);
-        // Fetch requests from Supabase
+        
+        // Check if we're in demo mode (userId starts with "demo-")
+        if (!userId || userId.toString().startsWith('demo-')) {
+          console.log("Using example requests for demo mode");
+          // Use example data for demo purposes
+          setRequests(exampleRequests);
+          setLoading(false);
+          return;
+        }
+        
+        // We have a real UUID, fetch from Supabase
+        console.log("Fetching requests for user:", userId);
         const { data, error } = await supabase
           .from('requests')
           .select('*')
@@ -56,7 +60,9 @@ export default function RequestsPage() {
         setRequests(transformedRequests);
       } catch (err: any) {
         console.error("Error fetching requests:", err);
-        setError("No se pudieron cargar las solicitudes. Por favor, intente de nuevo más tarde.");
+        // Fallback to example data in case of error
+        setRequests(exampleRequests);
+        setError("No se pudieron cargar las solicitudes desde la base de datos. Mostrando datos de ejemplo.");
       } finally {
         setLoading(false);
       }
@@ -96,8 +102,8 @@ export default function RequestsPage() {
           <Card>
             <CardContent className="p-8 text-center">
               <div className="flex flex-col items-center justify-center space-y-4">
-                <FileX className="h-12 w-12 text-destructive" />
-                <p className="text-sm text-destructive">{error}</p>
+                <FileX className="h-12 w-12 text-amber-500" />
+                <p className="text-sm text-muted-foreground">{error}</p>
               </div>
             </CardContent>
           </Card>
