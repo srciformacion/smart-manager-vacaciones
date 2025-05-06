@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme/theme-provider";
@@ -36,6 +35,7 @@ const RequestsManagementPage = lazy(() => import('@/pages/hr/RequestsManagementP
 const WorkersManagementPage = lazy(() => import('@/pages/hr/WorkersManagementPage'));
 const CalendarManagementPage = lazy(() => import('@/pages/hr/CalendarManagementPage'));
 const SendNotificationPage = lazy(() => import('@/pages/hr/SendNotificationPage'));
+const NotificationTemplatesPage = lazy(() => import('@/pages/hr/NotificationTemplatesPage'));
 
 // Other pages
 const Index = lazy(() => import('@/pages/Index'));
@@ -84,6 +84,7 @@ function App() {
               <Route path="/rrhh/workers-management" element={<WorkersManagementPage />} />
               <Route path="/rrhh/calendar-management" element={<CalendarManagementPage />} />
               <Route path="/rrhh/notifications" element={<SendNotificationPage />} />
+              <Route path="/rrhh/notification-templates" element={<NotificationTemplatesPage />} />
               
               {/* Redirect routes */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

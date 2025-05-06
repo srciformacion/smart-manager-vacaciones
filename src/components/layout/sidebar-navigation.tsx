@@ -14,7 +14,8 @@ import {
   History,
   BrainCircuit,
   BarChart4,
-  Bell
+  Bell,
+  MailCheck
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -38,10 +39,11 @@ const hrLinks = [
   { name: "Solicitudes", href: "/rrhh/requests", icon: FilePen, ariaLabel: "Ir a Gestión de Solicitudes" },
   { name: "Personal", href: "/rrhh/workers", icon: User, ariaLabel: "Ir a Gestión de Personal" },
   { name: "Documentos", href: "/rrhh/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
+  { name: "Notificaciones", href: "/rrhh/notifications", icon: Bell, ariaLabel: "Ir a Notificaciones" },
+  { name: "Plantillas", href: "/rrhh/notification-templates", icon: MailCheck, ariaLabel: "Ir a Plantillas de Notificaciones" },
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
   { name: "Asistente IA", href: "/rrhh/ai-assistant", icon: BrainCircuit, ariaLabel: "Ir a Asistente IA" },
   { name: "Informes", href: "/rrhh/reports", icon: BarChart4, ariaLabel: "Ir a Informes" },
-  { name: "Notificaciones", href: "/rrhh/notifications", icon: Bell, ariaLabel: "Ir a Notificaciones" },
   { name: "Configuración", href: "/rrhh/settings", icon: Settings, ariaLabel: "Ir a Configuración" }
 ];
 
