@@ -4,10 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { toast } from "sonner";
 import { ChatMessage, ChatConversation } from "@/types/chat";
-
-// Mock data for initial chat conversations and messages
-const exampleMessages: ChatMessage[] = [];
-const exampleConversations: ChatConversation[] = [];
+import { exampleMessages, exampleConversations } from "@/data/example-chats";
 
 interface ChatContextType {
   messages: ChatMessage[];

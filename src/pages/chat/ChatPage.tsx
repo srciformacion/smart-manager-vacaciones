@@ -20,7 +20,7 @@ export default function ChatPage() {
         const authUser = await fetchAuthUser();
         if (!authUser) {
           toast.error("Por favor inicia sesión para acceder al chat");
-          navigate('/auth');
+          navigate('/');
           return;
         }
         setLoading(false);
