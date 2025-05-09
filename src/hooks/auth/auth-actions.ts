@@ -102,7 +102,7 @@ export async function signOut(navigate: NavigateFunction) {
     // Success notification
     toast.success("Has cerrado la sesión correctamente");
     
-    // Navigate to root path instead of auth page
+    // Navigate to root path (home) instead of auth page
     navigate('/', { replace: true });
     
   } catch (err) {
