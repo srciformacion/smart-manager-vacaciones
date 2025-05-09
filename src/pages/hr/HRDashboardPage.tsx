@@ -4,6 +4,8 @@ import { HRStats } from "@/components/dashboard/hr-stats";
 import { SmartAssistantPanel } from "@/components/hr/smart-assistant-panel";
 import { RequestDetails } from "@/components/requests/request-details";
 import { PendingRequestsSection } from "@/components/hr/dashboard/pending-requests-section";
+import { WorkerMetrics } from "@/components/hr/dashboard/worker-metrics";
+import { WorkerDistributionWidget } from "@/components/hr/dashboard/worker-distribution-widget";
 import { useHRDashboard } from "@/hooks/hr/use-hr-dashboard";
 import { exampleUser, exampleWorkers } from "@/data/example-users";
 import { exampleRequests } from "@/data/example-requests";
@@ -50,6 +52,21 @@ export default function HRDashboardPage() {
             alertsCount={stats.alertsCount}
             weeklyRequests={stats.weeklyRequests}
           />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <WorkerDistributionWidget 
+              title="Distribución por Departamento" 
+              workers={workers} 
+              groupBy="department" 
+            />
+            <WorkerDistributionWidget 
+              title="Distribución por Turno" 
+              workers={workers} 
+              groupBy="shift" 
+            />
+          </div>
+          
+          <WorkerMetrics workers={workers} />
 
           <SmartAssistantPanel
             overlaps={smartAnalysis.overlaps}
