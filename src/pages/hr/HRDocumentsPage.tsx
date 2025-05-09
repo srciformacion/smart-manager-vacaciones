@@ -1,15 +1,22 @@
+
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { DetailedRequestView } from "@/components/hr/detailed-request-view";
 import { ManagementContent } from "@/components/hr/management/management-content";
 import { useRequests } from "@/hooks/use-requests";
 import { useRequestManagement } from "@/hooks/hr/use-request-management";
-import { exampleUser, exampleWorkers } from "@/data/example-users";
+import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
+import { exampleWorkers } from "@/data/example-users";
 import { exampleRequests } from "@/data/example-requests";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { FilePen } from "lucide-react";
+import { Link } from "react-router-dom";
 import { RequestStatus } from "@/types";
 
-export default function HRManagementPage() {
+export default function HRDocumentsPage() {
   const [activeTab, setActiveTab] = useState("solicitudes");
+  const { user } = useProfileAuth();
   const { requests, handleStatusChange } = useRequests(exampleRequests, exampleWorkers);
   
   const {
@@ -22,7 +29,7 @@ export default function HRManagementPage() {
   } = useRequestManagement(requests, exampleWorkers);
 
   return (
-    <MainLayout user={exampleUser}>
+    <MainLayout user={user}>
       {selectedRequest ? (
         <DetailedRequestView
           request={selectedRequest}
@@ -35,11 +42,21 @@ export default function HRManagementPage() {
         />
       ) : (
         <div className="space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Panel de gestión RRHH</h1>
-            <p className="text-muted-foreground mt-2">
-              Gestione solicitudes, genere informes y visualice la disponibilidad del personal
-            </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Documentos y solicitudes</h1>
+              <p className="text-muted-foreground mt-2">
+                Gestione solicitudes, documentos y certificados del personal
+              </p>
+            </div>
+            <div>
+              <Button asChild>
+                <Link to="/rrhh/management" className="flex items-center gap-2">
+                  <FilePen size={16} />
+                  <span>Gestión de solicitudes</span>
+                </Link>
+              </Button>
+            </div>
           </div>
 
           <ManagementContent
@@ -56,4 +73,3 @@ export default function HRManagementPage() {
     </MainLayout>
   );
 }
-

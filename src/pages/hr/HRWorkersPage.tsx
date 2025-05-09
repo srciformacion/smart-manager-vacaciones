@@ -8,6 +8,9 @@ import { WorkersFilters } from "@/components/hr/workers/workers-filters";
 import { WorkersTable } from "@/components/hr/workers/workers-table";
 import { WorkersPagination } from "@/components/hr/workers/workers-pagination";
 import { useWorkersFilter } from "@/hooks/hr/use-workers-filter";
+import { Button } from "@/components/ui/button";
+import { Users, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function HRWorkersPage() {
   const { user } = useProfileAuth();
@@ -38,9 +41,19 @@ export default function HRWorkersPage() {
   return (
     <MainLayout user={user}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Gestión de trabajadores</h1>
-          <p className="text-muted-foreground">Administra la información de los {exampleWorkers.length} empleados</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold">Gestión de trabajadores</h1>
+            <p className="text-muted-foreground">Administra la información de los {exampleWorkers.length} empleados</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link to="/rrhh/workers-management" className="flex items-center gap-2">
+                <Settings size={16} />
+                <span>Gestión avanzada</span>
+              </Link>
+            </Button>
+          </div>
         </div>
         
         <Card>

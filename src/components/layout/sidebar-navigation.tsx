@@ -18,7 +18,9 @@ import {
   AlertTriangle,
   Clock,
   Settings2,
-  Database
+  Database,
+  Users,
+  Calendar
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -41,18 +43,20 @@ const workerLinks = [
 
 const hrLinks = [
   { name: "Dashboard", href: "/rrhh/dashboard", icon: Home, ariaLabel: "Ir a Dashboard" },
-  { name: "Calendarios", href: "/rrhh/calendar", icon: CalendarDays, ariaLabel: "Ir a Gestión de Calendarios" },
+  { name: "Trabajadores", href: "/rrhh/workers", icon: Users, ariaLabel: "Ir a Gestión de Trabajadores" },
+  { name: "Calendario", href: "/rrhh/calendar", icon: Calendar, ariaLabel: "Ir a Calendario" },
+  { name: "Gestión Calendarios", href: "/rrhh/calendar-management", icon: CalendarDays, ariaLabel: "Ir a Gestión de Calendarios" },
   { name: "Solicitudes", href: "/rrhh/requests", icon: FilePen, ariaLabel: "Ir a Gestión de Solicitudes" },
-  { name: "Personal", href: "/rrhh/workers", icon: User, ariaLabel: "Ir a Gestión de Personal" },
+  { name: "Gestión Solicitudes", href: "/rrhh/management", icon: Users, ariaLabel: "Ir a Gestión de Solicitudes" },
   { name: "Documentos", href: "/rrhh/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
   { name: "Notificaciones", href: "/rrhh/notifications", icon: Bell, ariaLabel: "Ir a Notificaciones" },
   { name: "Plantillas", href: "/rrhh/notification-templates", icon: MailCheck, ariaLabel: "Ir a Plantillas de Notificaciones" },
   { name: "Asistente IA", href: "/rrhh/ai-assistant", icon: BrainCircuit, ariaLabel: "Ir a Asistente IA" },
+  { name: "Dashboard IA", href: "/rrhh/ai-dashboard", icon: BrainCircuit, ariaLabel: "Ir a Dashboard IA" },
   { name: "Asistente Inteligente", href: "/rrhh/smart-assistant", icon: AlertTriangle, ariaLabel: "Ir a Asistente Inteligente" },
-  { name: "Generador de Datos", href: "/rrhh/data-generation", icon: Database, ariaLabel: "Ir a Generador de Datos" },
   { name: "Informes", href: "/rrhh/reports", icon: BarChart4, ariaLabel: "Ir a Informes" },
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
-  { name: "Dashboard IA", href: "/rrhh/ai-dashboard", icon: BrainCircuit, ariaLabel: "Ir a Dashboard IA" },
+  { name: "Generador de Datos", href: "/rrhh/data-generation", icon: Database, ariaLabel: "Ir a Generador de Datos" },
   { name: "Configuración", href: "/rrhh/settings", icon: Settings, ariaLabel: "Ir a Configuración" }
 ];
 

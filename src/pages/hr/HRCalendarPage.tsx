@@ -7,6 +7,9 @@ import { MainLayout } from "@/components/layout/main-layout";
 import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { CalendarDays } from "lucide-react";
+import { Link } from "react-router-dom";
 import { exampleWorkers } from "@/data/example-users";
 import { format } from "date-fns";
 
@@ -73,9 +76,17 @@ export default function HRCalendarPage() {
   return (
     <MainLayout user={user}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Calendario global de personal</h1>
-          <p className="text-muted-foreground">Visualiza ausencias, turnos y alertas de acumulación</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold">Calendario global de personal</h1>
+            <p className="text-muted-foreground">Visualiza ausencias, turnos y alertas de acumulación</p>
+          </div>
+          <Button variant="outline" asChild>
+            <Link to="/rrhh/calendar-management" className="flex items-center gap-2">
+              <CalendarDays size={16} />
+              <span>Gestión avanzada</span>
+            </Link>
+          </Button>
         </div>
 
         <Card>
