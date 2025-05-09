@@ -36,8 +36,6 @@ export default function HRWorkersPage() {
     workersPerPage: 10
   });
   
-  console.log("HRWorkersPage rendering with", paginatedWorkers.length, "workers");
-  
   return (
     <MainLayout user={user}>
       <div className="space-y-6">
