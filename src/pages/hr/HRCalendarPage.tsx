@@ -32,6 +32,8 @@ const eventosEjemplo: Event[] = [
 ];
 
 export default function HRCalendarPage() {
+  console.log("HRCalendarPage rendering with FullCalendar");
+  
   const { user } = useProfileAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [workerFilter, setWorkerFilter] = useState<string | null>(null);
@@ -39,6 +41,7 @@ export default function HRCalendarPage() {
   const [counts, setCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
+    console.log("HRCalendarPage useEffect - processing events");
     const withColors = eventosEjemplo.map(evt => ({
       ...evt,
       color: colorMap[evt.worker] || colorPalette[0]
@@ -64,6 +67,8 @@ export default function HRCalendarPage() {
   const handleEventClick = (info: any) => {
     alert(`Evento: ${info.event.title}\nTrabajador: ${info.event.extendedProps.worker}`);
   };
+
+  console.log("FullCalendar plugins:", dayGridPlugin, interactionPlugin);
 
   return (
     <MainLayout user={user}>
