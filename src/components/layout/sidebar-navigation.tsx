@@ -1,74 +1,12 @@
 
-import {
-  CalendarDays,
-  ChevronsLeft,
-  CircleUser,
-  FilePen,
-  FileText,
-  Home,
-  LogOut,
-  MessageSquare,
-  Settings,
-  User,
-  History,
-  BrainCircuit,
-  BarChart4,
-  Bell,
-  MailCheck,
-  AlertTriangle,
-  Clock,
-  Settings2,
-  Database,
-  Users,
-  Calendar
-} from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { ChevronsLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserType, UserRole } from "@/types";
-
-const workerLinks = [
-  { name: "Dashboard", href: "/dashboard", icon: Home, ariaLabel: "Ir a Dashboard" },
-  { name: "Mi Calendario", href: "/calendar", icon: CalendarDays, ariaLabel: "Ir a Mi Calendario" },
-  { name: "Solicitudes", href: "/requests", icon: FilePen, ariaLabel: "Ir a Solicitudes" },
-  { name: "Documentos", href: "/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
-  { name: "Permisos", href: "/leave-request", icon: Clock, ariaLabel: "Ir a Permisos" },
-  { name: "Cambios de turno", href: "/shift-change-request", icon: History, ariaLabel: "Ir a Cambios de turno" },
-  { name: "Perfiles de turno", href: "/shift-profile", icon: Settings2, ariaLabel: "Ir a Perfiles de turno" },
-  { name: "Historial", href: "/history", icon: History, ariaLabel: "Ir a Historial" },
-  { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
-  { name: "Perfil", href: "/profile", icon: User, ariaLabel: "Ir a Perfil" },
-];
-
-const hrLinks = [
-  { name: "Dashboard", href: "/rrhh/dashboard", icon: Home, ariaLabel: "Ir a Dashboard" },
-  { name: "Trabajadores", href: "/rrhh/workers", icon: Users, ariaLabel: "Ir a Gestión de Trabajadores" },
-  { name: "Calendario", href: "/rrhh/calendar", icon: Calendar, ariaLabel: "Ir a Calendario" },
-  { name: "Gestión Calendarios", href: "/rrhh/calendar-management", icon: CalendarDays, ariaLabel: "Ir a Gestión de Calendarios" },
-  { name: "Solicitudes", href: "/rrhh/requests", icon: FilePen, ariaLabel: "Ir a Gestión de Solicitudes" },
-  { name: "Gestión Solicitudes", href: "/rrhh/management", icon: Users, ariaLabel: "Ir a Gestión de Solicitudes" },
-  { name: "Documentos", href: "/rrhh/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
-  { name: "Notificaciones", href: "/rrhh/notifications", icon: Bell, ariaLabel: "Ir a Notificaciones" },
-  { name: "Plantillas", href: "/rrhh/notification-templates", icon: MailCheck, ariaLabel: "Ir a Plantillas de Notificaciones" },
-  { name: "Asistente IA", href: "/rrhh/ai-assistant", icon: BrainCircuit, ariaLabel: "Ir a Asistente IA" },
-  { name: "Dashboard IA", href: "/rrhh/ai-dashboard", icon: BrainCircuit, ariaLabel: "Ir a Dashboard IA" },
-  { name: "Asistente Inteligente", href: "/rrhh/smart-assistant", icon: AlertTriangle, ariaLabel: "Ir a Asistente Inteligente" },
-  { name: "Informes", href: "/rrhh/reports", icon: BarChart4, ariaLabel: "Ir a Informes" },
-  { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
-  { name: "Generador de Datos", href: "/rrhh/data-generation", icon: Database, ariaLabel: "Ir a Generador de Datos" },
-  { name: "Configuración", href: "/rrhh/settings", icon: Settings, ariaLabel: "Ir a Configuración" }
-];
-
-interface SidebarNavigationProps {
-  user: UserType | null;
-  role?: UserRole;
-  collapsed?: boolean;
-  onLogout?: () => Promise<void>;
-  onNavigate?: () => void;
-  onClose?: () => void;
-  onCollapse?: () => void;
-}
+import { User, UserRole } from "@/types";
+import { workerLinks, hrLinks } from "./sidebar/navigation-links";
+import { SidebarNav } from "./sidebar/sidebar-nav";
+import { UserProfile } from "./sidebar/user-profile";
+import { SidebarNavigationProps } from "./sidebar/types";
 
 export function SidebarNavigation({
   user,
@@ -85,21 +23,9 @@ export function SidebarNavigation({
   
   console.log("SidebarNavigation rendering with role:", effectiveRole, "showing links:", links.map(l => l.name).join(", "));
   
-  // Extract initial for avatar fallback
-  const getInitial = () => {
-    if (user?.name) {
-      return user.name.charAt(0).toUpperCase();
-    }
-    return "U";
-  };
-
   const handleNavigation = () => {
     if (onNavigate) onNavigate();
     if (onClose) onClose();
-  };
-
-  const handleLogout = async () => {
-    if (onLogout) await onLogout();
   };
 
   return (
@@ -118,85 +44,20 @@ export function SidebarNavigation({
       </div>
 
       <div className="flex-1 overflow-auto py-2">
-        <nav className="grid items-start px-2 gap-1">
-          {links.map((link) => (
-            <NavLink
-              key={link.href}
-              to={link.href}
-              className={(props) => cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                props.isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground",
-                collapsed && "justify-center p-0 h-9 w-9",
-              )}
-              onClick={handleNavigation}
-              aria-label={link.ariaLabel}
-            >
-              <link.icon className={cn("h-4 w-4", collapsed ? "h-5 w-5" : "")} aria-hidden="true" />
-              {!collapsed && <span>{link.name}</span>}
-            </NavLink>
-          ))}
-        </nav>
+        <SidebarNav 
+          links={links} 
+          collapsed={collapsed} 
+          onNavigate={handleNavigation} 
+        />
       </div>
 
-      <div className={cn(
-        "mt-auto border-t border-sidebar-border p-4",
-        collapsed ? "flex justify-center" : ""
-      )}>
-        {user && (
-          <div className={cn(
-            collapsed ? "" : "flex items-center gap-3 mb-4"
-          )}>
-            {!collapsed ? (
-              <>
-                <Avatar>
-                  <AvatarImage src={user.profilePicture} alt={`${user.name}`} />
-                  <AvatarFallback>{getInitial()}</AvatarFallback>
-                </Avatar>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-sidebar-foreground">{user.name}</p>
-                  <p className="text-xs text-sidebar-foreground/70">{user.email}</p>
-                  <p className="text-xs font-medium bg-sidebar-primary/20 text-sidebar-foreground inline-block px-2 py-0.5 rounded-full">
-                    {effectiveRole === "hr" ? "RRHH" : "Trabajador"}
-                  </p>
-                </div>
-              </>
-            ) : (
-              <Avatar>
-                <AvatarImage src={user.profilePicture} alt={`${user.name}`} />
-                <AvatarFallback>{getInitial()}</AvatarFallback>
-              </Avatar>
-            )}
-          </div>
-        )}
-        
-        {!collapsed && (
-          <div className="flex items-center gap-2">
-            <NavLink
-              to="/profile"
-              className={({ isActive }) => cn(
-                "w-full flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground"
-              )}
-              onClick={handleNavigation}
-            >
-              <CircleUser className="h-4 w-4" />
-              Mi Perfil
-            </NavLink>
-          </div>
-        )}
-        
-        {onLogout && (
-          <Button 
-            variant="outline" 
-            className={cn("w-full mt-2 border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", collapsed && "p-2")} 
-            onClick={handleLogout}
-            aria-label="Cerrar sesión"
-          >
-            <LogOut className={cn("h-4 w-4", collapsed && "mr-0")} aria-hidden="true" />
-            {!collapsed && <span className="ml-2">Cerrar sesión</span>}
-          </Button>
-        )}
-      </div>
+      <UserProfile 
+        user={user} 
+        role={effectiveRole as UserRole} 
+        collapsed={collapsed} 
+        onLogout={onLogout} 
+        onNavigate={handleNavigation} 
+      />
     </div>
   );
 }
