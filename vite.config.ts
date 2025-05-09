@@ -99,6 +99,12 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    // Add this configuration to fix the estree-walker module resolution issue
+    dedupe: ['estree-walker']
+  },
+  optimizeDeps: {
+    // Force include problematic packages
+    include: ['estree-walker']
   },
   define: {
     'process.env': {}
