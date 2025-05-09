@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -103,7 +104,7 @@ export default function HRCalendarPage() {
               plugins={[dayGridPlugin, interactionPlugin]}
               initialView="dayGridMonth"
               events={filteredEvents}
-              eventColor={(info: any) => info.event.extendedProps.color}
+              eventColor="auto"
               dateClick={handleDateClick}
               eventClick={handleEventClick}
               headerToolbar={{ left: 'prev,next today', center: 'title', right: '' }}
@@ -119,4 +120,3 @@ export default function HRCalendarPage() {
     </MainLayout>
   );
 }
-
