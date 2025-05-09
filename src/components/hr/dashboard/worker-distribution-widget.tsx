@@ -59,30 +59,33 @@ export function WorkerDistributionWidget({
       <CardContent>
         <div className="h-[240px] w-full">
           <ChartContainer config={config}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={data}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {data.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={COLORS[index % COLORS.length]} 
-                      stroke="var(--background)"
-                      strokeWidth={2}
-                    />
-                  ))}
-                </Pie>
-                <ChartTooltip content={<ChartTooltipContent />} />
-              </PieChart>
-            </ResponsiveContainer>
-            <ChartLegend content={<ChartLegendContent />} verticalAlign="bottom" />
+            {/* Fix: Wrap the ResponsiveContainer in a fragment to make it a single child */}
+            <>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {data.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={COLORS[index % COLORS.length]} 
+                        stroke="var(--background)"
+                        strokeWidth={2}
+                      />
+                    ))}
+                  </Pie>
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                </PieChart>
+              </ResponsiveContainer>
+              <ChartLegend content={<ChartLegendContent />} verticalAlign="bottom" />
+            </>
           </ChartContainer>
         </div>
       </CardContent>

@@ -102,13 +102,13 @@ export async function signOut(navigate: NavigateFunction) {
     // Success notification
     toast.success("Has cerrado la sesión correctamente");
     
-    // Navigate using replace to prevent going back with browser history
-    navigate('/auth', { replace: true });
+    // Navigate to root path instead of auth page
+    navigate('/', { replace: true });
     
   } catch (err) {
     console.error('Sign out complete error:', err);
     toast.error('Error al cerrar sesión');
-    // Still redirect to auth page even if there was an error
-    navigate('/auth', { replace: true });
+    // Still redirect to root path even if there was an error
+    navigate('/', { replace: true });
   }
 }
