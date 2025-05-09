@@ -1,7 +1,7 @@
 
-import { MainLayout } from "@/components/layout/main-layout";
 import { ChatLayout } from "@/components/chat/chat-layout";
 import { ChatProvider } from "@/context/chat-context";
+import { MainLayout } from "@/components/layout/main-layout";
 import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
