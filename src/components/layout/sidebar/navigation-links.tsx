@@ -8,6 +8,7 @@ export const workerLinks: SidebarLinkItem[] = [
   { name: "Solicitudes", href: "/requests", icon: FilePen, ariaLabel: "Ir a Solicitudes" },
   { name: "Documentos", href: "/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
   { name: "Permisos", href: "/leave-request", icon: Clock, ariaLabel: "Ir a Permisos" },
+  { name: "Asuntos propios", href: "/personal-day-request", icon: FileText, ariaLabel: "Ir a Asuntos propios" },
   { name: "Cambios de turno", href: "/shift-change-request", icon: History, ariaLabel: "Ir a Cambios de turno" },
   { name: "Perfiles de turno", href: "/shift-profile", icon: Settings2, ariaLabel: "Ir a Perfiles de turno" },
   { name: "Historial", href: "/history", icon: History, ariaLabel: "Ir a Historial" },
