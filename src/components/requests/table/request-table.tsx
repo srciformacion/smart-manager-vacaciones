@@ -5,8 +5,8 @@ import { es } from "date-fns/locale";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RequestTableActions } from "./request-table-actions";
 import { Request, RequestStatus, User } from "@/types";
-import { StatusBadge } from "@/components/ui/status-badge"; // Using the existing status badge
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge"; 
+import { RequestTypeBadge } from "@/components/ui/request-type-badge";
 import { TableCell } from "@/components/ui/table"; 
 
 interface RequestTableProps {
@@ -37,21 +37,6 @@ export function RequestTable({
     }
   };
 
-  const getRequestTypeName = (type: string): string => {
-    switch (type) {
-      case 'vacation':
-        return 'Vacaciones';
-      case 'personalDay':
-        return 'Día personal';
-      case 'leave':
-        return 'Permiso';
-      case 'shiftChange':
-        return 'Cambio de turno';
-      default:
-        return type;
-    }
-  };
-
   return (
     <div className="w-full overflow-auto">
       <Table>
@@ -75,9 +60,7 @@ export function RequestTable({
             requests.map((request) => (
               <TableRow key={request.id}>
                 <TableCell>
-                  <Badge variant="outline">
-                    {getRequestTypeName(request.type)}
-                  </Badge>
+                  <RequestTypeBadge type={request.type} />
                 </TableCell>
                 <TableCell>{formatDate(request.startDate)}</TableCell>
                 <TableCell>{formatDate(request.endDate)}</TableCell>

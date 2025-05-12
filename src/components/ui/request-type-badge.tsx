@@ -15,18 +15,21 @@ export function RequestTypeBadge({ type }: RequestTypeBadgeProps) {
         </Badge>
       );
     case "personalDay":
+    case "personal-day":
       return (
         <Badge className="bg-green-100 hover:bg-green-200 text-green-800 border-green-300">
           Asuntos propios
         </Badge>
       );
     case "leave":
+    case "sick-leave":
       return (
         <Badge className="bg-purple-100 hover:bg-purple-200 text-purple-800 border-purple-300">
           Permiso justificado
         </Badge>
       );
     case "shiftChange":
+    case "shift-change":
       return (
         <Badge className="bg-amber-100 hover:bg-amber-200 text-amber-800 border-amber-300">
           Cambio de turno

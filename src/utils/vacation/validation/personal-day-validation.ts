@@ -18,7 +18,7 @@ export function validatePersonalDayRequest(
       reqDate.getFullYear() === date.getFullYear() &&
       reqDate.getMonth() === date.getMonth() &&
       reqDate.getDate() === date.getDate() &&
-      (req.type === 'personalDay' || req.type === 'vacation')
+      (req.type === 'personalDay' || req.type === 'personal-day' || req.type === 'vacation')
     );
   });
   
