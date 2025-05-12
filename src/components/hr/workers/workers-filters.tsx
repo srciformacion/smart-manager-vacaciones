@@ -48,14 +48,14 @@ export function WorkersFilters({
         </div>
         
         <Select 
-          value={departmentFilter || ""} 
-          onValueChange={(value) => setDepartmentFilter(value || null)}
+          value={departmentFilter || "all"} 
+          onValueChange={(value) => setDepartmentFilter(value === "all" ? null : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Filtrar por departamento" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos los departamentos</SelectItem>
+            <SelectItem value="all">Todos los departamentos</SelectItem>
             {departments.map((dept) => (
               <SelectItem key={dept} value={dept}>{dept}</SelectItem>
             ))}
@@ -63,14 +63,14 @@ export function WorkersFilters({
         </Select>
         
         <Select 
-          value={shiftFilter || ""} 
-          onValueChange={(value) => setShiftFilter(value || null)}
+          value={shiftFilter || "all"} 
+          onValueChange={(value) => setShiftFilter(value === "all" ? null : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Filtrar por turno" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos los turnos</SelectItem>
+            <SelectItem value="all">Todos los turnos</SelectItem>
             {shifts.map((shift) => (
               <SelectItem key={shift} value={shift}>{shift}</SelectItem>
             ))}
