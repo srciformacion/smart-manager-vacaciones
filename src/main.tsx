@@ -11,13 +11,30 @@ import { registerSW } from 'virtual:pwa-register'
 const updateSW = registerSW({
   onNeedRefresh() {
     // The PWA needs to be refreshed
-    console.log('New content is available, please refresh.')
+    console.log('Nueva versión disponible, por favor actualiza.')
   },
   onOfflineReady() {
     // The PWA is ready to work offline
-    console.log('App is ready for offline use.')
+    console.log('App lista para uso sin conexión.')
   }
 })
+
+// Setup communication with service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'GET_PENDING_REQUESTS') {
+      const pendingRequests = localStorage.getItem('pendingRequests') || '[]';
+      
+      // Respond with pending requests data
+      if (event.source) {
+        event.source.postMessage({
+          type: 'PENDING_REQUESTS_DATA',
+          pendingRequests
+        });
+      }
+    }
+  });
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
