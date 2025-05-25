@@ -19,18 +19,18 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png', 'offline.html'],
       manifest: {
-        name: 'La Rioja Cuida',
-        short_name: 'LR Cuida',
+        name: 'Smart Vacancy',
+        short_name: 'SmartVac',
         description: 'Sistema inteligente de gestión de vacaciones y permisos',
         theme_color: '#0f172a',
         icons: [
           {
-            src: '/lovable-uploads/a4799124-8538-46ae-9f04-366618a71181.png',
+            src: '/lovable-uploads/a1457b00-74b1-4313-8af6-d5f136d9400c.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: '/lovable-uploads/a4799124-8538-46ae-9f04-366618a71181.png',
+            src: '/lovable-uploads/a1457b00-74b1-4313-8af6-d5f136d9400c.png',
             sizes: '512x512',
             type: 'image/png',
           }
