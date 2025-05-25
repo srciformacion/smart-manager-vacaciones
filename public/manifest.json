@@ -1,7 +1,7 @@
 
 {
-  "name": "La Rioja Cuida",
-  "short_name": "LR Cuida",
+  "name": "Smart Vacancy",
+  "short_name": "SmartVac",
   "description": "Sistema inteligente de gestión de vacaciones y permisos",
   "start_url": "/",
   "display": "standalone",

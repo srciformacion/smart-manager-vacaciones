@@ -56,7 +56,7 @@ export function MainLayoutMobile({
             <line x1="4" x2="20" y1="18" y2="18" />
           </svg>
         </button>
-        <div className="ml-4 text-lg font-bold">La Rioja Cuida</div>
+        <div className="ml-4 text-lg font-bold">Smart Vacancy</div>
       </header>
 
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
