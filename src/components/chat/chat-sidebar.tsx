@@ -1,4 +1,3 @@
-
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useChat } from "@/context/chat-context";
@@ -21,7 +20,7 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
     return (
       <div className={cn("h-full", className)}>
         <div className="p-4 flex items-center justify-between">
-          <h2 className="font-bold text-white">La Rioja Chat</h2>
+          <h2 className="font-bold text-white">Smart Vacancy Chat</h2>
           <Plus className="h-5 w-5 text-white opacity-70 hover:opacity-100 cursor-pointer" />
         </div>
         <div className="px-3 pb-2">
@@ -54,7 +53,7 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
     <div className={cn("h-full flex flex-col", className)}>
       {/* Header */}
       <div className="p-4 flex items-center justify-between">
-        <h2 className="font-bold text-white">La Rioja Chat</h2>
+        <h2 className="font-bold text-white">Smart Vacancy Chat</h2>
         <Plus className="h-5 w-5 text-white opacity-70 hover:opacity-100 cursor-pointer" />
       </div>
       
@@ -154,10 +153,10 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
       <div className="border-t border-slate-700 p-3">
         <div className="flex items-center">
           <div className="w-8 h-8 rounded-sm bg-indigo-600 flex items-center justify-center mr-2 text-white font-medium">
-            LR
+            SV
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-medium">La Rioja Cuida</span>
+            <span className="text-sm font-medium">Smart Vacancy</span>
             <span className="text-xs text-slate-400">Activo</span>
           </div>
         </div>
