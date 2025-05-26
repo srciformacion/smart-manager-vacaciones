@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Request, RequestType } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { registerSyncTask } from '@/utils/background-sync';
+import { registerSyncTask, syncPendingRequests as backgroundSyncRequests } from '@/utils/background-sync'; // Renamed import to avoid conflict
 
 export function useOfflineRequests(userId: string) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,10 +19,16 @@ export function useOfflineRequests(userId: string) {
       if ('serviceWorker' in navigator && 'SyncManager' in window) {
         navigator.serviceWorker.ready.then(registration => {
           registration.sync.register('sync-pending-requests')
-            .catch(error => console.error('Error registering sync:', error));
+            .then(() => console.log('Background sync registered from hook on online'))
+            .catch(error => {
+                console.error('Error registering sync from hook:', error);
+                // Fallback si el registro de sync falla, intentar sincronización manual
+                syncPendingRequests();
+            });
         });
       } else {
         // Fallback para navegadores sin soporte de Background Sync
+        console.log('Background Sync not supported, attempting manual sync from hook');
         syncPendingRequests();
       }
     };
@@ -64,13 +70,13 @@ export function useOfflineRequests(userId: string) {
         return { success: true, data, isOffline: false };
       } else {
         // Modo offline: guardar en localStorage
-        const offlineRequest = {
+        const offlineRequest: Request = { // Ensure type matches Request
           ...requestData,
-          userid: userId,
+          userid: userId, // Supabase maps this to 'userid' column
           status: 'pending',
           id: `offline-${Date.now()}`, // ID temporal
-          createdat: new Date().toISOString(),
-          updatedat: new Date().toISOString()
+          createdAt: new Date(), // Use Date object, will be stringified by JSON
+          updatedAt: new Date(), // Use Date object
         };
 
         // Obtener solicitudes pendientes existentes
@@ -84,9 +90,13 @@ export function useOfflineRequests(userId: string) {
         localStorage.setItem('pendingRequests', JSON.stringify(pendingRequests));
 
         // Registrar tarea de sincronización en segundo plano
-        await registerSyncTask('sync-pending-requests');
+        const syncRegistered = await registerSyncTask('sync-pending-requests');
+        if (syncRegistered) {
+            toast.success('Solicitud guardada. Se sincronizará al recuperar conexión.');
+        } else {
+            toast.info('Solicitud guardada localmente. Intenta sincronizar manualmente más tarde.');
+        }
         
-        toast.success('Solicitud guardada para enviar cuando vuelvas a estar online');
         return { success: true, data: offlineRequest, isOffline: true };
       }
     } catch (error: any) {
@@ -105,68 +115,42 @@ export function useOfflineRequests(userId: string) {
 
       const allPending = JSON.parse(pendingString);
       // Filtrar por userId para obtener solo las del usuario actual
-      return allPending.filter((req: any) => req.userid === userId);
+      // Also ensure dates are parsed back into Date objects if needed, though for submission they are often ISO strings
+      return allPending.filter((req: any) => req.userid === userId)
+        .map((req: any) => ({
+            ...req,
+            startDate: new Date(req.startDate),
+            endDate: new Date(req.endDate),
+            createdAt: new Date(req.createdAt),
+            updatedAt: new Date(req.updatedAt),
+        }));
     } catch (error) {
       console.error('Error al obtener solicitudes pendientes:', error);
       return [];
     }
   };
 
-  const syncPendingRequests = async (): Promise<void> => {
-    const pendingRequests = getPendingOfflineRequests();
+  // Renamed this function to avoid conflict with the imported one
+  const syncPendingRequests = async (): Promise<void> => { 
+    console.log('Attempting manual sync from useOfflineRequests hook');
+    const { success, errors } = await backgroundSyncRequests(); // Call the utility function
     
-    if (pendingRequests.length === 0) return;
-    
-    let syncedCount = 0;
-    let errorCount = 0;
-    
-    for (const request of pendingRequests) {
-      try {
-        // Eliminar propiedades que no necesitamos enviar
-        const { id, createdat, updatedat, ...requestData } = request;
-        
-        // Enviar a Supabase
-        const { error } = await supabase
-          .from('requests')
-          .insert({
-            ...requestData,
-            status: 'pending'
-          });
-          
-        if (error) throw error;
-        syncedCount++;
-      } catch (error) {
-        console.error('Error al sincronizar solicitud:', error);
-        errorCount++;
-      }
+    if (success > 0) {
+      toast.success(`${success} solicitud(es) sincronizada(s) correctamente desde el hook`);
     }
     
-    if (syncedCount > 0) {
-      // Limpiar solicitudes sincronizadas
-      const updatedPendingRequests = localStorage.getItem('pendingRequests') 
-        ? JSON.parse(localStorage.getItem('pendingRequests') || '[]')
-        : [];
-      
-      // Filtrar solicitudes de otros usuarios que no debemos eliminar
-      const otherUserRequests = updatedPendingRequests.filter(
-        (req: any) => req.userid !== userId
-      );
-      
-      localStorage.setItem('pendingRequests', JSON.stringify(otherUserRequests));
-      
-      toast.success(`${syncedCount} solicitud(es) sincronizada(s) correctamente`);
+    if (errors > 0) {
+      toast.error(`No se pudieron sincronizar ${errors} solicitud(es) desde el hook`);
     }
-    
-    if (errorCount > 0) {
-      toast.error(`No se pudieron sincronizar ${errorCount} solicitud(es)`);
-    }
+    // The backgroundSyncRequests function handles removing/updating localStorage
   };
 
   return {
     submitRequest,
     getPendingOfflineRequests,
-    syncPendingRequests,
+    syncPendingRequests, // Expose this potentially manual sync trigger
     isSubmitting,
     isOnline: onlineStatus
   };
 }
+
