@@ -1,6 +1,9 @@
 
 // Service worker personalizado para extender la funcionalidad del generado por vite-plugin-pwa
 
+// Placeholder for Workbox to inject the manifest
+self.__WB_MANIFEST;
+
 // Esta función será ejecutada cuando se registre una sincronización en segundo plano
 self.addEventListener('sync', (event) => {
   console.log('Sync event detected:', event.tag);

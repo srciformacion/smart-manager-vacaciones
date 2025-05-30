@@ -1,6 +1,5 @@
 
 import { createContext, useContext, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AuthContextType } from './types';
 import { useAuthState } from './use-auth-state';
 import { signIn, signOut, signUp } from './auth-actions';
@@ -9,7 +8,6 @@ import { signIn, signOut, signUp } from './auth-actions';
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const navigate = useNavigate();
   const { 
     user, 
     session, 
@@ -20,7 +18,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   } = useAuthState();
 
   const handleSignIn = async (email: string, password: string) => {
-    return signIn(email, password, userRole, navigate);
+    return signIn(email, password, userRole);
   };
 
   const handleSignUp = async (email: string, password: string, metadata?: { [key: string]: any }) => {
@@ -28,7 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const handleSignOut = async () => {
-    return signOut(navigate);
+    return signOut();
   };
 
   // Fix the error by ensuring error has the correct type
