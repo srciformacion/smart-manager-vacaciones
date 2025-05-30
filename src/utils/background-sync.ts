@@ -1,14 +1,7 @@
-/**
- * Utilidad para manejar la sincronización en segundo plano de solicitudes pendientes
- */
 
 import { supabase } from '@/integrations/supabase/client';
-import { Request } from '@/types'; // Import Request type
+import { Request } from '@/types';
 
-/**
- * Registra una tarea de sincronización en segundo plano
- * @param tag Identificador de la tarea de sincronización
- */
 export async function registerSyncTask(tag: string): Promise<boolean> {
   if (!('serviceWorker' in navigator) || !('SyncManager' in window)) {
     console.warn('Background Sync no está soportado en este navegador');
@@ -17,7 +10,6 @@ export async function registerSyncTask(tag: string): Promise<boolean> {
 
   try {
     const registration = await navigator.serviceWorker.ready;
-    // Now TypeScript knows about registration.sync due to global.d.ts
     await registration.sync.register(tag);
     console.log(`Tarea de sincronización "${tag}" registrada correctamente`);
     return true;
@@ -27,10 +19,6 @@ export async function registerSyncTask(tag: string): Promise<boolean> {
   }
 }
 
-/**
- * Sincroniza todas las solicitudes pendientes con el servidor
- * Esta función es llamada por el Service Worker o manualmente.
- */
 export async function syncPendingRequests(): Promise<{ success: number; errors: number }> {
   console.log('syncPendingRequests called from background-sync.ts');
   const pendingString = localStorage.getItem('pendingRequests');
@@ -44,7 +32,7 @@ export async function syncPendingRequests(): Promise<{ success: number; errors: 
     pendingRequests = JSON.parse(pendingString);
   } catch (e) {
     console.error("Error parsing pendingRequests from localStorage", e);
-    localStorage.removeItem('pendingRequests'); // Clear corrupted data
+    localStorage.removeItem('pendingRequests');
     return { success: 0, errors: 0 };
   }
   
@@ -56,48 +44,40 @@ export async function syncPendingRequests(): Promise<{ success: number; errors: 
   let successCount = 0;
   let errorCount = 0;
   const successfullySyncedIds: string[] = [];
-  const requestsToKeep: Request[] = [];
 
   for (const request of pendingRequests) {
     try {
-      // Destructure with correct casing: createdAt, updatedAt
-      // id is an offline ID, not to be sent to Supabase directly if it's auto-generated there
-      const { id: offlineId, createdAt, updatedAt, userid, ...requestDataToSubmit } = request;
+      const { id, createdAt, updatedAt, userId, ...requestDataToSubmit } = request; // Fixed: changed from userid to userId
       
-      console.log('Attempting to sync request:', offlineId, requestDataToSubmit);
+      console.log('Attempting to sync request:', id, requestDataToSubmit);
 
-      // Enviar a Supabase
       const { error } = await supabase
         .from('requests')
         .insert({
           ...requestDataToSubmit,
-          userid: userid, // Ensure userid is passed
-          status: 'pending' // Or whatever status is appropriate
+          userId: userId, // Fixed: changed from userid to userId
+          status: 'pending'
         });
         
       if (error) {
-        console.error('Supabase insert error for request:', offlineId, error);
+        console.error('Supabase insert error for request:', id, error); // Fixed: changed from offlineId to id
         throw error;
       }
       
-      console.log('Successfully synced request:', offlineId);
+      console.log('Successfully synced request:', id); // Fixed: changed from offlineId to id
       successCount++;
-      successfullySyncedIds.push(offlineId);
+      successfullySyncedIds.push(id); // Fixed: changed from offlineId to id
     } catch (error) {
-      console.error('Error al sincronizar solicitud:', offlineId, error);
+      console.error('Error al sincronizar solicitud:', id, error); // Fixed: changed from offlineId to id
       errorCount++;
-      // Add request to keep if it failed
-      requestsToKeep.push(request);
     }
   }
 
   if (pendingRequests.length > 0) {
     if (errorCount === 0 && successCount === pendingRequests.length) {
-      // All requests synced successfully
       console.log('All pending requests synced. Clearing localStorage.');
       localStorage.removeItem('pendingRequests');
     } else {
-      // Some errors, or partial success. Update localStorage with remaining/failed requests.
       const remainingRequests = pendingRequests.filter(req => !successfullySyncedIds.includes(req.id));
       if (remainingRequests.length > 0) {
         console.log(`Updating localStorage with ${remainingRequests.length} remaining requests.`);

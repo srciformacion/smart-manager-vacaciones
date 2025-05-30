@@ -19,7 +19,6 @@ export default function Index() {
     try {
       const userStr = localStorage.getItem("user");
       if (userStr) {
-        // Attempt to parse the user object
         const userData = JSON.parse(userStr);
         const userRole = localStorage.getItem("userRole") as UserRole || userData.role as UserRole;
         console.log("Found user in storage with role:", userRole);
@@ -45,7 +44,6 @@ export default function Index() {
   };
 
   const handleDemoLoginWorker = () => {
-    // Set demo user data
     const demoUser = {
       id: "demo-worker-id",
       email: "worker@demo.com",
@@ -65,7 +63,6 @@ export default function Index() {
   };
   
   const handleDemoLoginHR = () => {
-    // Set demo HR user data
     const demoUser = {
       id: "demo-hr-id",
       email: "hr@demo.com",
@@ -88,7 +85,7 @@ export default function Index() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md text-center space-y-8">
         <div>
-          <h1 className="text-4xl font-bold text-primary">La Rioja Cuida</h1>
+          <h1 className="text-4xl font-bold text-primary">Smart Vacancy</h1>
           <p className="text-xl text-muted-foreground mt-4">
             Sistema de gestión de vacaciones y permisos
           </p>
