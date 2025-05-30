@@ -1,7 +1,7 @@
 
 // Service worker personalizado para extender la funcionalidad del generado por vite-plugin-pwa
 
-// Placeholder for Workbox to inject the manifest
+// Workbox manifest injection point - this must be here for the build to work
 self.__WB_MANIFEST;
 
 // Esta función será ejecutada cuando se registre una sincronización en segundo plano
