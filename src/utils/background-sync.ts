@@ -47,28 +47,28 @@ export async function syncPendingRequests(): Promise<{ success: number; errors: 
 
   for (const request of pendingRequests) {
     try {
-      const { id, createdAt, updatedAt, userId, ...requestDataToSubmit } = request; // Fixed: changed from userid to userId
+      const { id, createdAt, updatedAt, userId, ...requestDataToSubmit } = request;
       
-      console.log('Attempting to sync request:', id, requestDataToSubmit);
+      console.log('Attempting to sync request:', request.id, requestDataToSubmit);
 
       const { error } = await supabase
         .from('requests')
         .insert({
           ...requestDataToSubmit,
-          userId: userId, // Fixed: changed from userid to userId
+          userId: userId,
           status: 'pending'
         });
         
       if (error) {
-        console.error('Supabase insert error for request:', id, error); // Fixed: changed from offlineId to id
+        console.error('Supabase insert error for request:', request.id, error);
         throw error;
       }
       
-      console.log('Successfully synced request:', id); // Fixed: changed from offlineId to id
+      console.log('Successfully synced request:', request.id);
       successCount++;
-      successfullySyncedIds.push(id); // Fixed: changed from offlineId to id
+      successfullySyncedIds.push(request.id);
     } catch (error) {
-      console.error('Error al sincronizar solicitud:', id, error); // Fixed: changed from offlineId to id
+      console.error('Error al sincronizar solicitud:', request.id, error);
       errorCount++;
     }
   }
