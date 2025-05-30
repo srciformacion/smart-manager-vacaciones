@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -112,10 +113,10 @@ export default function LoginPage() {
         <div className="mb-8 text-center animate-in fade-in-50 slide-in-from-top duration-500">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-2xl font-bold text-primary-foreground">LC</span>
+              <span className="text-2xl font-bold text-primary-foreground">SV</span>
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-primary">La Rioja Cuida</h1>
+          <h1 className="text-3xl font-bold text-primary">Smart Vacancy</h1>
           <p className="mt-2 text-muted-foreground">
             Sistema inteligente de gestión de vacaciones y permisos
           </p>
@@ -164,6 +165,10 @@ export default function LoginPage() {
             <p>Credenciales de prueba:</p>
             <p>Email: rrhh@example.com | Contraseña: password</p>
           </div>
+        </div>
+        
+        <div className="mt-4 text-xs text-center text-muted-foreground">
+          <p>Versión 1.0.0 • Smart Vacancy © 2025</p>
         </div>
       </div>
     </div>
