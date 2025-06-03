@@ -40,9 +40,6 @@ const NotificationTemplatesPage = lazy(() => import('@/pages/hr/NotificationTemp
 // Other pages
 const Index = lazy(() => import('@/pages/Index'));
 
-// If there are imports, add the new import:
-import DataGenerationPage from "./pages/hr/DataGenerationPage";
-
 function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
@@ -88,9 +85,6 @@ function App() {
               <Route path="/rrhh/calendar-management" element={<CalendarManagementPage />} />
               <Route path="/rrhh/notifications" element={<SendNotificationPage />} />
               <Route path="/rrhh/notification-templates" element={<NotificationTemplatesPage />} />
-              
-              {/* Inside the RRHH protected routes section */}
-              <Route path="/rrhh/data-generation" element={<DataGenerationPage />} />
               
               {/* Redirect routes */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
