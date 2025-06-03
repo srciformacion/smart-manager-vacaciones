@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -11,11 +10,15 @@ import { toast } from "sonner";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 // Demo users for testing
-const DEMO_USERS = [
-  { email: "usuario@example.com", password: "password", role: "worker" },
-  { email: "rrhh@example.com", password: "password", role: "hr" }
-];
-
+const DEMO_USERS = [{
+  email: "usuario@example.com",
+  password: "password",
+  role: "worker"
+}, {
+  email: "rrhh@example.com",
+  password: "password",
+  role: "hr"
+}];
 export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,60 +31,55 @@ export default function AuthPage() {
   useEffect(() => {
     const checkSession = () => {
       const user = localStorage.getItem("user");
-      
       if (user) {
         // If there's an active session, redirect based on stored role
         const storedRole = localStorage.getItem("userRole") as UserRole || "worker";
         console.log("Found existing session, redirecting to", storedRole === "hr" ? "/rrhh/dashboard" : "/dashboard");
-        
         if (storedRole === "hr") {
           navigate("/rrhh/dashboard");
         } else {
           navigate("/dashboard");
         }
       }
-      
       setLoading(false);
     };
-
     checkSession();
   }, [navigate]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
     try {
       // Find the user in our demo users array - verificamos la coincidencia exacta
       const user = DEMO_USERS.find(u => u.email === email && u.password === password);
-      
       if (!user) {
         throw new Error("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
       }
 
       // Usamos el rol del usuario encontrado
       const role = user.role as UserRole;
-      
+
       // Create a user object with necessary fields
       const userData = {
         id: `demo-${Date.now().toString()}`,
         name: role === "hr" ? "Administrador RRHH" : "Usuario Demo",
         email: user.email,
-        user_metadata: { role },
+        user_metadata: {
+          role
+        },
         role: role
       };
-      
+
       // Store auth info in localStorage
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("userRole", role);
       localStorage.setItem("userEmail", email);
-      
+
       // Dispatch storage event to notify other tabs
       window.dispatchEvent(new Event("storage"));
-      
+
       // Mostramos el rol con el que se ha iniciado sesión
       toast.success(`Has iniciado sesión como ${role === "hr" ? "RRHH" : "Trabajador"}`);
-      
+
       // Redirect based on role
       if (role === "hr") {
         navigate("/rrhh/dashboard");
@@ -95,24 +93,19 @@ export default function AuthPage() {
       setIsSubmitting(false);
     }
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+  return <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="absolute top-4 right-4 flex gap-2">
         <ThemeToggle />
       </div>
       
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary">Smart Vacancy</h1>
+          <h1 className="text-3xl font-bold text-primary">La Rioja Cuida </h1>
           <p className="mt-2 text-muted-foreground">
             Sistema de gestión de vacaciones y permisos
           </p>
@@ -125,11 +118,7 @@ export default function AuthPage() {
 
           <div className="space-y-2">
             <Label>Tipo de usuario</Label>
-            <RadioGroup 
-              value={userRole} 
-              onValueChange={(value) => setUserRole(value as UserRole)}
-              className="flex gap-6"
-            >
+            <RadioGroup value={userRole} onValueChange={value => setUserRole(value as UserRole)} className="flex gap-6">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="worker" id="worker" />
                 <Label htmlFor="worker">Trabajador</Label>
@@ -143,33 +132,15 @@ export default function AuthPage() {
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
-              required
-            />
+            <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@email.com" required />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
+            <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full bg-primary hover:bg-primary/90" 
-            disabled={isSubmitting}
-          >
+          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>
             {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
           </Button>
 
@@ -190,42 +161,38 @@ export default function AuthPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => {
-              // Create user data
-              const userData = {
-                id: `demo-${Date.now().toString()}`,
-                name: userRole === "hr" ? "Administrador RRHH" : "Usuario Demo",
-                email: userRole === "hr" ? "rrhh@example.com" : "usuario@example.com",
-                user_metadata: { role: userRole },
-                role: userRole
-              };
-              
-              // Store auth info
-              localStorage.setItem("user", JSON.stringify(userData));
-              localStorage.setItem("userRole", userRole);
-              localStorage.setItem("userEmail", userData.email);
-              
-              toast.success(`Has iniciado sesión como ${userRole === "hr" ? "RRHH" : "Trabajador"} en modo demo`);
-              
-              // Redirect based on role
-              if (userRole === "hr") {
-                navigate("/rrhh/dashboard");
-              } else {
-                navigate("/dashboard");
-              }
-            }}
-          >
+          <Button variant="outline" className="w-full" onClick={() => {
+          // Create user data
+          const userData = {
+            id: `demo-${Date.now().toString()}`,
+            name: userRole === "hr" ? "Administrador RRHH" : "Usuario Demo",
+            email: userRole === "hr" ? "rrhh@example.com" : "usuario@example.com",
+            user_metadata: {
+              role: userRole
+            },
+            role: userRole
+          };
+
+          // Store auth info
+          localStorage.setItem("user", JSON.stringify(userData));
+          localStorage.setItem("userRole", userRole);
+          localStorage.setItem("userEmail", userData.email);
+          toast.success(`Has iniciado sesión como ${userRole === "hr" ? "RRHH" : "Trabajador"} en modo demo`);
+
+          // Redirect based on role
+          if (userRole === "hr") {
+            navigate("/rrhh/dashboard");
+          } else {
+            navigate("/dashboard");
+          }
+        }}>
             Entrar con credenciales de prueba
           </Button>
         </div>
         
         <div className="mt-4 text-xs text-center text-muted-foreground">
-          <p>Versión 1.0.0 • Smart Vacancy © 2025</p>
+          <p>Versión 1.1.0 • Smart Vacancy © 2025</p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
