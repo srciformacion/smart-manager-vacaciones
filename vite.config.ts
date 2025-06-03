@@ -19,8 +19,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png', 'offline.html'],
       manifest: {
-        name: 'Smart Vacancy',
-        short_name: 'SmartVac',
+        name: 'La Rioja Cuida',
+        short_name: 'LRCuida',
         description: 'Sistema inteligente de gestión de vacaciones y permisos',
         theme_color: '#0f172a',
         icons: [

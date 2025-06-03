@@ -3,7 +3,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'app.lovable.598b4b6779b64e8a88d3f670afcb5781',
-  appName: 'smart-manager-vacaciones',
+  appName: 'la-rioja-cuida',
   webDir: 'dist',
   server: {
     url: 'https://vacaciones.hhrrsrci.online',

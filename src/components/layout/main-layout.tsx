@@ -77,7 +77,7 @@ export function MainLayout({
             </Button>
             
             {/* Título o logo de la aplicación */}
-            <span className="text-lg font-bold">Smart Vacancy</span>
+            <span className="text-lg font-bold">La Rioja Cuida</span>
           </div>
           <div className="flex items-center gap-2 ml-auto">
             <InstallPWAButton />
