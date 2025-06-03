@@ -7,7 +7,7 @@ import { generateUsers } from "./users/user-generator";
 export { exampleUser };
 
 // Generate additional workers to reach the desired total
-const generatedWorkers = generateUsers(200, 6); // Start from ID 6 since we have 5 predefined
+const generatedWorkers = generateUsers(180, 21); // Start from ID 21 since we have 20 predefined
 
 // Combine predefined and generated workers
 export const exampleWorkers: User[] = [

@@ -1,6 +1,6 @@
 
 import { User } from "@/types";
-import { DEPARTMENTS, SHIFTS, WORKDAYS, ROLES } from "./departments";
+import { DEPARTMENTS, SHIFTS, WORKDAYS, ROLES, POSITIONS } from "./departments";
 
 const FIRST_NAMES = [
   "Ana", "Carlos", "María", "José", "Laura", "Miguel", "Carmen", "Antonio", 
@@ -9,7 +9,8 @@ const FIRST_NAMES = [
   "Teresa", "Alejandro", "Antonia", "Pedro", "Francisca", "Adrián", "Cristina",
   "Óscar", "Lucía", "Rubén", "Julia", "Álvaro", "Montserrat", "Sergio", "Esperanza",
   "Pablo", "Amparo", "Jorge", "Inmaculada", "Alberto", "Susana", "Roberto",
-  "Elena", "Ignacio", "Beatriz", "Marco", "Yolanda", "Víctor", "Margarita"
+  "Elena", "Ignacio", "Beatriz", "Marco", "Yolanda", "Víctor", "Margarita",
+  "Fernando", "Silvia", "Raúl", "Patricia", "Eduardo", "Rocío", "Gonzalo", "Nuria"
 ];
 
 const LAST_NAMES = [
@@ -19,11 +20,56 @@ const LAST_NAMES = [
   "Domínguez", "Vázquez", "Ramos", "Gil", "Ramírez", "Serrano", "Blanco",
   "Suárez", "Molina", "Morales", "Ortega", "Delgado", "Castro", "Ortiz",
   "Rubio", "Marín", "Sanz", "Iglesias", "Medina", "Garrido", "Cortés",
-  "Castillo", "Santos", "Lozano", "Guerrero", "Cano", "Prieto", "Méndez"
+  "Castillo", "Santos", "Lozano", "Guerrero", "Cano", "Prieto", "Méndez",
+  "Herrera", "Aguilar", "Vega", "Campos", "Reyes", "Cruz", "Flores", "Vargas"
 ];
 
 function getRandomElement<T>(array: readonly T[]): T {
   return array[Math.floor(Math.random() * array.length)];
+}
+
+// Function to assign appropriate position based on department and shift
+function getPositionForDepartmentAndShift(department: string, shift: string): string {
+  const emergencyPositions = ["Emergency Operator 24h", "Emergency Coordinator", "Emergency Technician", "Emergency Dispatcher"];
+  const callCenterPositions = ["Scheduled Teleoperator", "Emergency Teleoperator", "Call Center Supervisor", "Customer Service Agent"];
+  const operationsPositions = ["Morning Shift Worker", "Afternoon Shift Worker", "Night Shift Worker", "Weekend Specialist"];
+  const supportPositions = ["Technical Support", "Administrative Assistant", "Quality Supervisor", "Training Coordinator"];
+
+  if (department === "Emergency Services") {
+    if (shift === "Emergency 24h") {
+      return getRandomElement(emergencyPositions.slice(0, 3)); // Emergency specific roles
+    }
+    return getRandomElement([...emergencyPositions, "Training Coordinator"]);
+  }
+  
+  if (department === "Call Center") {
+    if (shift === "Emergency 24h" || shift === "Night") {
+      return "Emergency Teleoperator";
+    }
+    if (shift === "Scheduled" || shift === "Morning" || shift === "Afternoon") {
+      return getRandomElement(["Scheduled Teleoperator", "Customer Service Agent"]);
+    }
+    return getRandomElement(callCenterPositions);
+  }
+  
+  if (department === "Operations") {
+    if (shift === "Morning") return "Morning Shift Worker";
+    if (shift === "Afternoon") return "Afternoon Shift Worker";
+    if (shift === "Night") return "Night Shift Worker";
+    return getRandomElement(operationsPositions);
+  }
+  
+  if (department === "Medical Support") {
+    if (shift === "Emergency 24h") return "Emergency Dispatcher";
+    return getRandomElement(["Quality Supervisor", "Training Coordinator"]);
+  }
+  
+  if (department === "Telecommunications") {
+    return "Technical Support";
+  }
+  
+  // Default positions for other departments
+  return getRandomElement(supportPositions);
 }
 
 function generateRandomUser(id: number): User {
@@ -49,6 +95,9 @@ function generateRandomUser(id: number): User {
   startDate.setMonth(Math.floor(Math.random() * 12));
   startDate.setDate(Math.floor(Math.random() * 28) + 1);
   
+  // Get appropriate position based on department and shift
+  const position = getPositionForDepartmentAndShift(department, shift);
+  
   return {
     id: String(id),
     name,
@@ -58,7 +107,7 @@ function generateRandomUser(id: number): User {
     shift,
     workday,
     startDate,
-    position: `${department} - ${shift}`,
+    position,
     phone: `+34 ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 900 + 100)}`,
     seniority: Math.floor(Math.random() * 20) + 1
   };
