@@ -43,14 +43,7 @@ export default defineConfig(({ mode }) => ({
         enabled: true,
         type: 'module',
       },
-      strategies: 'injectManifest',
-      srcDir: 'public',
-      filename: 'sw-custom.js',
-      injectManifest: {
-        swSrc: 'public/sw-custom.js',
-        swDest: 'dist/sw.js',
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,webp}']
-      },
+      strategies: 'generateSW',
       workbox: {
         runtimeCaching: [
           {
