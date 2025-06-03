@@ -1,8 +1,8 @@
 
-// Service worker personalizado para extender la funcionalidad del generado por vite-plugin-pwa
-
-// Workbox manifest injection point - this must be here for the build to work
+// Workbox manifest injection point
 self.__WB_MANIFEST;
+
+// Service worker personalizado para extender la funcionalidad del generado por vite-plugin-pwa
 
 // Esta función será ejecutada cuando se registre una sincronización en segundo plano
 self.addEventListener('sync', (event) => {
