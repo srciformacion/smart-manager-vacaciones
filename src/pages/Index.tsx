@@ -73,7 +73,7 @@ export default function Index() {
       <div className="w-full max-w-md text-center space-y-8">
         <div>
           <h1 className="text-4xl font-bold text-primary">La Rioja Cuida</h1>
-          <p className="text-xl text-muted-foreground mt-4">Sistema de Gestión de Vacaciones y Permisos</p>
+          <p className="text-xl text-muted-foreground mt-4">Sistema de Gestión Inteligente de H</p>
         </div>
         
         <div className="space-y-4">
