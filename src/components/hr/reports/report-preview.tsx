@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Download, Share, Calendar, Users, FileText } from "lucide-react";
+import { Eye, Download, Share, Calendar, Users, FileText, TrendingUp, UserX, Timer, ShieldCheck } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -18,6 +18,10 @@ export function ReportPreview({ reportConfig, onDownload, onShare }: ReportPrevi
       case "vacations": return <Calendar className="h-5 w-5 text-blue-500" />;
       case "permissions": return <FileText className="h-5 w-5 text-green-500" />;
       case "attendance": return <Users className="h-5 w-5 text-purple-500" />;
+      case "productivity": return <TrendingUp className="h-5 w-5 text-emerald-500" />;
+      case "absenteeism": return <UserX className="h-5 w-5 text-red-500" />;
+      case "overtime": return <Timer className="h-5 w-5 text-orange-500" />;
+      case "compliance": return <ShieldCheck className="h-5 w-5 text-indigo-500" />;
       default: return <FileText className="h-5 w-5 text-gray-500" />;
     }
   };
@@ -28,6 +32,10 @@ export function ReportPreview({ reportConfig, onDownload, onShare }: ReportPrevi
       case "permissions": return "Permisos";
       case "attendance": return "Asistencia";
       case "comprehensive": return "Integral";
+      case "productivity": return "Productividad";
+      case "absenteeism": return "Ausentismo";
+      case "overtime": return "Horas Extras";
+      case "compliance": return "Cumplimiento";
       default: return "Desconocido";
     }
   };
@@ -40,6 +48,27 @@ export function ReportPreview({ reportConfig, onDownload, onShare }: ReportPrevi
       case "csv": return "245 KB";
       default: return "1.2 MB";
     }
+  };
+
+  const getEmployeesSummary = () => {
+    if (reportConfig.employees === "all") {
+      return "Todos los empleados";
+    }
+    return `${reportConfig.employees.length} empleados seleccionados`;
+  };
+
+  const getStatusesSummary = () => {
+    if (reportConfig.statuses.length === 4) {
+      return "Todos los estados";
+    }
+    return `${reportConfig.statuses.length} estados seleccionados`;
+  };
+
+  const getShiftsSummary = () => {
+    if (reportConfig.shifts.length === 6) {
+      return "Todos los turnos";
+    }
+    return `${reportConfig.shifts.length} turnos seleccionados`;
   };
 
   return (
@@ -89,25 +118,44 @@ export function ReportPreview({ reportConfig, onDownload, onShare }: ReportPrevi
             </p>
           </div>
           <div>
+            <span className="font-medium">Empleados:</span>
+            <p className="text-muted-foreground">
+              {getEmployeesSummary()}
+            </p>
+          </div>
+          <div>
+            <span className="font-medium">Estados:</span>
+            <p className="text-muted-foreground">
+              {getStatusesSummary()}
+            </p>
+          </div>
+          <div>
+            <span className="font-medium">Turnos:</span>
+            <p className="text-muted-foreground">
+              {getShiftsSummary()}
+            </p>
+          </div>
+          <div>
             <span className="font-medium">Generado el:</span>
             <p className="text-muted-foreground">
               {format(reportConfig.generatedAt, "d 'de' MMMM, yyyy 'a las' HH:mm", { locale: es })}
             </p>
           </div>
-          <div>
-            <span className="font-medium">Opciones:</span>
-            <div className="space-y-1">
-              {reportConfig.includeGraphics && (
-                <Badge variant="secondary" className="text-xs mr-1">
-                  Con gráficos
-                </Badge>
-              )}
-              {reportConfig.includeSummary && (
-                <Badge variant="secondary" className="text-xs">
-                  Con resumen
-                </Badge>
-              )}
-            </div>
+        </div>
+
+        <div className="space-y-2">
+          <span className="font-medium text-sm">Opciones:</span>
+          <div className="flex flex-wrap gap-1">
+            {reportConfig.includeGraphics && (
+              <Badge variant="secondary" className="text-xs">
+                Con gráficos
+              </Badge>
+            )}
+            {reportConfig.includeSummary && (
+              <Badge variant="secondary" className="text-xs">
+                Con resumen
+              </Badge>
+            )}
           </div>
         </div>
 

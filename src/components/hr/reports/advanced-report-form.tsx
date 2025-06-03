@@ -9,6 +9,9 @@ import { BasicInfoSection } from "./form-sections/basic-info-section";
 import { ReportTypeSection } from "./form-sections/report-type-section";
 import { DateRangeSection } from "./form-sections/date-range-section";
 import { DepartmentSelection } from "./form-sections/department-selection";
+import { EmployeeSelection } from "./form-sections/employee-selection";
+import { StatusFilterSection } from "./form-sections/status-filter-section";
+import { ShiftFilterSection } from "./form-sections/shift-filter-section";
 import { AdditionalOptions } from "./form-sections/additional-options";
 
 interface AdvancedReportFormProps {
@@ -22,6 +25,10 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
   const [reportName, setReportName] = useState("");
   const [format, setFormat] = useState("excel");
   const [departments, setDepartments] = useState<string[]>([]);
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
+  const [allEmployees, setAllEmployees] = useState(true);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedShifts, setSelectedShifts] = useState<string[]>([]);
   const [includeGraphics, setIncludeGraphics] = useState(true);
   const [includeSummary, setIncludeSummary] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -50,6 +57,9 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
       format,
       dateRange: { from: dateFrom, to: dateTo },
       departments: departments.length > 0 ? departments : departmentOptions,
+      employees: allEmployees ? "all" : selectedEmployees,
+      statuses: selectedStatuses.length > 0 ? selectedStatuses : ["pending", "approved", "rejected", "in_review"],
+      shifts: selectedShifts.length > 0 ? selectedShifts : ["morning", "afternoon", "night", "emergency", "oncall", "flexible"],
       includeGraphics,
       includeSummary,
       generatedAt: new Date()
@@ -63,6 +73,9 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
       // Limpiar formulario
       setReportName("");
       setDepartments([]);
+      setSelectedEmployees([]);
+      setSelectedStatuses([]);
+      setSelectedShifts([]);
       
       toast({
         title: "Informe generado",
@@ -105,6 +118,29 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
           <DepartmentSelection
             departments={departments}
             setDepartments={setDepartments}
+          />
+
+          <Separator />
+
+          <EmployeeSelection
+            selectedEmployees={selectedEmployees}
+            setSelectedEmployees={setSelectedEmployees}
+            allEmployees={allEmployees}
+            setAllEmployees={setAllEmployees}
+          />
+
+          <Separator />
+
+          <StatusFilterSection
+            selectedStatuses={selectedStatuses}
+            setSelectedStatuses={setSelectedStatuses}
+          />
+
+          <Separator />
+
+          <ShiftFilterSection
+            selectedShifts={selectedShifts}
+            setSelectedShifts={setSelectedShifts}
           />
 
           <Separator />
