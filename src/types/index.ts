@@ -1,3 +1,4 @@
+
 export type RequestType =
   | "vacation"
   | "personal-day"
@@ -18,6 +19,10 @@ export type Department =
   | "Human Resources"
   | "Finance"
   | "Operations"
+  | "Emergency Services"
+  | "Call Center"
+  | "Medical Support"
+  | "Telecommunications"
   | "Recursos Humanos"
   | "Atención al cliente"
   | "Administración"
@@ -29,11 +34,23 @@ export type Department =
 export type Shift = 
   | "Morning" 
   | "Afternoon" 
-  | "Night" 
+  | "Night"
+  | "Emergency 24h"
+  | "Emergency 12h"
+  | "Scheduled"
+  | "On-call"
+  | "Localizado"
+  | "Programado Mañana"
+  | "Programado Tarde"
+  | "Programado Noche"
+  | "Teleoperador Rotativo Mañana"
+  | "Teleoperador Rotativo Tarde"
+  | "Teleoperador Rotativo Noche"
+  | "Urgencias 24h"
+  | "Urgencias 12h"
   | "Programado"
   | "Urgente 24h"
-  | "Localizado"
-  | "Programado Mañana";
+  | "Urgente 12h";
 
 export type WeekDay =
   | "Monday"
