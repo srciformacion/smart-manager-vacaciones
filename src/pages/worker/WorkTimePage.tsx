@@ -4,10 +4,19 @@ import { useAuth } from "@/hooks/auth";
 import { WorkTimeClock } from "@/components/work-time/work-time-clock";
 import { WorkTimeHistory } from "@/components/work-time/work-time-history";
 import { useWorkTimeConfig } from "@/hooks/work-time/use-work-time-config";
+import { User } from "@/types";
 
 export default function WorkTimePage() {
-  const { user } = useAuth();
+  const { user: authUser } = useAuth();
   const { config, loading } = useWorkTimeConfig();
+
+  // Convert Supabase user to our User type
+  const user: User | null = authUser ? {
+    id: authUser.id,
+    name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || "Usuario",
+    email: authUser.email || "",
+    role: "worker" // Default role, you might want to get this from user metadata or profile
+  } : null;
 
   if (loading) {
     return (

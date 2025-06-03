@@ -5,10 +5,19 @@ import { HRWorkTimeDashboard } from "@/components/work-time/hr-work-time-dashboa
 import { WorkTimeSettings } from "@/components/work-time/work-time-settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWorkTimeConfig } from "@/hooks/work-time/use-work-time-config";
+import { User } from "@/types";
 
 export default function WorkTimeManagementPage() {
-  const { user } = useAuth();
+  const { user: authUser } = useAuth();
   const { config, loading } = useWorkTimeConfig();
+
+  // Convert Supabase user to our User type
+  const user: User | null = authUser ? {
+    id: authUser.id,
+    name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || "Usuario",
+    email: authUser.email || "",
+    role: "hr" // HR role for this page
+  } : null;
 
   if (loading) {
     return (
