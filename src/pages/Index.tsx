@@ -1,19 +1,17 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { UserRole } from "@/types";
-
 export default function Index() {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [checking, setChecking] = useState(true);
-
   useEffect(() => {
     checkUser();
   }, []);
-
   const checkUser = () => {
     setChecking(true);
     try {
@@ -22,7 +20,6 @@ export default function Index() {
         const userData = JSON.parse(userStr);
         const userRole = localStorage.getItem("userRole") as UserRole || userData.role as UserRole;
         console.log("Found user in storage with role:", userRole);
-        
         if (userRole === "hr") {
           navigate("/rrhh/dashboard");
         } else {
@@ -42,7 +39,6 @@ export default function Index() {
       setChecking(false);
     }
   };
-
   const handleDemoLoginWorker = () => {
     const demoUser = {
       id: "demo-worker-id",
@@ -50,18 +46,14 @@ export default function Index() {
       name: "Demo Worker",
       role: "worker"
     };
-    
     localStorage.setItem("user", JSON.stringify(demoUser));
     localStorage.setItem("userRole", "worker");
-    
     navigate("/dashboard");
-    
     toast({
       title: "Sesión de demostración iniciada",
       description: "Has iniciado sesión como trabajador en modo demostración"
     });
   };
-  
   const handleDemoLoginHR = () => {
     const demoUser = {
       id: "demo-hr-id",
@@ -69,34 +61,23 @@ export default function Index() {
       name: "Demo HR",
       role: "hr"
     };
-    
     localStorage.setItem("user", JSON.stringify(demoUser));
     localStorage.setItem("userRole", "hr");
-    
     navigate("/rrhh/dashboard");
-    
     toast({
       title: "Sesión de demostración iniciada",
       description: "Has iniciado sesión como personal de RRHH en modo demostración"
     });
   };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+  return <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md text-center space-y-8">
         <div>
-          <h1 className="text-4xl font-bold text-primary">Smart Vacancy</h1>
-          <p className="text-xl text-muted-foreground mt-4">
-            Sistema de gestión de vacaciones y permisos
-          </p>
+          <h1 className="text-4xl font-bold text-primary">La Rioja Cuida</h1>
+          <p className="text-xl text-muted-foreground mt-4">Sistema de Gestión de Vacaciones y Permisos</p>
         </div>
         
         <div className="space-y-4">
-          <Button 
-            onClick={() => navigate("/auth")} 
-            size="lg"
-            className="w-full"
-          >
+          <Button onClick={() => navigate("/auth")} size="lg" className="w-full">
             Iniciar sesión
           </Button>
           
@@ -107,23 +88,14 @@ export default function Index() {
           </div>
           
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-            <Button 
-              onClick={handleDemoLoginWorker} 
-              variant="outline"
-              className="flex-1"
-            >
+            <Button onClick={handleDemoLoginWorker} variant="outline" className="flex-1">
               Demo Trabajador
             </Button>
-            <Button 
-              onClick={handleDemoLoginHR} 
-              variant="outline"
-              className="flex-1"
-            >
+            <Button onClick={handleDemoLoginHR} variant="outline" className="flex-1">
               Demo RRHH
             </Button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
