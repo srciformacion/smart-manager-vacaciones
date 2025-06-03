@@ -1,6 +1,6 @@
 
 import { MainLayout } from "@/components/layout/main-layout";
-import { AIAssistantPanel } from "@/components/hr/ai-assistant/ai-assistant-panel";
+import { EnhancedAIPanel } from "@/components/hr/ai-assistant/enhanced-ai-panel";
 import { exampleUser } from "@/data/example-users";
 import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { useEffect } from "react";
@@ -34,11 +34,11 @@ export default function AIAssistantPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Asistente de IA</h1>
           <p className="text-muted-foreground mt-2">
-            Gestión inteligente de vacaciones, jornadas y recomendaciones automatizadas
+            Análisis inteligente, recomendaciones personalizadas y chat interactivo para optimizar la gestión de RRHH
           </p>
         </div>
 
-        <AIAssistantPanel />
+        <EnhancedAIPanel />
       </div>
     </MainLayout>
   );
