@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { VacationRulesDisplay } from "@/components/vacation/vacation-rules-display";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { exampleRequests } from "@/data/example-requests";
 
 export default function RequestsPage() {
   const { user } = useProfileAuth();
@@ -25,6 +26,19 @@ export default function RequestsPage() {
       if (!user?.id) return;
       
       try {
+        setLoading(true);
+        
+        // Check if user ID is a demo ID (starts with "demo-")
+        if (user.id.startsWith('demo-')) {
+          console.log("Using demo data for requests");
+          // Filter example requests to show only this user's requests
+          const userRequests = exampleRequests.filter(req => req.userId === user.id);
+          setRequests(userRequests);
+          setLoading(false);
+          return;
+        }
+        
+        // For real users, fetch from Supabase
         const { data, error } = await supabase
           .from('requests')
           .select('*')
@@ -54,10 +68,16 @@ export default function RequestsPage() {
         }
       } catch (error) {
         console.error('Error fetching requests:', error);
+        
+        // Fallback to demo data on error
+        console.log("Falling back to demo data due to error");
+        const userRequests = exampleRequests.filter(req => req.userId === user.id);
+        setRequests(userRequests);
+        
         toast({
           variant: "destructive",
           title: "Error",
-          description: "No se pudieron cargar las solicitudes"
+          description: "No se pudieron cargar las solicitudes desde la base de datos. Mostrando datos de ejemplo."
         });
       } finally {
         setLoading(false);
