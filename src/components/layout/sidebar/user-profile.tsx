@@ -24,28 +24,39 @@ export function UserProfile({ user, role, collapsed, onLogout, onNavigate }: Use
     return "U";
   };
 
+  const handleLogout = async () => {
+    try {
+      console.log("UserProfile - Attempting logout");
+      if (onLogout) {
+        await onLogout();
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   if (!user) return null;
 
   return (
     <TooltipProvider>
       <div className={cn(
-        "border-t border-sidebar-border p-3",
-        collapsed ? "flex flex-col items-center space-y-2" : "space-y-3"
+        "border-t border-sidebar-border p-2",
+        collapsed ? "flex flex-col items-center space-y-1" : "space-y-2"
       )}>
         {/* User Info Section */}
         <div className={cn(
-          collapsed ? "flex flex-col items-center space-y-1" : "flex items-center gap-3"
+          collapsed ? "flex flex-col items-center space-y-1" : "flex items-center gap-2"
         )}>
-          <Avatar className={collapsed ? "w-8 h-8" : "w-10 h-10"}>
+          <Avatar className={collapsed ? "w-6 h-6" : "w-8 h-8"}>
             <AvatarImage src={user.profilePicture} alt={`${user.name}`} />
-            <AvatarFallback>{getInitial()}</AvatarFallback>
+            <AvatarFallback className="text-xs">{getInitial()}</AvatarFallback>
           </Avatar>
           
           {!collapsed && (
-            <div className="space-y-1 min-w-0 flex-1">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">{user.name}</p>
+            <div className="space-y-0.5 min-w-0 flex-1">
+              <p className="text-xs font-medium text-sidebar-foreground truncate">{user.name}</p>
               <p className="text-xs text-sidebar-foreground/70 truncate">{user.email}</p>
-              <p className="text-xs font-medium bg-sidebar-primary/20 text-sidebar-foreground inline-block px-2 py-0.5 rounded-full">
+              <p className="text-xs font-medium bg-sidebar-primary/20 text-sidebar-foreground inline-block px-1.5 py-0.5 rounded-full">
                 {role === "hr" ? "RRHH" : "Trabajador"}
               </p>
             </div>
@@ -55,7 +66,7 @@ export function UserProfile({ user, role, collapsed, onLogout, onNavigate }: Use
         {/* Action Buttons */}
         <div className={cn(
           "flex",
-          collapsed ? "flex-col space-y-1" : "gap-2"
+          collapsed ? "flex-col space-y-1" : "gap-1"
         )}>
           {/* Profile Link */}
           {collapsed ? (
@@ -64,12 +75,12 @@ export function UserProfile({ user, role, collapsed, onLogout, onNavigate }: Use
                 <NavLink
                   to="/profile"
                   className={({ isActive }) => cn(
-                    "flex items-center justify-center rounded-lg p-2 h-8 w-8 text-sm transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    "flex items-center justify-center rounded-lg p-1.5 h-6 w-6 text-sm transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                     isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground"
                   )}
                   onClick={onNavigate}
                 >
-                  <CircleUser className="h-4 w-4" />
+                  <CircleUser className="h-3 w-3" />
                 </NavLink>
               </TooltipTrigger>
               <TooltipContent side="right" className="ml-2">
@@ -80,12 +91,12 @@ export function UserProfile({ user, role, collapsed, onLogout, onNavigate }: Use
             <NavLink
               to="/profile"
               className={({ isActive }) => cn(
-                "flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex-1",
+                "flex items-center gap-2 rounded-lg px-2 py-1 text-xs transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex-1",
                 isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground"
               )}
               onClick={onNavigate}
             >
-              <CircleUser className="h-4 w-4" />
+              <CircleUser className="h-3 w-3" />
               Mi Perfil
             </NavLink>
           )}
@@ -98,11 +109,11 @@ export function UserProfile({ user, role, collapsed, onLogout, onNavigate }: Use
                   <Button 
                     variant="outline" 
                     size="icon"
-                    className="border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 w-8" 
-                    onClick={onLogout}
+                    className="border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-6 w-6 p-0" 
+                    onClick={handleLogout}
                     aria-label="Cerrar sesión"
                   >
-                    <LogOut className="h-4 w-4" />
+                    <LogOut className="h-3 w-3" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="ml-2">
@@ -112,11 +123,12 @@ export function UserProfile({ user, role, collapsed, onLogout, onNavigate }: Use
             ) : (
               <Button 
                 variant="outline" 
-                className="border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm py-1.5 h-auto flex-1" 
-                onClick={onLogout}
+                size="sm"
+                className="border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-xs py-1 h-auto flex-1" 
+                onClick={handleLogout}
                 aria-label="Cerrar sesión"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="h-3 w-3 mr-1" />
                 Cerrar sesión
               </Button>
             )

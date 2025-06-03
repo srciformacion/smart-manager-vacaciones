@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { SidebarNavigation } from "./sidebar-navigation";
 import { useNavigate } from "react-router-dom";
@@ -19,15 +20,25 @@ export function MainSidebar({ onNavigate, collapsed = false, onCollapse }: MainS
   
   const handleLogout = async () => {
     try {
+      console.log("MainSidebar - Starting logout process");
       await signOut();
+      
       // Clear any local storage data related to the user
       localStorage.removeItem("user");
       localStorage.removeItem("userRole");
+      localStorage.removeItem("userEmail");
       
+      console.log("MainSidebar - Logout successful, navigating to auth");
       navigate("/auth", { replace: true });
+      
       if (onNavigate) {
         onNavigate();
       }
+      
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión correctamente"
+      });
     } catch (error) {
       console.error("Error during logout:", error);
       toast({
@@ -56,6 +67,8 @@ export function MainSidebar({ onNavigate, collapsed = false, onCollapse }: MainS
   // If no user in auth context, try localStorage (for demo users)
   else {
     const storedUserData = localStorage.getItem("user");
+    const storedRole = localStorage.getItem("userRole") as UserRole;
+    
     if (storedUserData) {
       try {
         const parsedUser = JSON.parse(storedUserData);
@@ -67,7 +80,7 @@ export function MainSidebar({ onNavigate, collapsed = false, onCollapse }: MainS
           profilePicture: parsedUser.profilePicture || ""
         };
         // Get role from localStorage or default to what's in the user object
-        effectiveRole = (localStorage.getItem("userRole") as UserRole) || parsedUser.role || "worker";
+        effectiveRole = storedRole || parsedUser.role || "worker";
       } catch (e) {
         console.error("Error parsing stored user data:", e);
       }
