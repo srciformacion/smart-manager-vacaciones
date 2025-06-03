@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Clock, Play, Square, Coffee, Utensils, AlertTriangle, Ambulance } from 'lucide-react';
+import { Clock, Play, Square, Coffee, Utensils, AlertTriangle, Ambulance, Edit } from 'lucide-react';
 import { useWorkTimeRecords } from '@/hooks/work-time/use-work-time-records';
 import { useWorkTimeConfig } from '@/hooks/work-time/use-work-time-config';
 import { format } from 'date-fns';
@@ -20,12 +19,15 @@ export function WorkTimeClock() {
     startBreak,
     endBreak,
     startLunch,
-    endLunch
+    endLunch,
+    changeAmbulance
   } = useWorkTimeRecords();
 
   const { config } = useWorkTimeConfig();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedAmbulance, setSelectedAmbulance] = useState('');
+  const [showAmbulanceChange, setShowAmbulanceChange] = useState(false);
+  const [newAmbulance, setNewAmbulance] = useState('');
 
   // Lista de ambulancias disponibles
   const ambulances = [
@@ -121,6 +123,14 @@ export function WorkTimeClock() {
     }
   };
 
+  const handleAmbulanceChange = () => {
+    if (newAmbulance && todayRecord) {
+      changeAmbulance(newAmbulance);
+      setShowAmbulanceChange(false);
+      setNewAmbulance('');
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -175,13 +185,61 @@ export function WorkTimeClock() {
           )}
         </div>
 
-        {/* Ambulance info */}
+        {/* Ambulance info with change option */}
         {todayRecord?.notes && (
-          <div className="text-center">
+          <div className="text-center space-y-2">
             <div className="flex items-center justify-center gap-2 text-sm">
               <Ambulance className="h-4 w-4" />
               <span className="font-medium">Ambulancia: {todayRecord.notes}</span>
+              {hasClockedIn && !hasClockedOut && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAmbulanceChange(!showAmbulanceChange)}
+                  className="h-6 w-6 p-0"
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+              )}
             </div>
+
+            {/* Change ambulance form */}
+            {showAmbulanceChange && (
+              <div className="space-y-2 p-3 border rounded-lg bg-muted/50">
+                <Label htmlFor="new-ambulance">Cambiar ambulancia</Label>
+                <Select value={newAmbulance} onValueChange={setNewAmbulance}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona nueva ambulancia..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ambulances.map((ambulance) => (
+                      <SelectItem key={ambulance} value={ambulance}>
+                        {ambulance}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleAmbulanceChange} 
+                    size="sm" 
+                    disabled={!newAmbulance}
+                  >
+                    Cambiar
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setShowAmbulanceChange(false);
+                      setNewAmbulance('');
+                    }} 
+                    variant="outline" 
+                    size="sm"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

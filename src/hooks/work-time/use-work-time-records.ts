@@ -108,6 +108,38 @@ export function useWorkTimeRecords(userId?: string) {
     }
   };
 
+  const changeAmbulance = async (newAmbulance: string) => {
+    if (!todayRecord) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('work_time_records')
+        .update({
+          notes: newAmbulance
+        })
+        .eq('id', todayRecord.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setTodayRecord(data);
+      await fetchRecords();
+      
+      toast({
+        title: "Ambulancia cambiada",
+        description: `Has cambiado a la ambulancia ${newAmbulance}`
+      });
+    } catch (error) {
+      console.error('Error changing ambulance:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo cambiar la ambulancia"
+      });
+    }
+  };
+
   const clockOut = async () => {
     if (!todayRecord) return;
 
@@ -288,6 +320,7 @@ export function useWorkTimeRecords(userId?: string) {
     endBreak,
     startLunch,
     endLunch,
+    changeAmbulance,
     fetchRecords
   };
 }
