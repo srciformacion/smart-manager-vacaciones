@@ -9,7 +9,7 @@ export const exampleUser: User = {
   department: "Human Resources",
   shift: "Morning",
   workday: "L-V",
-  hireDate: "2020-01-15",
+  startDate: new Date("2020-01-15"),
   position: "Gerente de RRHH",
   phone: "+34 600 123 456",
   seniority: 4
@@ -24,7 +24,7 @@ export const predefinedWorkers: User[] = [
     department: "Operations",
     shift: "Morning",
     workday: "L-V",
-    hireDate: "2019-03-10",
+    startDate: new Date("2019-03-10"),
     position: "Operario de Producción",
     phone: "+34 600 234 567",
     seniority: 5
@@ -37,7 +37,7 @@ export const predefinedWorkers: User[] = [
     department: "Operations",
     shift: "Afternoon",
     workday: "L-V",
-    hireDate: "2021-06-01",
+    startDate: new Date("2021-06-01"),
     position: "Técnico de Calidad",
     phone: "+34 600 345 678",
     seniority: 3
@@ -50,7 +50,7 @@ export const predefinedWorkers: User[] = [
     department: "Operations",
     shift: "Night",
     workday: "Rotativo",
-    hireDate: "2018-09-15",
+    startDate: new Date("2018-09-15"),
     position: "Técnico de Mantenimiento",
     phone: "+34 600 456 789",
     seniority: 6
@@ -63,7 +63,7 @@ export const predefinedWorkers: User[] = [
     department: "Finance",
     shift: "Morning",
     workday: "L-V",
-    hireDate: "2022-01-10",
+    startDate: new Date("2022-01-10"),
     position: "Administrativa",
     phone: "+34 600 567 890",
     seniority: 2

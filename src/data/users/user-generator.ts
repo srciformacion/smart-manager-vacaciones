@@ -44,10 +44,10 @@ function generateRandomUser(id: number): User {
   const role = getRandomElement(ROLES);
   
   // Generate random hire date within last 10 years
-  const hireDate = new Date();
-  hireDate.setFullYear(hireDate.getFullYear() - Math.floor(Math.random() * 10));
-  hireDate.setMonth(Math.floor(Math.random() * 12));
-  hireDate.setDate(Math.floor(Math.random() * 28) + 1);
+  const startDate = new Date();
+  startDate.setFullYear(startDate.getFullYear() - Math.floor(Math.random() * 10));
+  startDate.setMonth(Math.floor(Math.random() * 12));
+  startDate.setDate(Math.floor(Math.random() * 28) + 1);
   
   return {
     id: String(id),
@@ -57,7 +57,7 @@ function generateRandomUser(id: number): User {
     department,
     shift,
     workday,
-    hireDate: hireDate.toISOString().split('T')[0],
+    startDate,
     position: `${department} - ${shift}`,
     phone: `+34 ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 900 + 100)}`,
     seniority: Math.floor(Math.random() * 20) + 1
