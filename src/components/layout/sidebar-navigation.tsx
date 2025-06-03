@@ -38,7 +38,7 @@ export function SidebarNavigation({
         collapsed ? "justify-center" : "justify-between"
       )}>
         {!collapsed && (
-          <span className="text-lg font-bold text-sidebar-foreground text-center">
+          <span className="text-lg font-bold text-sidebar-foreground">
             La Rioja Cuida
           </span>
         )}
