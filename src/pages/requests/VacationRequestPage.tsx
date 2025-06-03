@@ -10,6 +10,9 @@ import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useProfileAuth } from '@/hooks/profile/useProfileAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { VacationRulesDisplay } from '@/components/vacation/vacation-rules-display';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 export default function VacationRequestPage() {
   const { user } = useProfileAuth();
@@ -128,8 +131,15 @@ export default function VacationRequestPage() {
   return (
     <MainLayout user={user}>
       <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/requests')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver a Solicitudes
+          </Button>
+        </div>
+
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Solicitud de vacaciones</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Solicitud de Vacaciones</h1>
           <p className="text-muted-foreground mt-2">
             Complete el formulario para solicitar sus días de vacaciones
           </p>
@@ -139,6 +149,8 @@ export default function VacationRequestPage() {
             </p>
           )}
         </div>
+
+        <VacationRulesDisplay user={user} />
         
         <RequestForm 
           requestType="vacation"

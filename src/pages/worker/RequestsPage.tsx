@@ -1,135 +1,202 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/main-layout";
-import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { RequestList } from "@/components/requests/request-list";
-import { exampleRequests } from "@/data/example-requests";
-import { exampleUser } from "@/data/example-users";
-import { Card, CardContent } from "@/components/ui/card";
-import { FileX } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Plus, Calendar, Clock, Users, FileText } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { Request } from "@/types";
-import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
+import { VacationRulesDisplay } from "@/components/vacation/vacation-rules-display";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function RequestsPage() {
-  const { user, userId } = useProfileAuth();
+  const { user } = useProfileAuth();
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
-  
+  const [showVacationRules, setShowVacationRules] = useState(false);
+
   useEffect(() => {
-    async function fetchRequests() {
+    const fetchRequests = async () => {
+      if (!user?.id) return;
+      
       try {
-        setLoading(true);
-        
-        // Check if we're in demo mode (userId starts with "demo-" or is undefined)
-        if (!userId || (typeof userId === 'string' && userId.startsWith('demo-'))) {
-          console.log("Using example requests for demo mode");
-          // Use example data for demo purposes
-          setRequests(exampleRequests);
-          setLoading(false);
-          return;
-        }
-        
-        // We have a real UUID, fetch from Supabase
-        console.log("Fetching requests for user:", userId);
         const { data, error } = await supabase
           .from('requests')
           .select('*')
-          .eq('userid', userId);
+          .eq('userid', user.id)
+          .order('createdat', { ascending: false });
+        
+        if (error) throw error;
+        
+        if (data) {
+          const mappedRequests: Request[] = data.map(req => ({
+            id: req.id,
+            userId: req.userid,
+            type: req.type,
+            startDate: new Date(req.startdate),
+            endDate: new Date(req.enddate),
+            status: req.status,
+            createdAt: new Date(req.createdat),
+            updatedAt: new Date(req.updatedat),
+            reason: req.reason,
+            observations: req.notes,
+            attachmentUrl: req.attachmenturl,
+            startTime: req.starttime,
+            endTime: req.endtime,
+          }));
           
-        if (error) {
-          throw error;
+          setRequests(mappedRequests);
         }
-        
-        // Transform data to match Request type if needed
-        const transformedRequests: Request[] = data?.map((req: any) => ({
-          id: req.id,
-          userId: req.userid,
-          type: req.type,
-          startDate: new Date(req.startdate),
-          endDate: new Date(req.enddate),
-          status: req.status,
-          createdAt: new Date(req.createdat),
-          updatedAt: new Date(req.updatedat),
-          reason: req.reason,
-          attachmentUrl: req.attachmenturl,
-          startTime: req.starttime,
-          endTime: req.endtime,
-          observations: req.notes // Map notes to observations
-        })) || [];
-        
-        setRequests(transformedRequests);
-      } catch (err: any) {
-        console.error("Error fetching requests:", err);
-        // Fallback to example data in case of error
-        setRequests(exampleRequests);
-        setError("No se pudieron cargar las solicitudes desde la base de datos. Mostrando datos de ejemplo.");
-        
+      } catch (error) {
+        console.error('Error fetching requests:', error);
         toast({
           variant: "destructive",
-          title: "Error al cargar solicitudes",
-          description: err.message || "No se pudieron cargar las solicitudes"
+          title: "Error",
+          description: "No se pudieron cargar las solicitudes"
         });
       } finally {
         setLoading(false);
       }
-    }
-    
+    };
+
     fetchRequests();
-  }, [userId, toast]);
-  
-  const handleViewDetails = (request: Request) => {
-    console.log("Ver detalles de solicitud:", request);
-    toast({
-      title: "Ver detalles",
-      description: `Solicitud: ${request.id.substring(0, 8)}...`
-    });
+  }, [user?.id]);
+
+  const handleVacationRequest = () => {
+    setShowVacationRules(true);
   };
-  
-  const handleDownloadAttachment = (request: Request) => {
-    if (request.attachmentUrl) {
-      window.open(request.attachmentUrl, '_blank');
-      
-      toast({
-        title: "Descargando adjunto",
-        description: "Se ha abierto el archivo adjunto en una nueva ventana"
-      });
-    }
+
+  const proceedToVacationForm = () => {
+    navigate("/vacation-request");
   };
-  
+
+  if (!user) return null;
+
   return (
-    <MainLayout user={user || exampleUser}>
+    <MainLayout user={user}>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Mis solicitudes</h1>
-        <p className="text-muted-foreground">Gestiona tus solicitudes de permisos, vacaciones y cambios de turno</p>
-        
-        {loading ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <div className="flex flex-col items-center justify-center space-y-4">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-                <p className="text-sm text-muted-foreground">Cargando solicitudes...</p>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Mis Solicitudes</h1>
+            <p className="text-muted-foreground mt-2">
+              Gestiona tus solicitudes de permisos, vacaciones y cambios de turno
+            </p>
+          </div>
+        </div>
+
+        <Tabs defaultValue="create" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="create">Crear Solicitud</TabsTrigger>
+            <TabsTrigger value="history">Historial</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="create" className="space-y-6">
+            {showVacationRules ? (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold">Solicitud de Vacaciones</h2>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowVacationRules(false)}
+                  >
+                    ← Volver
+                  </Button>
+                </div>
+                
+                <VacationRulesDisplay user={user} />
+                
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={proceedToVacationForm}
+                    size="lg"
+                    className="w-full sm:w-auto"
+                  >
+                    Continuar con la Solicitud
+                  </Button>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        ) : error ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <div className="flex flex-col items-center justify-center space-y-4">
-                <FileX className="h-12 w-12 text-amber-500" />
-                <p className="text-sm text-muted-foreground">{error}</p>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleVacationRequest}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Vacaciones</CardTitle>
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-xs">
+                      Solicitar días de vacaciones según las reglas de tu grupo de trabajo
+                    </CardDescription>
+                    <Button size="sm" className="w-full mt-3">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Solicitar
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate("/personal-day-request")}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Asuntos Propios</CardTitle>
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-xs">
+                      Solicitar días por asuntos personales
+                    </CardDescription>
+                    <Button size="sm" className="w-full mt-3">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Solicitar
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate("/shift-change-request")}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Cambio de Turno</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-xs">
+                      Intercambiar turno con otro compañero
+                    </CardDescription>
+                    <Button size="sm" className="w-full mt-3">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Solicitar
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate("/leave-request")}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Permisos</CardTitle>
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-xs">
+                      Solicitar permisos con documentación
+                    </CardDescription>
+                    <Button size="sm" className="w-full mt-3">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Solicitar
+                    </Button>
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <RequestList 
-            requests={requests} 
-            onViewDetails={handleViewDetails}
-            onDownloadAttachment={handleDownloadAttachment}
-          />
-        )}
+            )}
+          </TabsContent>
+          
+          <TabsContent value="history">
+            <RequestList
+              requests={requests}
+              isLoading={loading}
+              showWorkerInfo={false}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </MainLayout>
   );
