@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DateRangeSection } from "./form/date-range-section";
+import { VacationDatesSection } from "./form/vacation-dates-section";
 import { TimeSelectionSection } from "./form/time-selection-section";
-import { RequestDetailsSection } from "./form/request-details-section";
+import { PrioritySection } from "./form/priority-section";
 import { FileUploadSection } from "./form/file-upload-section";
 import { User, RequestType } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,7 +73,7 @@ export function RequestForm({
   const form = useForm<RequestFormValues>({
     resolver: zodResolver(requestFormSchema),
     defaultValues: {
-      reason: "",
+      isPriority: false,
       notes: "",
     },
   });
@@ -86,11 +86,11 @@ export function RequestForm({
       const requestData = {
         userid: user.id,
         type: requestType,
-        startdate: values.dateRange.from,
-        enddate: values.dateRange.to || values.dateRange.from,
+        startdate: values.startDate,
+        enddate: values.endDate,
         starttime: values.startTime,
         endtime: values.endTime,
-        reason: values.reason,
+        reason: values.isPriority ? 'Prioritaria' : 'Normal',
         notes: values.notes,
         status: 'pending'
       };
@@ -148,12 +148,21 @@ export function RequestForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <DateRangeSection 
-              form={form} 
-              user={user} 
-              requestType={requestType}
-              isSubmitting={submitting || isSubmitting} 
-            />
+            {requestType === 'vacation' ? (
+              <VacationDatesSection 
+                form={form} 
+                user={user} 
+                requestType={requestType}
+                isSubmitting={submitting || isSubmitting} 
+              />
+            ) : (
+              <VacationDatesSection 
+                form={form} 
+                user={user} 
+                requestType={requestType}
+                isSubmitting={submitting || isSubmitting} 
+              />
+            )}
             
             {isLeaveForm && (
               <TimeSelectionSection 
@@ -163,7 +172,7 @@ export function RequestForm({
               />
             )}
             
-            <RequestDetailsSection 
+            <PrioritySection 
               form={form} 
               requestType={requestType}
               isSubmitting={submitting || isSubmitting} 

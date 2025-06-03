@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DateRange } from "react-day-picker";
 import { User, Request, Balance } from "@/types";
 import { validateVacationRequest, suggestAlternativeDates, calculateAvailableDays } from "@/utils/vacationLogic";
 import { useToast } from "@/hooks/use-toast";
@@ -10,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 export function useVacationRequest(user: User, requests: Request[], balance: Balance) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [suggestions, setSuggestions] = useState<DateRange[]>([]);
+  const [suggestions, setSuggestions] = useState<{from: Date, to: Date}[]>([]);
   const [success, setSuccess] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -30,21 +29,26 @@ export function useVacationRequest(user: User, requests: Request[], balance: Bal
   const remainingDays = availableBalance.vacationDays - usedVacationDays;
 
   const handleSubmit = async (
-    values: { dateRange: DateRange; reason?: string; notes?: string },
+    values: { 
+      startDate: Date; 
+      endDate: Date; 
+      isPriority?: boolean; 
+      notes?: string 
+    },
     file: File | null
   ) => {
     setIsSubmitting(true);
     setValidationError(null);
     setSuggestions([]);
 
-    if (!values.dateRange?.from || !values.dateRange?.to) {
-      setValidationError("Por favor, seleccione un rango de fechas válido");
+    if (!values.startDate || !values.endDate) {
+      setValidationError("Por favor, seleccione las fechas de inicio y fin");
       setIsSubmitting(false);
       return;
     }
 
     const requestedDays = Math.floor(
-      (values.dateRange.to.getTime() - values.dateRange.from.getTime()) / (1000 * 60 * 60 * 24)
+      (values.endDate.getTime() - values.startDate.getTime()) / (1000 * 60 * 60 * 24)
     ) + 1;
 
     if (requestedDays > remainingDays) {
@@ -54,8 +58,8 @@ export function useVacationRequest(user: User, requests: Request[], balance: Bal
     }
 
     const validation = validateVacationRequest(
-      values.dateRange.from,
-      values.dateRange.to,
+      values.startDate,
+      values.endDate,
       user,
       requests
     );
@@ -69,8 +73,8 @@ export function useVacationRequest(user: User, requests: Request[], balance: Bal
       });
       
       const alternatives = suggestAlternativeDates(
-        values.dateRange.from,
-        values.dateRange.to,
+        values.startDate,
+        values.endDate,
         user,
         requests
       );
@@ -90,9 +94,9 @@ export function useVacationRequest(user: User, requests: Request[], balance: Bal
         .insert({
           userid: user.id,
           type: 'vacation',
-          startDate: values.dateRange.from,
-          endDate: values.dateRange.to,
-          reason: values.reason || '',
+          startDate: values.startDate,
+          endDate: values.endDate,
+          reason: values.isPriority ? 'Prioritaria' : 'Normal',
           notes: values.notes || '',
           status: 'pending',
           createdAt: new Date(),
@@ -108,7 +112,7 @@ export function useVacationRequest(user: User, requests: Request[], balance: Bal
       });
       
       setSuccess(true);
-      setTimeout(() => navigate("/historial"), 2000);
+      setTimeout(() => navigate("/requests"), 2000);
       
     } catch (error) {
       console.error("Error al crear solicitud:", error);
