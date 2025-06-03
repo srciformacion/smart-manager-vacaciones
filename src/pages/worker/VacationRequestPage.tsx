@@ -5,7 +5,6 @@ import { MainLayout } from "@/components/layout/main-layout";
 import { RequestForm } from "@/components/requests/request-form";
 import { User, Request, Balance } from "@/types";
 import { Button } from "@/components/ui/button";
-import { DateRange } from "react-day-picker";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ArrowLeft } from "lucide-react";
 import { VacationBalanceInfo } from "@/components/vacation/vacation-balance-info";
@@ -69,10 +68,13 @@ export default function VacationRequestPage() {
     vacationHandleSubmit(values, null);
   };
 
-  const applySuggestion = (suggestion: DateRange) => {
+  const applySuggestion = (suggestion: { from: Date; to: Date }) => {
     setValidationError(null);
     setSuggestions([]);
-    vacationHandleSubmit({ dateRange: suggestion }, null);
+    vacationHandleSubmit({ 
+      startDate: suggestion.from, 
+      endDate: suggestion.to 
+    }, null);
   };
 
   return (
