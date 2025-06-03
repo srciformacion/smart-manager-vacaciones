@@ -1,13 +1,10 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { StaffAvailabilityCalendar } from "@/components/hr/calendar/staff-availability-calendar";
 import { RequestsTabContent } from "@/components/hr/requests-tab-content";
-import { ReportsGenerator } from "@/components/hr/reports/reports-generator";
-import { NotificationSender } from "@/components/hr/notification-sender";
-import { SearchInput } from "@/components/hr/search-input";
-import { RequestStatus, Request, User, Department } from "@/types";
+import { Request, User, RequestStatus, Department } from "@/types";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 interface ManagementContentProps {
   activeTab: string;
@@ -17,6 +14,7 @@ interface ManagementContentProps {
   onViewDetails: (request: Request) => void;
   onStatusChange: (request: Request, newStatus: RequestStatus) => void;
   onDownloadAttachment: (request: Request) => void;
+  showWorkerInfo?: boolean;
 }
 
 export function ManagementContent({
@@ -27,91 +25,113 @@ export function ManagementContent({
   onViewDetails,
   onStatusChange,
   onDownloadAttachment,
+  showWorkerInfo = false
 }: ManagementContentProps) {
-  // Estado para búsqueda y filtros
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<RequestStatus | "all">("all");
   const [departmentFilter, setDepartmentFilter] = useState<Department | "all">("all");
 
-  // Obtener departamentos únicos
-  const departments = workers.reduce<Department[]>((acc, worker) => {
-    if (worker.department && !acc.includes(worker.department)) {
-      acc.push(worker.department);
-    }
-    return acc;
-  }, []);
-
-  // Filtrar solicitudes
-  const filteredRequests = requests.filter((request) => {
+  // Filtrar solicitudes por término de búsqueda (nombre del trabajador)
+  const filteredRequests = requests.filter(request => {
+    const worker = workers.find(w => w.id === request.userId);
+    const workerName = worker ? worker.name.toLowerCase() : "";
+    
+    const matchesSearch = searchTerm === "" || 
+      workerName.includes(searchTerm.toLowerCase()) ||
+      request.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.type.toLowerCase().includes(searchTerm.toLowerCase());
+    
     const matchesStatus = statusFilter === "all" || request.status === statusFilter;
-    const worker = workers.find((w) => w.id === request.userId);
-    const matchesDepartment = departmentFilter === "all" || (worker && worker.department === departmentFilter);
-    return matchesStatus && matchesDepartment;
+    
+    const matchesDepartment = departmentFilter === "all" || 
+      (worker && worker.department === departmentFilter);
+    
+    return matchesSearch && matchesStatus && matchesDepartment;
   });
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-      <TabsList className="grid grid-cols-4 md:w-[600px]">
-        <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
-        <TabsTrigger value="calendario">Calendario</TabsTrigger>
-        <TabsTrigger value="informes">Informes</TabsTrigger>
-        <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="solicitudes">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="mb-4">
-              <SearchInput 
-                placeholder="Buscar solicitudes..." 
-                value={searchQuery}
-                onChange={(value) => setSearchQuery(value)}
-              />
-            </div>
-            
-            <RequestsTabContent 
-              requests={filteredRequests}
-              workers={workers}
-              onViewDetails={onViewDetails}
-              onStatusChange={onStatusChange}
-              onDownloadAttachment={onDownloadAttachment}
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
-              departmentFilter={departmentFilter}
-              setDepartmentFilter={setDepartmentFilter}
-              departments={departments}
-            />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="calendario">
-        <Card>
-          <CardContent className="pt-6">
-            <StaffAvailabilityCalendar />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="informes">
-        <Card>
-          <CardContent className="pt-6">
-            <ReportsGenerator 
-              users={workers}
-              departments={departments}
-              requests={requests}
-            />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="notificaciones">
-        <Card>
-          <CardContent className="pt-6">
-            <NotificationSender />
-          </CardContent>
-        </Card>
-      </TabsContent>
-    </Tabs>
+    <div className="space-y-6">
+      {/* Barra de búsqueda mejorada */}
+      <div className="flex items-center space-x-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Buscar por trabajador, ID de solicitud o tipo..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="solicitudes">Todas las solicitudes</TabsTrigger>
+          <TabsTrigger value="pendientes">Pendientes</TabsTrigger>
+          <TabsTrigger value="aprobadas">Aprobadas</TabsTrigger>
+          <TabsTrigger value="rechazadas">Rechazadas</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="solicitudes">
+          <RequestsTabContent
+            requests={filteredRequests}
+            workers={workers}
+            onViewDetails={onViewDetails}
+            onStatusChange={onStatusChange}
+            onDownloadAttachment={onDownloadAttachment}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            departmentFilter={departmentFilter}
+            setDepartmentFilter={setDepartmentFilter}
+            showWorkerInfo={showWorkerInfo}
+          />
+        </TabsContent>
+
+        <TabsContent value="pendientes">
+          <RequestsTabContent
+            requests={filteredRequests.filter(r => r.status === "pending")}
+            workers={workers}
+            onViewDetails={onViewDetails}
+            onStatusChange={onStatusChange}
+            onDownloadAttachment={onDownloadAttachment}
+            statusFilter="pending"
+            setStatusFilter={setStatusFilter}
+            departmentFilter={departmentFilter}
+            setDepartmentFilter={setDepartmentFilter}
+            showWorkerInfo={showWorkerInfo}
+          />
+        </TabsContent>
+
+        <TabsContent value="aprobadas">
+          <RequestsTabContent
+            requests={filteredRequests.filter(r => r.status === "approved")}
+            workers={workers}
+            onViewDetails={onViewDetails}
+            onStatusChange={onStatusChange}
+            onDownloadAttachment={onDownloadAttachment}
+            statusFilter="approved"
+            setStatusFilter={setStatusFilter}
+            departmentFilter={departmentFilter}
+            setDepartmentFilter={setDepartmentFilter}
+            showWorkerInfo={showWorkerInfo}
+          />
+        </TabsContent>
+
+        <TabsContent value="rechazadas">
+          <RequestsTabContent
+            requests={filteredRequests.filter(r => r.status === "rejected")}
+            workers={workers}
+            onViewDetails={onViewDetails}
+            onStatusChange={onStatusChange}
+            onDownloadAttachment={onDownloadAttachment}
+            statusFilter="rejected"
+            setStatusFilter={setStatusFilter}
+            departmentFilter={departmentFilter}
+            setDepartmentFilter={setDepartmentFilter}
+            showWorkerInfo={showWorkerInfo}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

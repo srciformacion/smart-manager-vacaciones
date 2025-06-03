@@ -14,6 +14,7 @@ interface RequestsTabContentProps {
   departmentFilter?: Department | "all";
   setDepartmentFilter?: (department: Department | "all") => void;
   departments?: Department[];
+  showWorkerInfo?: boolean;
 }
 
 export function RequestsTabContent({
@@ -26,7 +27,8 @@ export function RequestsTabContent({
   setStatusFilter,
   departmentFilter = "all",
   setDepartmentFilter,
-  departments = []
+  departments = [],
+  showWorkerInfo = false
 }: RequestsTabContentProps) {
   return (
     <RequestList
@@ -36,6 +38,7 @@ export function RequestsTabContent({
       onViewDetails={onViewDetails}
       onStatusChange={onStatusChange}
       onDownloadAttachment={onDownloadAttachment}
+      showWorkerInfo={showWorkerInfo}
     />
   );
 }

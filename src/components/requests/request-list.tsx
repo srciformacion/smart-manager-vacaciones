@@ -10,6 +10,7 @@ interface RequestListProps {
   onViewDetails?: (request: Request) => void;
   onStatusChange?: (request: Request, newStatus: RequestStatus) => void;
   onDownloadAttachment?: (request: Request) => void;
+  showWorkerInfo?: boolean;
 }
 
 export function RequestList({
@@ -20,6 +21,7 @@ export function RequestList({
   onViewDetails = () => {},
   onStatusChange,
   onDownloadAttachment,
+  showWorkerInfo = false,
 }: RequestListProps) {
   return (
     <RequestTable
@@ -30,6 +32,7 @@ export function RequestList({
       onViewDetails={onViewDetails}
       onStatusChange={onStatusChange}
       onDownloadAttachment={onDownloadAttachment}
+      showWorkerInfo={showWorkerInfo}
     />
   );
 }

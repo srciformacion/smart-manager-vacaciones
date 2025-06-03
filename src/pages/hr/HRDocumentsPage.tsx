@@ -46,7 +46,8 @@ export default function HRDocumentsPage() {
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Documentos y solicitudes</h1>
               <p className="text-muted-foreground mt-2">
-                Gestione solicitudes, documentos y certificados del personal
+                Gestione solicitudes, documentos y certificados del personal. 
+                Cada solicitud muestra el trabajador que la generó.
               </p>
             </div>
             <div>
@@ -67,6 +68,7 @@ export default function HRDocumentsPage() {
             onViewDetails={handleViewRequestDetails}
             onStatusChange={handleStatusChange}
             onDownloadAttachment={handleDownloadAttachment}
+            showWorkerInfo={true}
           />
         </div>
       )}
