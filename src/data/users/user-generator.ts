@@ -30,37 +30,46 @@ function getRandomElement<T>(array: readonly T[]): T {
 
 // Function to assign appropriate position based on department and shift
 function getPositionForDepartmentAndShift(department: string, shift: string): string {
-  const emergencyPositions = ["Emergency Operator 24h", "Emergency Coordinator", "Emergency Technician", "Emergency Dispatcher"];
-  const callCenterPositions = ["Scheduled Teleoperator", "Emergency Teleoperator", "Call Center Supervisor", "Customer Service Agent"];
+  const emergencyPositions = ["Emergency Operator 24h", "Emergency Operator 12h", "Emergency Coordinator", "Emergency Technician", "Emergency Dispatcher", "Localizado Emergency"];
+  const callCenterPositions = ["Scheduled Teleoperator", "Emergency Teleoperator", "Teleoperador Rotativo", "Call Center Supervisor", "Customer Service Agent"];
   const operationsPositions = ["Morning Shift Worker", "Afternoon Shift Worker", "Night Shift Worker", "Weekend Specialist"];
   const supportPositions = ["Technical Support", "Administrative Assistant", "Quality Supervisor", "Training Coordinator"];
 
   if (department === "Emergency Services") {
-    if (shift === "Emergency 24h") {
-      return getRandomElement(emergencyPositions.slice(0, 3)); // Emergency specific roles
+    if (shift === "Urgencias 24h") {
+      return "Emergency Operator 24h";
     }
-    return getRandomElement([...emergencyPositions, "Training Coordinator"]);
+    if (shift === "Urgencias 12h") {
+      return "Emergency Operator 12h";
+    }
+    if (shift === "Localizado") {
+      return "Localizado Emergency";
+    }
+    return getRandomElement(emergencyPositions);
   }
   
   if (department === "Call Center") {
-    if (shift === "Emergency 24h" || shift === "Night") {
+    if (shift === "Emergency 24h" || shift === "Emergency 12h") {
       return "Emergency Teleoperator";
     }
-    if (shift === "Scheduled" || shift === "Morning" || shift === "Afternoon") {
-      return getRandomElement(["Scheduled Teleoperator", "Customer Service Agent"]);
+    if (shift.includes("Rotativo")) {
+      return "Teleoperador Rotativo";
+    }
+    if (shift.includes("Programado") || shift === "Scheduled") {
+      return "Scheduled Teleoperator";
     }
     return getRandomElement(callCenterPositions);
   }
   
   if (department === "Operations") {
-    if (shift === "Morning") return "Morning Shift Worker";
-    if (shift === "Afternoon") return "Afternoon Shift Worker";
-    if (shift === "Night") return "Night Shift Worker";
+    if (shift === "Programado Mañana" || shift === "Morning") return "Morning Shift Worker";
+    if (shift === "Programado Tarde" || shift === "Afternoon") return "Afternoon Shift Worker";
+    if (shift === "Programado Noche" || shift === "Night") return "Night Shift Worker";
     return getRandomElement(operationsPositions);
   }
   
   if (department === "Medical Support") {
-    if (shift === "Emergency 24h") return "Emergency Dispatcher";
+    if (shift === "Urgencias 24h" || shift === "Emergency 24h") return "Emergency Dispatcher";
     return getRandomElement(["Quality Supervisor", "Training Coordinator"]);
   }
   

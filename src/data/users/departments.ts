@@ -17,8 +17,18 @@ export const SHIFTS = [
   "Afternoon", 
   "Night",
   "Emergency 24h",
+  "Emergency 12h",
   "Scheduled",
-  "On-call"
+  "On-call",
+  "Localizado",
+  "Programado Mañana",
+  "Programado Tarde",
+  "Programado Noche",
+  "Teleoperador Rotativo Mañana",
+  "Teleoperador Rotativo Tarde",
+  "Teleoperador Rotativo Noche",
+  "Urgencias 24h",
+  "Urgencias 12h"
 ] as const;
 
 export const WORKDAYS = ["L-V", "L-S", "Rotativo", "24h Cycle", "Flexible"] as const;
@@ -29,13 +39,16 @@ export const ROLES = ["worker", "hr"] as const;
 export const POSITIONS = [
   // Emergency Services
   "Emergency Operator 24h",
+  "Emergency Operator 12h",
   "Emergency Coordinator",
   "Emergency Technician",
   "Emergency Dispatcher",
+  "Localizado Emergency",
   
   // Call Center / Teleoperators
   "Scheduled Teleoperator",
   "Emergency Teleoperator", 
+  "Teleoperador Rotativo",
   "Call Center Supervisor",
   "Customer Service Agent",
   
