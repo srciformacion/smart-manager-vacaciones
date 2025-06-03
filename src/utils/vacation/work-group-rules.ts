@@ -11,19 +11,19 @@ export function validateDatesForWorkGroup(
   switch (workGroup) {
     case 'Grupo Localizado':
       const isQuincena = (
-        startDate.getDate() === 1 && endDate.getDate() === 15 ||
-        startDate.getDate() === 16 && (
+        (startDate.getDate() === 1 && endDate.getDate() === 15) ||
+        (startDate.getDate() === 16 && (
           endDate.getDate() === 30 ||
           endDate.getDate() === 31 ||
           (endDate.getMonth() === 1 && endDate.getDate() === 28) ||
           (endDate.getMonth() === 1 && endDate.getDate() === 29)
-        )
+        ))
       );
       
       if (!isQuincena) {
         return {
           valid: false,
-          message: 'Las vacaciones para Grupo Localizado deben ser en quincenas naturales (1-15 o 16-fin de mes)'
+          message: 'Grupo personal localizado: Las vacaciones deben ser en quincenas naturales (1-15 o 16-fin de mes)'
         };
       }
       break;
@@ -37,44 +37,46 @@ export function validateDatesForWorkGroup(
       if (!isWeek && !isFourDayBlock) {
         return {
           valid: false,
-          message: 'Las vacaciones para Grupo Programado deben ser semanas naturales (lunes a domingo) o un bloque de 4 días'
+          message: 'Grupo personal de programado: Las vacaciones deben ser semanas naturales (lunes a domingo) o bloque de 4 días'
         };
       }
       break;
       
     case 'Urgente 24h':
-      if (durationInDays !== 2 && durationInDays !== 3 && durationInDays !== 32) {
+      const validBlocks = [2, 3, 32];
+      if (!validBlocks.includes(durationInDays)) {
         return {
           valid: false,
-          message: 'Las vacaciones para Urgente 24h deben ser bloques de 2 o 3 días, o un bloque de 32 días'
+          message: 'Grupo personal Urgente 24h: Debe elegir bloques de 2, 3 días o 32 días a regular defecto de horas'
         };
       }
       break;
       
     case 'Urgente 12h':
       const isQuincenaUrgente = (
-        startDate.getDate() === 1 && endDate.getDate() === 15 ||
-        startDate.getDate() === 16 && (
+        (startDate.getDate() === 1 && endDate.getDate() === 15) ||
+        (startDate.getDate() === 16 && (
           endDate.getDate() === 30 ||
           endDate.getDate() === 31 ||
           (endDate.getMonth() === 1 && endDate.getDate() === 28) ||
           (endDate.getMonth() === 1 && endDate.getDate() === 29)
-        )
+        ))
       );
       
       if (!isQuincenaUrgente) {
         return {
           valid: false,
-          message: 'Las vacaciones para Urgente 12h deben ser en quincenas naturales (1-15 o 16-fin de mes)'
+          message: 'Grupo personal Urgente 12h: Las vacaciones deben ser en quincenas naturales (1-15 o 16-fin de mes)'
         };
       }
       break;
       
     case 'GES Sala Sanitaria':
-      if (durationInDays !== 10 && durationInDays !== 12) {
+      const validGESBlocks = [10, 12];
+      if (!validGESBlocks.includes(durationInDays)) {
         return {
           valid: false,
-          message: 'Las vacaciones para GES Sala Sanitaria deben ser bloques de 10 o 12 días'
+          message: 'Grupo personal GES Sala Sanitaria: Debe elegir bloques de 10 o 12 días'
         };
       }
       break;
@@ -88,26 +90,26 @@ export function validateDatesForWorkGroup(
       if (!isWeekBlock && !is4DayBlock) {
         return {
           valid: false,
-          message: 'Las vacaciones para Top Programado deben ser semanas naturales (lunes a domingo) o un bloque de 4 días'
+          message: 'Grupo personal Top programado: Las vacaciones deben ser semanas naturales (lunes a domingo) o bloque de 4 días'
         };
       }
       break;
       
     case 'Grupo 1/3':
       const isQuincenaGroup = (
-        startDate.getDate() === 1 && endDate.getDate() === 15 ||
-        startDate.getDate() === 16 && (
+        (startDate.getDate() === 1 && endDate.getDate() === 15) ||
+        (startDate.getDate() === 16 && (
           endDate.getDate() === 30 ||
           endDate.getDate() === 31 ||
           (endDate.getMonth() === 1 && endDate.getDate() === 28) ||
           (endDate.getMonth() === 1 && endDate.getDate() === 29)
-        )
+        ))
       );
       
       if (!isQuincenaGroup) {
         return {
           valid: false,
-          message: 'Las vacaciones para Grupo 1/3 deben ser en quincenas naturales (1-15 o 16-fin de mes)'
+          message: 'Grupo personal 1/3: Las vacaciones deben ser en quincenas naturales (1-15 o 16-fin de mes)'
         };
       }
       break;

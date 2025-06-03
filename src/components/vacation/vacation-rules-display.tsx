@@ -8,132 +8,147 @@ interface VacationRulesDisplayProps {
 }
 
 export function VacationRulesDisplay({ user }: VacationRulesDisplayProps) {
-  const getWorkGroupRules = (workGroup: WorkGroup): { title: string; rules: string[]; examples: string[] } => {
+  const getWorkGroupRules = (workGroup: WorkGroup): { title: string; rules: string[]; examples: string[]; additionalInfo: string[] } => {
     switch (workGroup) {
       case 'Grupo Localizado':
         return {
-          title: "Reglas para Grupo Localizado",
+          title: "Grupo personal localizado",
           rules: [
             "Las vacaciones deben tomarse en quincenas naturales completas",
-            "Período 1: Del 1 al 15 de cada mes",
-            "Período 2: Del 16 al último día del mes",
-            "No se permiten períodos parciales"
+            "Primera quincena: Del 1 al 15 de cada mes",
+            "Segunda quincena: Del 16 al último día del mes"
           ],
           examples: [
             "✅ Del 1 al 15 de agosto",
             "✅ Del 16 al 31 de julio", 
             "❌ Del 5 al 19 de agosto"
+          ],
+          additionalInfo: [
+            "No se permiten períodos parciales o que no coincidan con las quincenas naturales"
           ]
         };
         
       case 'Grupo Programado':
         return {
-          title: "Reglas para Grupo Programado",
+          title: "Grupo personal de programado",
           rules: [
-            "Las vacaciones deben comenzar en lunes y terminar en domingo",
-            "Mínimo: semanas naturales completas",
-            "Alternativa: bloques de 4 días consecutivos",
-            "Debe mantener la continuidad del turno"
+            "Semanas naturales de lunes a domingo",
+            "Alternativa: Bloque de 4 días",
+            "El bloque de 4 días podrá anexionarse a la semana opcional por cuestiones organizativas"
           ],
           examples: [
-            "✅ Del lunes 5 al domingo 11 de agosto",
-            "✅ Bloque de 4 días: lunes a jueves",
+            "✅ Del lunes al domingo (semana completa)",
+            "✅ Bloque de 4 días consecutivos",
             "❌ Del miércoles al martes siguiente"
+          ],
+          additionalInfo: [
+            "Los bloques pueden combinarse según necesidades organizativas"
           ]
         };
         
       case 'Urgente 24h':
         return {
-          title: "Reglas para Urgente 24h",
+          title: "Grupo personal Urgente 24h",
           rules: [
-            "Bloques específicos de 2 o 3 días consecutivos",
-            "Alternativa: bloque largo de 32 días",
-            "Debe coordinarse con cobertura de urgencias",
-            "Prioridad según antigüedad en caso de conflicto"
+            "Tres bloques de guardias: 2, 3 o 2 días",
+            "Alternativa: 32 días a regular defecto de horas",
+            "Debe coordinarse con la cobertura de urgencias 24h"
           ],
           examples: [
-            "✅ 2 días: viernes y sábado",
-            "✅ 3 días: viernes, sábado y domingo",
-            "✅ Bloque de 32 días en verano"
+            "✅ Bloque de 2 días",
+            "✅ Bloque de 3 días",
+            "✅ 32 días para regular defecto de horas"
+          ],
+          additionalInfo: [
+            "La empresa ajustará la jornada por horas de exceso o defecto dentro del calendario anual"
           ]
         };
         
       case 'Urgente 12h':
         return {
-          title: "Reglas para Urgente 12h",
+          title: "Grupo personal Urgente 12h",
           rules: [
-            "Quincenas naturales completas",
-            "Del 1 al 15 o del 16 al final del mes",
-            "Coordinación obligatoria con turno complementario",
-            "Solicitud con 30 días de antelación mínima"
+            "Las vacaciones deben tomarse en quincenas naturales",
+            "Primera quincena: Del 1 al 15 de cada mes",
+            "Segunda quincena: Del 16 al último día del mes"
           ],
           examples: [
             "✅ Del 1 al 15 de septiembre",
             "✅ Del 16 al 30 de junio",
             "❌ Del 10 al 25 de cualquier mes"
+          ],
+          additionalInfo: [
+            "Debe coordinarse con el turno de 12 horas complementario"
           ]
         };
         
       case 'GES Sala Sanitaria':
         return {
-          title: "Reglas para GES Sala Sanitaria",
+          title: "Grupo personal GES Sala Sanitaria",
           rules: [
-            "Bloques de 10 días laborables",
-            "Alternativa: bloques de 12 días laborables",
-            "Debe garantizarse cobertura sanitaria",
-            "Rotación equitativa entre personal"
+            "Tres bloques de días: 10, 10 y 12 días",
+            "Los bloques deben ser consecutivos",
+            "Debe garantizarse la cobertura sanitaria en todo momento"
           ],
           examples: [
-            "✅ 10 días laborables consecutivos",
-            "✅ 12 días laborables consecutivos",
+            "✅ Bloque de 10 días consecutivos",
+            "✅ Bloque de 12 días consecutivos",
             "❌ Períodos inferiores a 10 días"
+          ],
+          additionalInfo: [
+            "La distribución debe respetar las necesidades del servicio sanitario"
           ]
         };
         
       case 'Top Programado':
         return {
-          title: "Reglas para Top Programado",
+          title: "Grupo personal Top programado",
           rules: [
-            "Semanas naturales: lunes a domingo",
-            "Alternativa: bloques de 4 días consecutivos",
-            "Debe mantener continuidad operativa",
-            "Coordinación con turnos adyacentes"
+            "Semanas naturales de lunes a domingo",
+            "Alternativa: Bloque de 4 días",
+            "Debe mantener la continuidad operativa del servicio"
           ],
           examples: [
             "✅ Semana completa: lunes a domingo",
-            "✅ 4 días: martes a viernes",
-            "❌ Períodos que corten la semana laboral"
+            "✅ Bloque de 4 días consecutivos",
+            "❌ Períodos que corten la continuidad semanal"
+          ],
+          additionalInfo: [
+            "Los bloques pueden anexionarse según cuestiones organizativas"
           ]
         };
         
       case 'Grupo 1/3':
         return {
-          title: "Reglas para Grupo 1/3",
+          title: "Grupo personal 1/3",
           rules: [
-            "Quincenas naturales obligatorias",
-            "Primera quincena: del 1 al 15",
-            "Segunda quincena: del 16 al final del mes",
-            "Rotación entre los tercios del grupo"
+            "Las vacaciones deben tomarse en quincenas naturales",
+            "Primera quincena: Del 1 al 15 de cada mes", 
+            "Segunda quincena: Del 16 al último día del mes"
           ],
           examples: [
             "✅ Del 1 al 15 de octubre",
             "✅ Del 16 al 31 de diciembre",
-            "❌ Cualquier otro período"
+            "❌ Cualquier otro período que no sea quincena natural"
+          ],
+          additionalInfo: [
+            "Debe respetarse la rotación entre los tercios del grupo"
           ]
         };
         
       default:
         return {
-          title: "Reglas Generales de Vacaciones",
+          title: "Normas Generales de Vacaciones",
           rules: [
-            "Solicitud con antelación mínima de 15 días",
-            "Máximo 22 días al año (+ días por antigüedad)",
-            "No acumulables al año siguiente",
-            "Aprobación sujeta a necesidades del servicio"
+            "Solicitud con antelación según normativa interna",
+            "Días asignados según convenio y antigüedad",
+            "Sujeto a necesidades organizativas del servicio"
           ],
           examples: [
-            "✅ Cualquier período dentro de los días disponibles",
-            "⚠️ Verificar disponibilidad con antelación"
+            "⚠️ Verificar grupo de trabajo específico"
+          ],
+          additionalInfo: [
+            "Consultar con RRHH para casos no contemplados"
           ]
         };
     }
@@ -147,7 +162,7 @@ export function VacationRulesDisplay({ user }: VacationRulesDisplayProps) {
       <AlertTitle className="text-lg font-semibold">{rules.title}</AlertTitle>
       <AlertDescription className="mt-3 space-y-4">
         <div>
-          <h4 className="font-medium text-sm mb-2">📋 Condiciones obligatorias:</h4>
+          <h4 className="font-medium text-sm mb-2">📋 Normas específicas del grupo:</h4>
           <ul className="list-disc list-inside space-y-1 text-sm">
             {rules.rules.map((rule, index) => (
               <li key={index} className="text-muted-foreground">{rule}</li>
@@ -156,19 +171,32 @@ export function VacationRulesDisplay({ user }: VacationRulesDisplayProps) {
         </div>
         
         <div>
-          <h4 className="font-medium text-sm mb-2">💡 Ejemplos:</h4>
+          <h4 className="font-medium text-sm mb-2">💡 Ejemplos de aplicación:</h4>
           <ul className="space-y-1 text-sm">
             {rules.examples.map((example, index) => (
               <li key={index} className="text-muted-foreground">{example}</li>
             ))}
           </ul>
         </div>
+
+        <div>
+          <h4 className="font-medium text-sm mb-2">ℹ️ Información adicional:</h4>
+          <ul className="list-disc list-inside space-y-1 text-sm">
+            {rules.additionalInfo.map((info, index) => (
+              <li key={index} className="text-muted-foreground">{info}</li>
+            ))}
+          </ul>
+        </div>
         
-        <div className="pt-2 border-t">
-          <p className="text-xs text-muted-foreground">
-            <strong>Importante:</strong> El incumplimiento de estas reglas resultará en el rechazo automático de la solicitud.
-            Para casos excepcionales, contactar con RRHH con antelación.
-          </p>
+        <div className="pt-2 border-t bg-amber-50 p-3 rounded">
+          <h4 className="font-medium text-sm mb-2 text-amber-800">⚠️ Normas generales importantes:</h4>
+          <ul className="list-disc list-inside space-y-1 text-xs text-amber-700">
+            <li>Las vacaciones no pueden iniciarse en días de descanso semanal (salvo pacto organizativo)</li>
+            <li>Si no se presentan solicitudes en plazo, la empresa asignará las fechas respetando las opciones del grupo</li>
+            <li>La empresa puede modificar turnos por razones organizativas si el servicio no puede quedar descubierto</li>
+            <li>Se ajustará la jornada por horas de exceso o defecto dentro del calendario anual</li>
+            <li>Se restarán 8 horas por día de antigüedad generado al calendario anual</li>
+          </ul>
         </div>
       </AlertDescription>
     </Alert>
