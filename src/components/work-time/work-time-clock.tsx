@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Play, Square, Coffee, Utensils, AlertTriangle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Clock, Play, Square, Coffee, Utensils, AlertTriangle, Ambulance } from 'lucide-react';
 import { useWorkTimeRecords } from '@/hooks/work-time/use-work-time-records';
 import { useWorkTimeConfig } from '@/hooks/work-time/use-work-time-config';
 import { format } from 'date-fns';
@@ -23,6 +25,20 @@ export function WorkTimeClock() {
 
   const { config } = useWorkTimeConfig();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedAmbulance, setSelectedAmbulance] = useState('');
+
+  // Lista de ambulancias disponibles
+  const ambulances = [
+    'AMB-001',
+    'AMB-002', 
+    'AMB-003',
+    'AMB-004',
+    'AMB-005',
+    'SVA-001',
+    'SVA-002',
+    'UVI-001',
+    'UVI-002'
+  ];
 
   // Update current time every second
   useState(() => {
@@ -99,6 +115,12 @@ export function WorkTimeClock() {
   const hasClockedIn = !!todayRecord?.clock_in_time;
   const hasClockedOut = !!todayRecord?.clock_out_time;
 
+  const handleClockIn = () => {
+    if (selectedAmbulance) {
+      clockIn(selectedAmbulance);
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -153,12 +175,22 @@ export function WorkTimeClock() {
           )}
         </div>
 
+        {/* Ambulance info */}
+        {todayRecord?.notes && (
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 text-sm">
+              <Ambulance className="h-4 w-4" />
+              <span className="font-medium">Ambulancia: {todayRecord.notes}</span>
+            </div>
+          </div>
+        )}
+
         {/* Working time */}
         <div className="text-center">
           <div className="text-xl font-semibold flex items-center justify-center gap-2">
             Tiempo trabajado: {getWorkingTime()}
             {isOvertime && hasClockedIn && (
-              <AlertTriangle className="h-5 w-5 text-amber-500" title="Exceso de jornada" />
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
             )}
           </div>
           {isOvertime && hasClockedIn && (
@@ -195,10 +227,33 @@ export function WorkTimeClock() {
         {/* Action buttons */}
         <div className="space-y-2">
           {!hasClockedIn && (
-            <Button onClick={clockIn} className="w-full" size="lg">
-              <Play className="h-4 w-4 mr-2" />
-              Fichar Entrada
-            </Button>
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="ambulance-select">Selecciona tu ambulancia</Label>
+                <Select value={selectedAmbulance} onValueChange={setSelectedAmbulance}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona una ambulancia..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ambulances.map((ambulance) => (
+                      <SelectItem key={ambulance} value={ambulance}>
+                        {ambulance}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <Button 
+                onClick={handleClockIn} 
+                className="w-full" 
+                size="lg"
+                disabled={!selectedAmbulance}
+              >
+                <Play className="h-4 w-4 mr-2" />
+                Fichar Entrada
+              </Button>
+            </div>
           )}
 
           {hasClockedIn && !hasClockedOut && (

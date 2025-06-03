@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -68,7 +67,7 @@ export function useWorkTimeRecords(userId?: string) {
     }
   };
 
-  const clockIn = async () => {
+  const clockIn = async (ambulance?: string) => {
     if (!targetUserId) return;
 
     try {
@@ -80,7 +79,8 @@ export function useWorkTimeRecords(userId?: string) {
           user_id: targetUserId,
           date: today,
           clock_in_time: now,
-          status: 'incomplete'
+          status: 'incomplete',
+          notes: ambulance || null
         }, {
           onConflict: 'user_id,date'
         })
@@ -94,7 +94,9 @@ export function useWorkTimeRecords(userId?: string) {
       
       toast({
         title: "Entrada registrada",
-        description: "Has fichado correctamente la entrada"
+        description: ambulance 
+          ? `Has fichado correctamente la entrada en ${ambulance}`
+          : "Has fichado correctamente la entrada"
       });
     } catch (error) {
       console.error('Error clocking in:', error);
