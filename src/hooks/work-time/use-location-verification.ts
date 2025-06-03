@@ -1,6 +1,5 @@
-
 import { useState, useCallback } from 'react';
-import { useWorkTimeLocations } from './use-work-time-locations';
+import { useWorkTimeLocations, WorkTimeLocation } from './use-work-time-locations';
 import { useToast } from '@/components/ui/use-toast';
 
 interface LocationData {

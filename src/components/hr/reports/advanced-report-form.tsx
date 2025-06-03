@@ -15,6 +15,7 @@ import { AdditionalOptions } from "./form-sections/additional-options";
 import { SchedulingSection } from "./form-sections/scheduling-section";
 import { ComparisonSection } from "./form-sections/comparison-section";
 import { AlertsSection } from "./form-sections/alerts-section";
+import { OvertimeCostsFormSection } from "./form-sections/overtime-costs-section";
 
 interface AdvancedReportFormProps {
   onSubmit: (reportConfig: any) => void;
@@ -53,6 +54,12 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
   const [alertTypes, setAlertTypes] = useState<string[]>([]);
   const [alertThresholds, setAlertThresholds] = useState<Record<string, string>>({});
   const [alertRecipients, setAlertRecipients] = useState("");
+
+  // Nuevas variables para costos de horas extras
+  const [includeOvertimeCosts, setIncludeOvertimeCosts] = useState(false);
+  const [includePositionAnalysis, setIncludePositionAnalysis] = useState(true);
+  const [includeSeniorityAnalysis, setIncludeSeniorityAnalysis] = useState(true);
+  const [includeDetailedBreakdown, setIncludeDetailedBreakdown] = useState(false);
 
   const departmentOptions = [
     "Enfermería", "Medicina", "Administración", "Limpieza", 
@@ -104,6 +111,12 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
         thresholds: alertThresholds,
         recipients: alertRecipients
       } : null,
+      // Nueva configuración de costos de horas extras
+      overtimeCosts: includeOvertimeCosts ? {
+        includePositionAnalysis,
+        includeSeniorityAnalysis,
+        includeDetailedBreakdown
+      } : null,
       generatedAt: new Date()
     };
 
@@ -123,6 +136,7 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
       setEnableAlerts(false);
       setEmailRecipients("");
       setAlertRecipients("");
+      setIncludeOvertimeCosts(false);
       
       toast({
         title: "Informe generado",
@@ -197,6 +211,19 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
             setIncludeGraphics={setIncludeGraphics}
             includeSummary={includeSummary}
             setIncludeSummary={setIncludeSummary}
+          />
+
+          <Separator />
+
+          <OvertimeCostsFormSection
+            includeOvertimeCosts={includeOvertimeCosts}
+            setIncludeOvertimeCosts={setIncludeOvertimeCosts}
+            includePositionAnalysis={includePositionAnalysis}
+            setIncludePositionAnalysis={setIncludePositionAnalysis}
+            includeSeniorityAnalysis={includeSeniorityAnalysis}
+            setIncludeSeniorityAnalysis={setIncludeSeniorityAnalysis}
+            includeDetailedBreakdown={includeDetailedBreakdown}
+            setIncludeDetailedBreakdown={setIncludeDetailedBreakdown}
           />
 
           <Separator />
