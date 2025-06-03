@@ -1,10 +1,11 @@
 
-import { CalendarDays, Home, FilePen, FileText, Clock, History, Settings2, MessageSquare, User, BarChart4, Bell, MailCheck, AlertTriangle, BrainCircuit, Settings, Users, Calendar } from "lucide-react";
+import { CalendarDays, Home, FilePen, FileText, Clock, History, Settings2, MessageSquare, User, BarChart4, Bell, MailCheck, AlertTriangle, BrainCircuit, Settings, Users, Calendar, Timer } from "lucide-react";
 import { SidebarLinkItem } from "./types";
 
 export const workerLinks: SidebarLinkItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: Home, ariaLabel: "Ir a Dashboard" },
   { name: "Mi Calendario", href: "/calendar", icon: CalendarDays, ariaLabel: "Ir a Mi Calendario" },
+  { name: "Jornada Laboral", href: "/work-time", icon: Timer, ariaLabel: "Ir a Jornada Laboral" },
   { name: "Solicitudes", href: "/requests", icon: FilePen, ariaLabel: "Ir a Solicitudes" },
   { name: "Documentos", href: "/documents", icon: FileText, ariaLabel: "Ir a Documentos" },
   { name: "Permisos", href: "/leave-request", icon: Clock, ariaLabel: "Ir a Permisos" },
@@ -21,6 +22,7 @@ export const hrLinks: SidebarLinkItem[] = [
   { name: "Trabajadores", href: "/rrhh/workers", icon: Users, ariaLabel: "Ir a Gestión de Trabajadores" },
   { name: "Calendario", href: "/rrhh/calendar", icon: Calendar, ariaLabel: "Ir a Calendario" },
   { name: "Gestión Calendarios", href: "/rrhh/calendar-management", icon: CalendarDays, ariaLabel: "Ir a Gestión de Calendarios" },
+  { name: "Jornada Laboral", href: "/rrhh/work-time", icon: Timer, ariaLabel: "Ir a Gestión de Jornada Laboral" },
   { name: "Solicitudes", href: "/rrhh/requests", icon: FilePen, ariaLabel: "Ir a Gestión de Solicitudes" },
   { name: "Gestión Solicitudes", href: "/rrhh/management", icon: Users, ariaLabel: "Ir a Gestión de Solicitudes" },
   { name: "Documentos", href: "/rrhh/documents", icon: FileText, ariaLabel: "Ir a Documentos" },

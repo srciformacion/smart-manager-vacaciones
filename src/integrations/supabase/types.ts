@@ -320,6 +320,135 @@ export type Database = {
           },
         ]
       }
+      work_time_alerts: {
+        Row: {
+          alert_date: string
+          alert_type: string
+          created_at: string
+          id: string
+          is_resolved: boolean
+          message: string
+          resolved_at: string | null
+          resolved_by: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_date: string
+          alert_type: string
+          created_at?: string
+          id?: string
+          is_resolved?: boolean
+          message: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_date?: string
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_resolved?: boolean
+          message?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      work_time_module_config: {
+        Row: {
+          alert_incomplete_workday: boolean
+          alert_missing_records: boolean
+          alert_overtime: boolean
+          break_duration_minutes: number
+          created_at: string
+          daily_hours_limit: number
+          id: string
+          is_enabled: boolean
+          lunch_duration_minutes: number
+          updated_at: string
+          weekly_hours_limit: number
+        }
+        Insert: {
+          alert_incomplete_workday?: boolean
+          alert_missing_records?: boolean
+          alert_overtime?: boolean
+          break_duration_minutes?: number
+          created_at?: string
+          daily_hours_limit?: number
+          id?: string
+          is_enabled?: boolean
+          lunch_duration_minutes?: number
+          updated_at?: string
+          weekly_hours_limit?: number
+        }
+        Update: {
+          alert_incomplete_workday?: boolean
+          alert_missing_records?: boolean
+          alert_overtime?: boolean
+          break_duration_minutes?: number
+          created_at?: string
+          daily_hours_limit?: number
+          id?: string
+          is_enabled?: boolean
+          lunch_duration_minutes?: number
+          updated_at?: string
+          weekly_hours_limit?: number
+        }
+        Relationships: []
+      }
+      work_time_records: {
+        Row: {
+          break_end_time: string | null
+          break_start_time: string | null
+          clock_in_time: string | null
+          clock_out_time: string | null
+          created_at: string
+          date: string
+          id: string
+          lunch_end_time: string | null
+          lunch_start_time: string | null
+          notes: string | null
+          status: string
+          total_worked_hours: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          break_end_time?: string | null
+          break_start_time?: string | null
+          clock_in_time?: string | null
+          clock_out_time?: string | null
+          created_at?: string
+          date: string
+          id?: string
+          lunch_end_time?: string | null
+          lunch_start_time?: string | null
+          notes?: string | null
+          status?: string
+          total_worked_hours?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          break_end_time?: string | null
+          break_start_time?: string | null
+          clock_in_time?: string | null
+          clock_out_time?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          lunch_end_time?: string | null
+          lunch_start_time?: string | null
+          notes?: string | null
+          status?: string
+          total_worked_hours?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

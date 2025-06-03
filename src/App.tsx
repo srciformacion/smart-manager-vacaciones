@@ -9,6 +9,7 @@ import { Loader } from "@/components/ui/loader";
 const AuthPage = lazy(() => import('@/pages/auth/AuthPage'));
 const DashboardPage = lazy(() => import('@/pages/worker/DashboardPage'));
 const WorkCalendarPage = lazy(() => import('@/pages/worker/WorkCalendarPage'));
+const WorkTimePage = lazy(() => import('@/pages/worker/WorkTimePage'));
 const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
 const RequestsPage = lazy(() => import('@/pages/worker/RequestsPage'));
 const DocumentsPage = lazy(() => import('@/pages/worker/DocumentsPage'));
@@ -36,6 +37,7 @@ const WorkersManagementPage = lazy(() => import('@/pages/hr/WorkersManagementPag
 const CalendarManagementPage = lazy(() => import('@/pages/hr/CalendarManagementPage'));
 const SendNotificationPage = lazy(() => import('@/pages/hr/SendNotificationPage'));
 const NotificationTemplatesPage = lazy(() => import('@/pages/hr/NotificationTemplatesPage'));
+const WorkTimeManagementPage = lazy(() => import('@/pages/hr/WorkTimeManagementPage'));
 
 // Other pages
 const Index = lazy(() => import('@/pages/Index'));
@@ -56,6 +58,7 @@ function App() {
               {/* Worker routes */}
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/calendar" element={<WorkCalendarPage />} />
+              <Route path="/work-time" element={<WorkTimePage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/requests" element={<RequestsPage />} />
               <Route path="/documents" element={<DocumentsPage />} />
@@ -74,6 +77,7 @@ function App() {
               <Route path="/rrhh/workers" element={<HRWorkersPage />} />
               <Route path="/rrhh/requests" element={<HRRequestsPage />} />
               <Route path="/rrhh/calendar" element={<HRCalendarPage />} />
+              <Route path="/rrhh/work-time" element={<WorkTimeManagementPage />} />
               <Route path="/rrhh/documents" element={<HRDocumentsPage />} />
               <Route path="/rrhh/reports" element={<HRReportsPage />} />
               <Route path="/rrhh/settings" element={<HRSettingsPage />} />
