@@ -356,6 +356,45 @@ export type Database = {
         }
         Relationships: []
       }
+      work_time_locations: {
+        Row: {
+          allowed_ip_addresses: string[] | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string
+          radius_meters: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          allowed_ip_addresses?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          radius_meters?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          allowed_ip_addresses?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          radius_meters?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       work_time_module_config: {
         Row: {
           alert_incomplete_workday: boolean
@@ -365,8 +404,11 @@ export type Database = {
           created_at: string
           daily_hours_limit: number
           id: string
+          ip_restriction_enabled: boolean | null
           is_enabled: boolean
+          location_restriction_enabled: boolean | null
           lunch_duration_minutes: number
+          require_location_permission: boolean | null
           updated_at: string
           weekly_hours_limit: number
         }
@@ -378,8 +420,11 @@ export type Database = {
           created_at?: string
           daily_hours_limit?: number
           id?: string
+          ip_restriction_enabled?: boolean | null
           is_enabled?: boolean
+          location_restriction_enabled?: boolean | null
           lunch_duration_minutes?: number
+          require_location_permission?: boolean | null
           updated_at?: string
           weekly_hours_limit?: number
         }
@@ -391,8 +436,11 @@ export type Database = {
           created_at?: string
           daily_hours_limit?: number
           id?: string
+          ip_restriction_enabled?: boolean | null
           is_enabled?: boolean
+          location_restriction_enabled?: boolean | null
           lunch_duration_minutes?: number
+          require_location_permission?: boolean | null
           updated_at?: string
           weekly_hours_limit?: number
         }
@@ -402,11 +450,19 @@ export type Database = {
         Row: {
           break_end_time: string | null
           break_start_time: string | null
+          clock_in_ip_address: string | null
+          clock_in_latitude: number | null
+          clock_in_longitude: number | null
           clock_in_time: string | null
+          clock_out_ip_address: string | null
+          clock_out_latitude: number | null
+          clock_out_longitude: number | null
           clock_out_time: string | null
           created_at: string
           date: string
           id: string
+          ip_verified: boolean | null
+          location_verified: boolean | null
           lunch_end_time: string | null
           lunch_start_time: string | null
           notes: string | null
@@ -418,11 +474,19 @@ export type Database = {
         Insert: {
           break_end_time?: string | null
           break_start_time?: string | null
+          clock_in_ip_address?: string | null
+          clock_in_latitude?: number | null
+          clock_in_longitude?: number | null
           clock_in_time?: string | null
+          clock_out_ip_address?: string | null
+          clock_out_latitude?: number | null
+          clock_out_longitude?: number | null
           clock_out_time?: string | null
           created_at?: string
           date: string
           id?: string
+          ip_verified?: boolean | null
+          location_verified?: boolean | null
           lunch_end_time?: string | null
           lunch_start_time?: string | null
           notes?: string | null
@@ -434,11 +498,19 @@ export type Database = {
         Update: {
           break_end_time?: string | null
           break_start_time?: string | null
+          clock_in_ip_address?: string | null
+          clock_in_latitude?: number | null
+          clock_in_longitude?: number | null
           clock_in_time?: string | null
+          clock_out_ip_address?: string | null
+          clock_out_latitude?: number | null
+          clock_out_longitude?: number | null
           clock_out_time?: string | null
           created_at?: string
           date?: string
           id?: string
+          ip_verified?: boolean | null
+          location_verified?: boolean | null
           lunch_end_time?: string | null
           lunch_start_time?: string | null
           notes?: string | null

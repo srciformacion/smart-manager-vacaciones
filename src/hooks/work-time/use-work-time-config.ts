@@ -11,6 +11,9 @@ export interface WorkTimeConfig {
   alert_incomplete_workday: boolean;
   alert_missing_records: boolean;
   alert_overtime: boolean;
+  location_restriction_enabled: boolean;
+  ip_restriction_enabled: boolean;
+  require_location_permission: boolean;
   created_at: string;
   updated_at: string;
 }
