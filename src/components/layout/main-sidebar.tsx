@@ -21,19 +21,24 @@ export function MainSidebar({ onNavigate, collapsed = false, onCollapse }: MainS
   const handleLogout = async () => {
     try {
       console.log("MainSidebar - Starting logout process");
+      
+      // Call the signOut function
       await signOut();
       
-      // Clear any local storage data related to the user
-      localStorage.removeItem("user");
-      localStorage.removeItem("userRole");
-      localStorage.removeItem("userEmail");
-      
       console.log("MainSidebar - Logout successful, navigating to auth");
+      
+      // Navigate to auth page
       navigate("/auth", { replace: true });
       
+      // Call navigation handler if provided
       if (onNavigate) {
         onNavigate();
       }
+      
+      // Force page reload to clear any remaining state
+      setTimeout(() => {
+        window.location.href = "/auth";
+      }, 100);
       
       toast({
         title: "Sesión cerrada",
@@ -41,10 +46,15 @@ export function MainSidebar({ onNavigate, collapsed = false, onCollapse }: MainS
       });
     } catch (error) {
       console.error("Error during logout:", error);
+      
+      // Force logout even if there's an error
+      localStorage.clear();
+      navigate("/auth", { replace: true });
+      
       toast({
         variant: "destructive",
         title: "Error al cerrar sesión",
-        description: "No se pudo cerrar la sesión correctamente"
+        description: "Sesión cerrada forzosamente"
       });
     }
   };

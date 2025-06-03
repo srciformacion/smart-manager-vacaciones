@@ -12,80 +12,101 @@ export function useAuthState() {
   const [userRole, setUserRole] = useState<UserRole>('worker');
 
   useEffect(() => {
-    // First check localStorage for demo user
-    const demoUser = localStorage.getItem('user');
-    const storedRole = localStorage.getItem('userRole') as UserRole;
-    
-    if (demoUser) {
+    let mounted = true;
+
+    const initializeAuth = async () => {
       try {
-        const userData = JSON.parse(demoUser);
-        console.log("Auth state - Found demo user:", userData);
-        setUser(userData);
+        // First check localStorage for demo user
+        const demoUser = localStorage.getItem('user');
+        const storedRole = localStorage.getItem('userRole') as UserRole;
         
-        if (storedRole) {
-          console.log("Auth state - Setting role from localStorage:", storedRole);
-          setUserRole(storedRole);
-        } else if (userData.role) {
-          console.log("Auth state - Setting role from user data:", userData.role);
-          setUserRole(userData.role);
+        if (demoUser) {
+          try {
+            const userData = JSON.parse(demoUser);
+            console.log("Auth state - Found demo user:", userData);
+            
+            if (mounted) {
+              setUser(userData);
+              
+              if (storedRole) {
+                console.log("Auth state - Setting role from localStorage:", storedRole);
+                setUserRole(storedRole);
+              } else if (userData.role) {
+                console.log("Auth state - Setting role from user data:", userData.role);
+                setUserRole(userData.role);
+              }
+              
+              setLoading(false);
+            }
+            return;
+          } catch (err) {
+            console.error('Error parsing demo user:', err);
+            // Continue to regular auth check if demo user parsing fails
+          }
         }
+
+        // Set up auth state listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (event, session) => {
+            if (!mounted) return;
+            
+            console.log("Auth state change event:", event, session?.user?.email);
+            setSession(session);
+            setUser(session?.user ?? null);
+            
+            // Update user role from metadata or localStorage
+            if (session?.user?.user_metadata?.role) {
+              const role = session.user.user_metadata.role as UserRole;
+              console.log("Auth state - Setting role from metadata:", role);
+              setUserRole(role);
+              localStorage.setItem('userRole', role);
+            } else if (storedRole) {
+              console.log("Auth state - Using stored role:", storedRole);
+              setUserRole(storedRole);
+            }
+            
+            setLoading(false);
+          }
+        );
+
+        // Check for existing session
+        const { data: { session } } = await supabase.auth.getSession();
         
-        setLoading(false);
-        return;
+        if (mounted) {
+          console.log("Initial session check:", session?.user?.email);
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          // Update user role from metadata or localStorage
+          if (session?.user?.user_metadata?.role) {
+            const role = session.user.user_metadata.role as UserRole;
+            console.log("Initial session - Setting role from metadata:", role);
+            setUserRole(role);
+            localStorage.setItem('userRole', role);
+          } else if (storedRole) {
+            console.log("Initial session - Using stored role:", storedRole);
+            setUserRole(storedRole);
+          }
+          
+          setLoading(false);
+        }
+
+        return () => {
+          subscription?.unsubscribe();
+        };
       } catch (err) {
-        console.error('Error parsing demo user:', err);
-        // Continue to regular auth check if demo user parsing fails
-      }
-    }
-
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log("Auth state change event:", event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Update user role from metadata or localStorage
-        if (session?.user?.user_metadata?.role) {
-          const role = session.user.user_metadata.role as UserRole;
-          console.log("Auth state - Setting role from metadata:", role);
-          setUserRole(role);
-          localStorage.setItem('userRole', role);
-        } else if (storedRole) {
-          console.log("Auth state - Using stored role:", storedRole);
-          setUserRole(storedRole);
+        console.error('Error getting auth session:', err);
+        if (mounted) {
+          setError(err instanceof Error ? err : new Error(String(err)));
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
-    );
+    };
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session check:", session?.user?.email);
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      // Update user role from metadata or localStorage
-      if (session?.user?.user_metadata?.role) {
-        const role = session.user.user_metadata.role as UserRole;
-        console.log("Initial session - Setting role from metadata:", role);
-        setUserRole(role);
-        localStorage.setItem('userRole', role);
-      } else if (storedRole) {
-        console.log("Initial session - Using stored role:", storedRole);
-        setUserRole(storedRole);
-      }
-      
-      setLoading(false);
-    }).catch(err => {
-      console.error('Error getting auth session:', err);
-      setError(err instanceof Error ? err : new Error(String(err)));
-      setLoading(false);
-    });
+    initializeAuth();
 
     return () => {
-      subscription?.unsubscribe();
+      mounted = false;
     };
   }, []);
 

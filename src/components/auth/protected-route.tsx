@@ -20,18 +20,20 @@ export const ProtectedRoute = ({
   // After initial auth check, remove loading state
   useEffect(() => {
     if (!loading) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setInitialLoad(false);
-      }, 500);
+      }, 300);
+      return () => clearTimeout(timer);
     }
   }, [loading]);
 
   // For debugging
   useEffect(() => {
-    console.log("ProtectedRoute - User:", user);
+    console.log("ProtectedRoute - User:", user?.email || "No user");
     console.log("ProtectedRoute - Role:", userRole);
     console.log("ProtectedRoute - Required Role:", requiredRole);
-  }, [user, userRole, requiredRole]);
+    console.log("ProtectedRoute - Loading:", loading);
+  }, [user, userRole, requiredRole, loading]);
 
   // While we're checking authentication status, show loading
   if (loading || initialLoad) {
@@ -70,6 +72,7 @@ export const ProtectedRoute = ({
     }
     
     // No user found, redirect to login
+    console.log("No user found, redirecting to auth");
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 

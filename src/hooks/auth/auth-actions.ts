@@ -38,10 +38,24 @@ export const signUp = async (email: string, password: string, userRole?: UserRol
 };
 
 export const signOut = async () => {
-  // Clear stored user role
+  console.log("Signing out user...");
+  
+  // Clear stored user role and data
   localStorage.removeItem('userRole');
   localStorage.removeItem('user');
+  localStorage.removeItem('userEmail');
+  
+  // Clear any other session-related items
+  const keysToRemove = Object.keys(localStorage).filter(key => 
+    key.startsWith('sb-') || key.includes('supabase')
+  );
+  keysToRemove.forEach(key => localStorage.removeItem(key));
   
   const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+  if (error) {
+    console.error("Error during signOut:", error);
+    throw error;
+  }
+  
+  console.log("User signed out successfully");
 };
