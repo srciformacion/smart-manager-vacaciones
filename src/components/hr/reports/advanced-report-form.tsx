@@ -39,6 +39,14 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
     }
   };
 
+  const handleIncludeGraphicsChange = (checked: boolean | "indeterminate") => {
+    setIncludeGraphics(checked === true);
+  };
+
+  const handleIncludeSummaryChange = (checked: boolean | "indeterminate") => {
+    setIncludeSummary(checked === true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reportName.trim()) {
@@ -208,7 +216,7 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
                 <Checkbox
                   id="graphics"
                   checked={includeGraphics}
-                  onCheckedChange={setIncludeGraphics}
+                  onCheckedChange={handleIncludeGraphicsChange}
                 />
                 <Label htmlFor="graphics" className="text-sm font-normal">
                   Incluir gráficos y visualizaciones
@@ -218,7 +226,7 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
                 <Checkbox
                   id="summary"
                   checked={includeSummary}
-                  onCheckedChange={setIncludeSummary}
+                  onCheckedChange={handleIncludeSummaryChange}
                 />
                 <Label htmlFor="summary" className="text-sm font-normal">
                   Incluir resumen ejecutivo
