@@ -37,9 +37,6 @@ function generateRandomUser(id: number): User {
   const emailLastName = lastName1.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const email = `${emailName}.${emailLastName}@empresa.com`;
   
-  // Generate employee number
-  const employeeNumber = `EMP${String(id).padStart(4, '0')}`;
-  
   // Random assignment of department, shift, etc.
   const department = getRandomElement(DEPARTMENTS);
   const shift = getRandomElement(SHIFTS);
@@ -60,7 +57,6 @@ function generateRandomUser(id: number): User {
     department,
     shift,
     workday,
-    employeeNumber,
     hireDate: hireDate.toISOString().split('T')[0],
     position: `${department} - ${shift}`,
     phone: `+34 ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 900 + 100)}`,
