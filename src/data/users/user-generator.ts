@@ -2,109 +2,116 @@
 import { User } from "@/types";
 import { DEPARTMENTS, SHIFTS, WORKDAYS, ROLES, POSITIONS } from "./departments";
 
-const FIRST_NAMES = [
-  "Ana", "Carlos", "María", "José", "Laura", "Miguel", "Carmen", "Antonio", 
-  "Isabel", "Francisco", "Pilar", "Manuel", "Rosa", "Juan", "Mercedes",
-  "Rafael", "Concepción", "David", "Dolores", "Javier", "Josefa", "Daniel",
-  "Teresa", "Alejandro", "Antonia", "Pedro", "Francisca", "Adrián", "Cristina",
-  "Óscar", "Lucía", "Rubén", "Julia", "Álvaro", "Montserrat", "Sergio", "Esperanza",
-  "Pablo", "Amparo", "Jorge", "Inmaculada", "Alberto", "Susana", "Roberto",
-  "Elena", "Ignacio", "Beatriz", "Marco", "Yolanda", "Víctor", "Margarita",
-  "Fernando", "Silvia", "Raúl", "Patricia", "Eduardo", "Rocío", "Gonzalo", "Nuria"
+const NOMBRES_MASCULINOS = [
+  "Antonio", "Manuel", "José", "Francisco", "David", "Juan", "José Antonio", "Javier",
+  "Daniel", "José Luis", "Francisco Javier", "Carlos", "Jesús", "Alejandro", "Miguel",
+  "José Manuel", "Rafael", "Miguel Ángel", "Pedro", "Pablo", "Ángel", "Sergio", "Fernando",
+  "Jorge", "Luis", "Alberto", "Álvaro", "Juan Carlos", "Adrián", "Diego", "Juan José",
+  "Raúl", "Iván", "Juan Antonio", "Rubén", "Enrique", "Óscar", "Ramón", "Vicente",
+  "Roberto", "Andrés", "Eduardo", "Gonzalo", "Víctor", "Ignacio", "Marco", "Joaquín"
 ];
 
-const LAST_NAMES = [
-  "García", "Rodríguez", "González", "Fernández", "López", "Martínez", "Sánchez",
-  "Pérez", "Gómez", "Martín", "Jiménez", "Ruiz", "Hernández", "Díaz", "Moreno",
-  "Muñoz", "Álvarez", "Romero", "Alonso", "Gutiérrez", "Navarro", "Torres",
-  "Domínguez", "Vázquez", "Ramos", "Gil", "Ramírez", "Serrano", "Blanco",
-  "Suárez", "Molina", "Morales", "Ortega", "Delgado", "Castro", "Ortiz",
-  "Rubio", "Marín", "Sanz", "Iglesias", "Medina", "Garrido", "Cortés",
-  "Castillo", "Santos", "Lozano", "Guerrero", "Cano", "Prieto", "Méndez",
-  "Herrera", "Aguilar", "Vega", "Campos", "Reyes", "Cruz", "Flores", "Vargas"
+const NOMBRES_FEMENINOS = [
+  "María", "Carmen", "Ana", "Isabel", "Dolores", "Pilar", "Teresa", "Josefa",
+  "Margarita", "Cristina", "Laura", "Antonia", "Marta", "Elena", "Francisca", "Mercedes",
+  "Rosa", "Rosario", "Manuela", "Raquel", "Emilia", "Victoria", "Julia", "Patricia",
+  "Amparo", "Sofía", "Claudia", "Eva", "Gloria", "Susana", "Paula", "Rocío",
+  "Beatriz", "Yolanda", "Silvia", "Montserrat", "Esperanza", "Inmaculada", "Nuria", "Lucía"
+];
+
+const APELLIDOS = [
+  "García", "Rodríguez", "González", "Fernández", "López", "Martínez", "Sánchez", "Pérez",
+  "Gómez", "Martín", "Jiménez", "Ruiz", "Hernández", "Díaz", "Moreno", "Álvarez",
+  "Romero", "Alonso", "Gutiérrez", "Navarro", "Torres", "Domínguez", "Vázquez", "Ramos",
+  "Gil", "Ramírez", "Serrano", "Blanco", "Molina", "Morales", "Suárez", "Ortega",
+  "Delgado", "Castro", "Ortiz", "Rubio", "Marín", "Sanz", "Núñez", "Iglesias",
+  "Medina", "Garrido", "Santos", "Castillo", "Cortés", "Lozano", "Guerrero", "Cano",
+  "Prieto", "Méndez", "Cruz", "Calvo", "Gallego", "Vidal", "León", "Márquez",
+  "Herrera", "Peña", "Flores", "Cabrera", "Campos", "Vega", "Fuentes", "Carrasco"
 ];
 
 function getRandomElement<T>(array: readonly T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-// Function to assign appropriate position based on department and shift
+// Función para asignar posición apropiada según departamento y turno
 function getPositionForDepartmentAndShift(department: string, shift: string): string {
-  const emergencyPositions = ["Emergency Operator 24h", "Emergency Operator 12h", "Emergency Coordinator", "Emergency Technician", "Emergency Dispatcher", "Localizado Emergency"];
-  const callCenterPositions = ["Scheduled Teleoperator", "Emergency Teleoperator", "Teleoperador Rotativo", "Call Center Supervisor", "Customer Service Agent"];
-  const operationsPositions = ["Morning Shift Worker", "Afternoon Shift Worker", "Night Shift Worker", "Weekend Specialist"];
-  const supportPositions = ["Technical Support", "Administrative Assistant", "Quality Supervisor", "Training Coordinator"];
+  const emergencyPositions = ["Operador de Urgencias 24h", "Operador de Urgencias 12h", "Coordinador de Urgencias", "Técnico de Urgencias", "Dispatcher de Emergencias", "Técnico Localizado Urgencias"];
+  const callCenterPositions = ["Teleoperadora Programada", "Teleoperador de Urgencias", "Teleoperadora Rotativa", "Supervisor de Call Center", "Agente de Atención al Cliente"];
+  const operationsPositions = ["Operario Turno Mañana", "Operario Turno Tarde", "Operario Turno Noche", "Especialista de Fin de Semana"];
+  const supportPositions = ["Técnico de Soporte", "Auxiliar Administrativo", "Supervisor de Calidad", "Coordinador de Formación"];
 
   if (department === "Emergency Services") {
     if (shift === "Urgencias 24h") {
-      return "Emergency Operator 24h";
+      return "Operador de Urgencias 24h";
     }
     if (shift === "Urgencias 12h") {
-      return "Emergency Operator 12h";
+      return "Operador de Urgencias 12h";
     }
     if (shift === "Localizado") {
-      return "Localizado Emergency";
+      return "Técnico Localizado Urgencias";
     }
     return getRandomElement(emergencyPositions);
   }
   
   if (department === "Call Center") {
     if (shift === "Emergency 24h" || shift === "Emergency 12h") {
-      return "Emergency Teleoperator";
+      return "Teleoperador de Urgencias";
     }
     if (shift.includes("Rotativo")) {
-      return "Teleoperador Rotativo";
+      return "Teleoperadora Rotativa";
     }
     if (shift.includes("Programado") || shift === "Scheduled") {
-      return "Scheduled Teleoperator";
+      return "Teleoperadora Programada";
     }
     return getRandomElement(callCenterPositions);
   }
   
   if (department === "Operations") {
-    if (shift === "Programado Mañana" || shift === "Morning") return "Morning Shift Worker";
-    if (shift === "Programado Tarde" || shift === "Afternoon") return "Afternoon Shift Worker";
-    if (shift === "Programado Noche" || shift === "Night") return "Night Shift Worker";
+    if (shift === "Programado Mañana" || shift === "Morning") return "Operario Turno Mañana";
+    if (shift === "Programado Tarde" || shift === "Afternoon") return "Operario Turno Tarde";
+    if (shift === "Programado Noche" || shift === "Night") return "Operario Turno Noche";
     return getRandomElement(operationsPositions);
   }
   
   if (department === "Medical Support") {
-    if (shift === "Urgencias 24h" || shift === "Emergency 24h") return "Emergency Dispatcher";
-    return getRandomElement(["Quality Supervisor", "Training Coordinator"]);
+    if (shift === "Urgencias 24h" || shift === "Emergency 24h") return "Técnico Emergencias Médicas";
+    return getRandomElement(["Supervisor de Calidad Sanitaria", "Coordinador de Formación Médica"]);
   }
   
   if (department === "Telecommunications") {
-    return "Technical Support";
+    return "Técnico de Soporte IT";
   }
   
-  // Default positions for other departments
+  // Posiciones por defecto para otros departamentos
   return getRandomElement(supportPositions);
 }
 
 function generateRandomUser(id: number): User {
-  const firstName = getRandomElement(FIRST_NAMES);
-  const lastName1 = getRandomElement(LAST_NAMES);
-  const lastName2 = getRandomElement(LAST_NAMES);
+  const ismale = Math.random() > 0.5;
+  const firstName = ismale ? getRandomElement(NOMBRES_MASCULINOS) : getRandomElement(NOMBRES_FEMENINOS);
+  const lastName1 = getRandomElement(APELLIDOS);
+  const lastName2 = getRandomElement(APELLIDOS);
   const name = `${firstName} ${lastName1} ${lastName2}`;
   
-  // Generate email from name
+  // Generar email a partir del nombre
   const emailName = firstName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const emailLastName = lastName1.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const email = `${emailName}.${emailLastName}@empresa.com`;
   
-  // Random assignment of department, shift, etc.
+  // Asignación aleatoria de departamento, turno, etc.
   const department = getRandomElement(DEPARTMENTS);
   const shift = getRandomElement(SHIFTS);
   const workday = getRandomElement(WORKDAYS);
   const role = getRandomElement(ROLES);
   
-  // Generate random hire date within last 10 years
+  // Generar fecha de contratación aleatoria en los últimos 10 años
   const startDate = new Date();
   startDate.setFullYear(startDate.getFullYear() - Math.floor(Math.random() * 10));
   startDate.setMonth(Math.floor(Math.random() * 12));
   startDate.setDate(Math.floor(Math.random() * 28) + 1);
   
-  // Get appropriate position based on department and shift
+  // Obtener posición apropiada según departamento y turno
   const position = getPositionForDepartmentAndShift(department, shift);
   
   return {

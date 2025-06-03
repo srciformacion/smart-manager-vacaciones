@@ -35,32 +35,36 @@ export const WORKDAYS = ["L-V", "L-S", "Rotativo", "24h Cycle", "Flexible"] as c
 
 export const ROLES = ["worker", "hr"] as const;
 
-// Specific positions for emergency and teleoperator services
+// Posiciones específicas para servicios de urgencias y teleoperación
 export const POSITIONS = [
-  // Emergency Services
-  "Emergency Operator 24h",
-  "Emergency Operator 12h",
-  "Emergency Coordinator",
-  "Emergency Technician",
-  "Emergency Dispatcher",
-  "Localizado Emergency",
+  // Servicios de Urgencias
+  "Operador de Urgencias 24h",
+  "Operador de Urgencias 12h",
+  "Coordinador de Urgencias",
+  "Técnico de Urgencias",
+  "Dispatcher de Emergencias",
+  "Técnico Localizado Urgencias",
   
-  // Call Center / Teleoperators
-  "Scheduled Teleoperator",
-  "Emergency Teleoperator", 
-  "Teleoperador Rotativo",
-  "Call Center Supervisor",
-  "Customer Service Agent",
+  // Call Center / Teleoperadoras
+  "Teleoperadora Programada",
+  "Teleoperador de Urgencias", 
+  "Teleoperadora Rotativa",
+  "Supervisor de Call Center",
+  "Agente de Atención al Cliente",
   
-  // Scheduled Workers
-  "Morning Shift Worker",
-  "Afternoon Shift Worker", 
-  "Night Shift Worker",
-  "Weekend Specialist",
+  // Trabajadores Programados
+  "Operario Turno Mañana",
+  "Operario Turno Tarde", 
+  "Operario Turno Noche",
+  "Especialista de Fin de Semana",
   
-  // Support Staff
-  "Technical Support",
-  "Administrative Assistant",
-  "Quality Supervisor",
-  "Training Coordinator"
+  // Personal de Apoyo
+  "Técnico de Soporte IT",
+  "Auxiliar Administrativo",
+  "Supervisor de Calidad Sanitaria",
+  "Coordinador de Formación",
+  "Técnico Emergencias Médicas",
+  "Especialista Comunicaciones",
+  "Administrador de Sistemas",
+  "Analista de Comunicaciones"
 ] as const;
