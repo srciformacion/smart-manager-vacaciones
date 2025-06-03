@@ -129,9 +129,9 @@ export function WorkTimeHistory() {
                   </div>
                 </div>
 
-                {(record.break_start_time || record.lunch_start_time) && (
+                {(record.break_start_time || record.lunch_start_time || record.permission_start_time) && (
                   <div className="mt-3 pt-3 border-t">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-3 gap-4 text-sm">
                       {record.break_start_time && (
                         <div>
                           <div className="text-muted-foreground">Descanso</div>
@@ -148,6 +148,14 @@ export function WorkTimeHistory() {
                           </div>
                         </div>
                       )}
+                      {record.permission_start_time && (
+                        <div>
+                          <div className="text-muted-foreground">Permiso</div>
+                          <div>
+                            {formatTime(record.permission_start_time)} - {formatTime(record.permission_end_time)}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -155,7 +163,7 @@ export function WorkTimeHistory() {
                 {record.notes && (
                   <div className="mt-3 pt-3 border-t">
                     <div className="text-sm">
-                      <div className="text-muted-foreground">Notas</div>
+                      <div className="text-muted-foreground">Ambulancia</div>
                       <div>{record.notes}</div>
                     </div>
                   </div>

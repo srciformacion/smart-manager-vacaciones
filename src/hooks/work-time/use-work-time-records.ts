@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -13,6 +14,8 @@ export interface WorkTimeRecord {
   break_end_time: string | null;
   lunch_start_time: string | null;
   lunch_end_time: string | null;
+  permission_start_time: string | null;
+  permission_end_time: string | null;
   total_worked_hours: number | null;
   notes: string | null;
   status: 'incomplete' | 'complete' | 'partial';
@@ -306,6 +309,72 @@ export function useWorkTimeRecords(userId?: string) {
     }
   };
 
+  const startPermission = async () => {
+    if (!todayRecord) return;
+
+    try {
+      const now = new Date().toISOString();
+      
+      const { data, error } = await supabase
+        .from('work_time_records')
+        .update({
+          permission_start_time: now
+        })
+        .eq('id', todayRecord.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setTodayRecord(data);
+      
+      toast({
+        title: "Permiso iniciado",
+        description: "Has iniciado tu permiso"
+      });
+    } catch (error) {
+      console.error('Error starting permission:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo iniciar el permiso"
+      });
+    }
+  };
+
+  const endPermission = async () => {
+    if (!todayRecord) return;
+
+    try {
+      const now = new Date().toISOString();
+      
+      const { data, error } = await supabase
+        .from('work_time_records')
+        .update({
+          permission_end_time: now
+        })
+        .eq('id', todayRecord.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setTodayRecord(data);
+      
+      toast({
+        title: "Permiso finalizado",
+        description: "Has regresado del permiso"
+      });
+    } catch (error) {
+      console.error('Error ending permission:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo finalizar el permiso"
+      });
+    }
+  };
+
   useEffect(() => {
     fetchRecords();
   }, [targetUserId]);
@@ -320,6 +389,8 @@ export function useWorkTimeRecords(userId?: string) {
     endBreak,
     startLunch,
     endLunch,
+    startPermission,
+    endPermission,
     changeAmbulance,
     fetchRecords
   };

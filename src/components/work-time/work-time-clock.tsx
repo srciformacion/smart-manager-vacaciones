@@ -1,10 +1,11 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Clock, Play, Square, Coffee, Utensils, AlertTriangle, Ambulance, Edit } from 'lucide-react';
+import { Clock, Play, Square, Coffee, Utensils, AlertTriangle, Ambulance, Edit, UserX } from 'lucide-react';
 import { useWorkTimeRecords } from '@/hooks/work-time/use-work-time-records';
 import { useWorkTimeConfig } from '@/hooks/work-time/use-work-time-config';
 import { format } from 'date-fns';
@@ -20,6 +21,8 @@ export function WorkTimeClock() {
     endBreak,
     startLunch,
     endLunch,
+    startPermission,
+    endPermission,
     changeAmbulance
   } = useWorkTimeRecords();
 
@@ -76,6 +79,13 @@ export function WorkTimeClock() {
       const lunchEnd = new Date(todayRecord.lunch_end_time);
       duration -= (lunchEnd.getTime() - lunchStart.getTime());
     }
+
+    // Subtract permission time
+    if (todayRecord.permission_start_time && todayRecord.permission_end_time) {
+      const permissionStart = new Date(todayRecord.permission_start_time);
+      const permissionEnd = new Date(todayRecord.permission_end_time);
+      duration -= (permissionEnd.getTime() - permissionStart.getTime());
+    }
     
     const hours = Math.floor(duration / (1000 * 60 * 60));
     const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
@@ -104,6 +114,13 @@ export function WorkTimeClock() {
       const lunchEnd = new Date(todayRecord.lunch_end_time);
       duration -= (lunchEnd.getTime() - lunchStart.getTime());
     }
+
+    // Subtract permission time
+    if (todayRecord.permission_start_time && todayRecord.permission_end_time) {
+      const permissionStart = new Date(todayRecord.permission_start_time);
+      const permissionEnd = new Date(todayRecord.permission_end_time);
+      duration -= (permissionEnd.getTime() - permissionStart.getTime());
+    }
     
     return duration / (1000 * 60 * 60); // Convert to hours
   };
@@ -114,6 +131,7 @@ export function WorkTimeClock() {
 
   const isOnBreak = todayRecord?.break_start_time && !todayRecord?.break_end_time;
   const isOnLunch = todayRecord?.lunch_start_time && !todayRecord?.lunch_end_time;
+  const isOnPermission = todayRecord?.permission_start_time && !todayRecord?.permission_end_time;
   const hasClockedIn = !!todayRecord?.clock_in_time;
   const hasClockedOut = !!todayRecord?.clock_out_time;
 
@@ -171,7 +189,7 @@ export function WorkTimeClock() {
           {!hasClockedIn && (
             <Badge variant="outline">Sin fichar</Badge>
           )}
-          {hasClockedIn && !hasClockedOut && !isOnBreak && !isOnLunch && (
+          {hasClockedIn && !hasClockedOut && !isOnBreak && !isOnLunch && !isOnPermission && (
             <Badge variant="default">Trabajando</Badge>
           )}
           {isOnBreak && (
@@ -179,6 +197,9 @@ export function WorkTimeClock() {
           )}
           {isOnLunch && (
             <Badge variant="secondary">En almuerzo</Badge>
+          )}
+          {isOnPermission && (
+            <Badge variant="secondary">En permiso</Badge>
           )}
           {hasClockedOut && (
             <Badge variant="outline">Jornada finalizada</Badge>
@@ -280,6 +301,12 @@ export function WorkTimeClock() {
               {formatTime(todayRecord?.lunch_start_time)} - {formatTime(todayRecord?.lunch_end_time)}
             </div>
           </div>
+          <div className="col-span-2">
+            <div className="font-medium">Permiso</div>
+            <div>
+              {formatTime(todayRecord?.permission_start_time)} - {formatTime(todayRecord?.permission_end_time)}
+            </div>
+          </div>
         </div>
 
         {/* Action buttons */}
@@ -316,15 +343,15 @@ export function WorkTimeClock() {
 
           {hasClockedIn && !hasClockedOut && (
             <>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {!isOnBreak ? (
                   <Button 
                     onClick={startBreak} 
                     variant="outline"
-                    disabled={isOnLunch}
+                    disabled={isOnLunch || isOnPermission}
                   >
                     <Coffee className="h-4 w-4 mr-2" />
-                    Iniciar Descanso
+                    Descanso
                   </Button>
                 ) : (
                   <Button onClick={endBreak} variant="outline">
@@ -337,15 +364,31 @@ export function WorkTimeClock() {
                   <Button 
                     onClick={startLunch} 
                     variant="outline"
-                    disabled={isOnBreak}
+                    disabled={isOnBreak || isOnPermission}
                   >
                     <Utensils className="h-4 w-4 mr-2" />
-                    Iniciar Almuerzo
+                    Almuerzo
                   </Button>
                 ) : (
                   <Button onClick={endLunch} variant="outline">
                     <Square className="h-4 w-4 mr-2" />
                     Fin Almuerzo
+                  </Button>
+                )}
+
+                {!isOnPermission ? (
+                  <Button 
+                    onClick={startPermission} 
+                    variant="outline"
+                    disabled={isOnBreak || isOnLunch}
+                  >
+                    <UserX className="h-4 w-4 mr-2" />
+                    Permiso
+                  </Button>
+                ) : (
+                  <Button onClick={endPermission} variant="outline">
+                    <Square className="h-4 w-4 mr-2" />
+                    Fin Permiso
                   </Button>
                 )}
               </div>
@@ -354,7 +397,7 @@ export function WorkTimeClock() {
                 onClick={clockOut} 
                 className="w-full" 
                 size="lg"
-                disabled={isOnBreak || isOnLunch}
+                disabled={isOnBreak || isOnLunch || isOnPermission}
               >
                 <Square className="h-4 w-4 mr-2" />
                 Fichar Salida
