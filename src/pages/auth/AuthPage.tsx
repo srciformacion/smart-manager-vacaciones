@@ -106,7 +106,7 @@ export default function AuthPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-primary">La Rioja Cuida </h1>
-          <p className="mt-2 text-muted-foreground">Sistema de gestión completo de Ho</p>
+          <p className="mt-2 text-muted-foreground">Sistema de Gestión Inteligente de Jorna</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -189,7 +189,7 @@ export default function AuthPage() {
         </div>
         
         <div className="mt-4 text-xs text-center text-muted-foreground">
-          <p>Versión 1.1.0 • Smart Vacancy © 2025</p>
+          <p>Versión 1.1.0 • Workify © 2025</p>
         </div>
       </div>
     </div>;
