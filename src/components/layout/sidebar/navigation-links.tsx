@@ -1,5 +1,5 @@
 
-import { CalendarDays, Home, FilePen, FileText, Clock, History, Settings2, MessageSquare, User, BarChart4, Bell, MailCheck, AlertTriangle, BrainCircuit, Settings, Database, Users, Calendar } from "lucide-react";
+import { CalendarDays, Home, FilePen, FileText, Clock, History, Settings2, MessageSquare, User, BarChart4, Bell, MailCheck, AlertTriangle, BrainCircuit, Settings, Users, Calendar } from "lucide-react";
 import { SidebarLinkItem } from "./types";
 
 export const workerLinks: SidebarLinkItem[] = [
@@ -31,6 +31,5 @@ export const hrLinks: SidebarLinkItem[] = [
   { name: "Asistente Inteligente", href: "/rrhh/smart-assistant", icon: AlertTriangle, ariaLabel: "Ir a Asistente Inteligente" },
   { name: "Informes", href: "/rrhh/reports", icon: BarChart4, ariaLabel: "Ir a Informes" },
   { name: "Chat", href: "/chat", icon: MessageSquare, ariaLabel: "Ir a Chat" },
-  { name: "Generador de Datos", href: "/rrhh/data-generation", icon: Database, ariaLabel: "Ir a Generador de Datos" },
   { name: "Configuración", href: "/rrhh/settings", icon: Settings, ariaLabel: "Ir a Configuración" }
 ];
