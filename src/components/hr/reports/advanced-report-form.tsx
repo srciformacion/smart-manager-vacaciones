@@ -2,14 +2,14 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Download, Calendar, Users, Clock } from "lucide-react";
+import { FileText, Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { BasicInfoSection } from "./form-sections/basic-info-section";
+import { ReportTypeSection } from "./form-sections/report-type-section";
+import { DateRangeSection } from "./form-sections/date-range-section";
+import { DepartmentSelection } from "./form-sections/department-selection";
+import { AdditionalOptions } from "./form-sections/additional-options";
 
 interface AdvancedReportFormProps {
   onSubmit: (reportConfig: any) => void;
@@ -30,22 +30,6 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
     "Enfermería", "Medicina", "Administración", "Limpieza", 
     "Seguridad", "Cocina", "Mantenimiento", "Dirección"
   ];
-
-  const handleDepartmentChange = (dept: string, checked: boolean) => {
-    if (checked) {
-      setDepartments([...departments, dept]);
-    } else {
-      setDepartments(departments.filter(d => d !== dept));
-    }
-  };
-
-  const handleIncludeGraphicsChange = (checked: boolean | "indeterminate") => {
-    setIncludeGraphics(checked === true);
-  };
-
-  const handleIncludeSummaryChange = (checked: boolean | "indeterminate") => {
-    setIncludeSummary(checked === true);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,143 +81,40 @@ export function AdvancedReportForm({ onSubmit }: AdvancedReportFormProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Información básica */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="report-name">Nombre del informe *</Label>
-              <Input
-                id="report-name"
-                value={reportName}
-                onChange={(e) => setReportName(e.target.value)}
-                placeholder="Informe de vacaciones Q1 2024"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="format">Formato de salida</Label>
-              <Select value={format} onValueChange={setFormat}>
-                <SelectTrigger id="format">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="excel">Excel (.xlsx)</SelectItem>
-                  <SelectItem value="pdf">PDF</SelectItem>
-                  <SelectItem value="csv">CSV</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <BasicInfoSection
+            reportName={reportName}
+            setReportName={setReportName}
+            format={format}
+            setFormat={setFormat}
+          />
 
-          {/* Tipo de informe */}
-          <div className="space-y-2">
-            <Label htmlFor="report-type">Tipo de informe</Label>
-            <Select value={reportType} onValueChange={setReportType}>
-              <SelectTrigger id="report-type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="vacations">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Informe de Vacaciones
-                  </div>
-                </SelectItem>
-                <SelectItem value="permissions">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    Informe de Permisos
-                  </div>
-                </SelectItem>
-                <SelectItem value="attendance">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Informe de Asistencia
-                  </div>
-                </SelectItem>
-                <SelectItem value="comprehensive">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Informe Integral
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <ReportTypeSection
+            reportType={reportType}
+            setReportType={setReportType}
+          />
 
-          {/* Rango de fechas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Fecha desde</Label>
-              <DatePicker
-                selectedDate={dateFrom}
-                onSelect={setDateFrom}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Fecha hasta</Label>
-              <DatePicker
-                selectedDate={dateTo}
-                onSelect={setDateTo}
-              />
-            </div>
-          </div>
+          <DateRangeSection
+            dateFrom={dateFrom}
+            setDateFrom={setDateFrom}
+            dateTo={dateTo}
+            setDateTo={setDateTo}
+          />
 
           <Separator />
 
-          {/* Departamentos */}
-          <div className="space-y-3">
-            <Label>Departamentos a incluir</Label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {departmentOptions.map((dept) => (
-                <div key={dept} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={dept}
-                    checked={departments.includes(dept)}
-                    onCheckedChange={(checked) => 
-                      handleDepartmentChange(dept, checked as boolean)
-                    }
-                  />
-                  <Label htmlFor={dept} className="text-sm font-normal">
-                    {dept}
-                  </Label>
-                </div>
-              ))}
-            </div>
-            {departments.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                Si no seleccionas ninguno, se incluirán todos los departamentos
-              </p>
-            )}
-          </div>
+          <DepartmentSelection
+            departments={departments}
+            setDepartments={setDepartments}
+          />
 
           <Separator />
 
-          {/* Opciones adicionales */}
-          <div className="space-y-3">
-            <Label>Opciones adicionales</Label>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="graphics"
-                  checked={includeGraphics}
-                  onCheckedChange={handleIncludeGraphicsChange}
-                />
-                <Label htmlFor="graphics" className="text-sm font-normal">
-                  Incluir gráficos y visualizaciones
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="summary"
-                  checked={includeSummary}
-                  onCheckedChange={handleIncludeSummaryChange}
-                />
-                <Label htmlFor="summary" className="text-sm font-normal">
-                  Incluir resumen ejecutivo
-                </Label>
-              </div>
-            </div>
-          </div>
+          <AdditionalOptions
+            includeGraphics={includeGraphics}
+            setIncludeGraphics={setIncludeGraphics}
+            includeSummary={includeSummary}
+            setIncludeSummary={setIncludeSummary}
+          />
 
           <Button
             type="submit"
