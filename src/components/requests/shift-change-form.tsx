@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateSection } from "./form/date-section";
-import { ReplacementSection } from "./form/replacement-section";
+import { ReplacementSearchSection } from "./form/replacement-search-section";
 import { RequestDetailsSection } from "./form/request-details-section";
+import { ShiftTypeSection } from "./form/shift-type-section";
 import { requestFormSchema, RequestFormValues } from "./form/request-form-schema";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,53 +27,15 @@ export function ShiftChangeForm({
   onSubmit,
   isSubmitting = false,
 }: ShiftChangeFormProps) {
-  const [availableCoworkers, setAvailableCoworkers] = useState<User[]>(coworkers);
   const [submitting, setSubmitting] = useState<boolean>(isSubmitting);
 
   const form = useForm<RequestFormValues>({
     resolver: zodResolver(requestFormSchema),
     defaultValues: {
       notes: "",
+      isFullShift: true,
     },
   });
-
-  // Cargar los trabajadores disponibles desde Supabase
-  useEffect(() => {
-    const loadCoworkers = async () => {
-      try {
-        // Obtener todos los perfiles excepto el del usuario actual
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .neq('id', user.id);
-        
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-          // Transformamos los datos de la BD al formato que espera la UI
-          const mappedCoworkers: User[] = data.map(profile => ({
-            id: profile.id,
-            name: profile.name || '',
-            email: profile.email || '',
-            role: 'worker' as UserRole, // Cast to UserRole type
-            department: profile.department || '',
-            // Añadir campos requeridos por la interfaz User
-            shift: 'Programado',
-            workGroup: 'Grupo Programado',
-            workday: 'Completa',
-            seniority: 1
-          }));
-          
-          setAvailableCoworkers(mappedCoworkers);
-        }
-      } catch (error) {
-        console.error("Error al cargar compañeros:", error);
-        // Si hay error, usamos los datos de ejemplo proporcionados
-      }
-    };
-    
-    loadCoworkers();
-  }, [user.id]);
 
   const handleFormSubmit = async (values: RequestFormValues) => {
     setSubmitting(true);
@@ -84,6 +47,8 @@ export function ShiftChangeForm({
         type: 'shiftChange',
         startdate: values.startDate,
         enddate: values.endDate || values.startDate,
+        starttime: values.isFullShift ? null : values.changeStartTime,
+        endtime: values.isFullShift ? null : values.changeEndTime,
         notes: values.notes,
         status: 'pending'
       };
@@ -114,12 +79,13 @@ export function ShiftChangeForm({
         
         // Notificar al usuario de reemplazo
         if (values.replacementUserId) {
+          const shiftType = values.isFullShift ? "turno completo" : `de ${values.changeStartTime} a ${values.changeEndTime}`;
           const { error: notificationError } = await supabase
             .from('notifications')
             .insert({
               user_id: values.replacementUserId,
               title: "Nueva solicitud de cambio de turno",
-              message: `${user.name} ha solicitado un cambio de turno contigo para el día ${new Date(values.startDate || new Date()).toLocaleDateString()}`,
+              message: `${user.name} ha solicitado un cambio de ${shiftType} contigo para el día ${new Date(values.startDate || new Date()).toLocaleDateString()}`,
               type: "shiftChange"
             });
           
@@ -155,11 +121,15 @@ export function ShiftChangeForm({
               user={user} 
               isSubmitting={submitting || isSubmitting} 
             />
+
+            <ShiftTypeSection 
+              form={form} 
+              isSubmitting={submitting || isSubmitting} 
+            />
             
-            <ReplacementSection 
+            <ReplacementSearchSection 
               form={form} 
               user={user} 
-              availableUsers={availableCoworkers} 
               isSubmitting={submitting || isSubmitting} 
             />
             
