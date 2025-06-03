@@ -22,7 +22,7 @@ const LAST_NAMES = [
   "Castillo", "Santos", "Lozano", "Guerrero", "Cano", "Prieto", "Méndez"
 ];
 
-function getRandomElement<T>(array: T[]): T {
+function getRandomElement<T>(array: readonly T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
