@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { SidebarNavigation } from "./sidebar-navigation";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/auth";
 import { User, UserRole } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
 
 interface MainSidebarProps {
   onNavigate?: () => void;
