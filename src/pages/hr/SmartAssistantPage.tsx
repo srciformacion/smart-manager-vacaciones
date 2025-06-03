@@ -1,4 +1,3 @@
-
 import { MainLayout } from "@/components/layout/main-layout";
 import { SmartAssistantPanel } from "@/components/hr/smart-assistant-panel";
 import { Button } from "@/components/ui/button";
@@ -56,7 +55,7 @@ export default function SmartAssistantPage() {
 
   const tutorialSteps = [
     {
-      title: "Bienvenido a La Rioja Cuida",
+      title: "Bienvenido a smart vacancy",
       description: "Esta herramienta te ayuda a gestionar mejor tu equipo identificando situaciones que requieren atención."
     },
     {
@@ -82,7 +81,7 @@ export default function SmartAssistantPage() {
       localStorage.setItem('smartAssistantTutorialSeen', 'true');
       toast({
         title: "Tutorial completado",
-        description: "Ahora puedes utilizar todas las funciones de La Rioja Cuida"
+        description: "Ahora puedes utilizar todas las funciones de smart vacancy"
       });
     }
   };
