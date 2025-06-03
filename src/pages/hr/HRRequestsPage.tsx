@@ -5,18 +5,32 @@ import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
 import { exampleRequests } from "@/data/example-requests";
 import { exampleUser, exampleWorkers } from "@/data/example-users";
 import { RequestList } from "@/components/requests/request-list";
+import { ApprovalWorkflowView } from "@/components/hr/approval/approval-workflow-view";
+import { PendingApprovalsWidget } from "@/components/hr/approval/pending-approvals-widget";
+import { useApprovalManagement } from "@/hooks/hr/use-approval-management";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileX } from "lucide-react";
 import { Request, RequestStatus } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function HRRequestsPage() {
   const { user, userId } = useProfileAuth();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
   const { toast } = useToast();
+  
+  const {
+    workflows,
+    processApproval,
+    getWorkflowByRequestId,
+    getPendingApprovals,
+  } = useApprovalManagement(requests, exampleWorkers);
+
+  const pendingApprovals = getPendingApprovals(userId || "");
   
   useEffect(() => {
     async function fetchRequests() {
@@ -79,12 +93,7 @@ export default function HRRequestsPage() {
   }, [userId, toast]);
   
   const handleViewDetails = (request: Request) => {
-    console.log("Ver detalles de solicitud:", request);
-    // Implement view details functionality
-    toast({
-      title: "Ver detalles",
-      description: `Solicitud: ${request.id.substring(0, 8)}...`
-    });
+    setSelectedRequestId(request.id);
   };
   
   const handleStatusChange = (request: Request, newStatus: RequestStatus) => {
@@ -136,12 +145,22 @@ export default function HRRequestsPage() {
       });
     }
   };
+
+  const handleProcessApproval = (stepId: string, action: "approve" | "reject" | "request_info", comments?: string) => {
+    const workflow = workflows.find(w => w.steps.some(s => s.id === stepId));
+    if (workflow) {
+      processApproval(workflow.id, stepId, userId || "", action, comments);
+    }
+  };
+
+  const selectedRequest = selectedRequestId ? requests.find(r => r.id === selectedRequestId) : null;
+  const selectedWorkflow = selectedRequestId ? getWorkflowByRequestId(selectedRequestId) : null;
   
   return (
     <MainLayout user={user || exampleUser}>
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">Gestión de solicitudes</h1>
-        <p className="text-muted-foreground">Administra las solicitudes de los empleados</p>
+        <p className="text-muted-foreground">Administra las solicitudes de los empleados con flujos de aprobación</p>
         
         {loading ? (
           <Card>
@@ -162,14 +181,56 @@ export default function HRRequestsPage() {
             </CardContent>
           </Card>
         ) : (
-          <RequestList 
-            requests={requests}
-            users={exampleWorkers}
-            isHRView={true}
-            onViewDetails={handleViewDetails}
-            onStatusChange={handleStatusChange}
-            onDownloadAttachment={handleDownloadAttachment}
-          />
+          <Tabs defaultValue="pending-approvals" className="w-full">
+            <TabsList>
+              <TabsTrigger value="pending-approvals">Aprobaciones Pendientes ({pendingApprovals.length})</TabsTrigger>
+              <TabsTrigger value="all-requests">Todas las Solicitudes</TabsTrigger>
+              {selectedRequest && <TabsTrigger value="workflow">Flujo de Aprobación</TabsTrigger>}
+            </TabsList>
+            
+            <TabsContent value="pending-approvals">
+              <PendingApprovalsWidget
+                pendingSteps={pendingApprovals}
+                requests={requests}
+                users={exampleWorkers}
+                onViewRequest={(requestId) => {
+                  setSelectedRequestId(requestId);
+                }}
+              />
+            </TabsContent>
+            
+            <TabsContent value="all-requests">
+              <RequestList 
+                requests={requests}
+                users={exampleWorkers}
+                isHRView={true}
+                onViewDetails={handleViewDetails}
+                onStatusChange={handleStatusChange}
+                onDownloadAttachment={handleDownloadAttachment}
+              />
+            </TabsContent>
+            
+            {selectedRequest && selectedWorkflow && (
+              <TabsContent value="workflow">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <h3 className="text-lg font-medium">
+                      Solicitud de {exampleWorkers.find(w => w.id === selectedRequest.userId)?.name}
+                    </h3>
+                    <span className="text-muted-foreground">
+                      {selectedRequest.startDate.toLocaleDateString()} - {selectedRequest.endDate.toLocaleDateString()}
+                    </span>
+                  </div>
+                  
+                  <ApprovalWorkflowView
+                    workflow={selectedWorkflow}
+                    currentUserId={userId || ""}
+                    onProcessApproval={handleProcessApproval}
+                  />
+                </div>
+              </TabsContent>
+            )}
+          </Tabs>
         )}
       </div>
     </MainLayout>
