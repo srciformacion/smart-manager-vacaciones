@@ -13,21 +13,21 @@ interface SidebarNavProps {
 export function SidebarNav({ links, collapsed, onNavigate }: SidebarNavProps) {
   return (
     <TooltipProvider>
-      <nav className="grid items-start px-2 gap-1">
+      <nav className="grid items-start px-2 gap-0.5">
         {links.map((link) => {
           const NavContent = (
             <NavLink
               key={link.href}
               to={link.href}
               className={(props) => cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                "flex items-center gap-3 rounded-lg px-3 py-1.5 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 props.isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground",
-                collapsed && "justify-center p-2 h-10 w-10 mx-auto"
+                collapsed && "justify-center p-1.5 h-9 w-9 mx-auto"
               )}
               onClick={onNavigate}
               aria-label={link.ariaLabel}
             >
-              <link.icon className={cn("h-4 w-4", collapsed ? "h-5 w-5" : "")} aria-hidden="true" />
+              <link.icon className={cn("h-4 w-4", collapsed ? "h-4 w-4" : "")} aria-hidden="true" />
               {!collapsed && <span>{link.name}</span>}
             </NavLink>
           );
