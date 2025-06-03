@@ -58,7 +58,7 @@ export function SmartAssistantPanel({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-warning" />
-            Asistente inteligente - Alertas y recomendaciones
+            La Rioja Cuida - Alertas y recomendaciones
           </CardTitle>
           <CardDescription>
             {totalAlerts === 0

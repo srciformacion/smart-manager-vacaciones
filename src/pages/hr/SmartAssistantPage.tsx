@@ -56,7 +56,7 @@ export default function SmartAssistantPage() {
 
   const tutorialSteps = [
     {
-      title: "Bienvenido al Asistente Inteligente",
+      title: "Bienvenido a La Rioja Cuida",
       description: "Esta herramienta te ayuda a gestionar mejor tu equipo identificando situaciones que requieren atención."
     },
     {
@@ -82,7 +82,7 @@ export default function SmartAssistantPage() {
       localStorage.setItem('smartAssistantTutorialSeen', 'true');
       toast({
         title: "Tutorial completado",
-        description: "Ahora puedes utilizar todas las funciones del Asistente Inteligente"
+        description: "Ahora puedes utilizar todas las funciones de La Rioja Cuida"
       });
     }
   };
@@ -100,7 +100,7 @@ export default function SmartAssistantPage() {
       <div className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Asistente inteligente</h1>
+            <h1 className="text-3xl font-bold tracking-tight">La Rioja Cuida</h1>
             <p className="text-muted-foreground mt-2">
               Análisis y recomendaciones para la gestión eficiente del personal
             </p>
