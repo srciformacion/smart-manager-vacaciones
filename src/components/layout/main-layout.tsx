@@ -11,7 +11,8 @@ import { InstallPWAButton } from '@/components/pwa/install-pwa-button';
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User } from "@/types";
 import { useAuth } from "@/hooks/auth";
-import { Menu as MenuIcon } from "lucide-react";
+import { Menu as MenuIcon, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface MainLayoutProps {
   children: React.ReactNode;
@@ -25,11 +26,17 @@ export function MainLayout({
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { signOut } = useAuth();
   
   useEffect(() => {
     setMounted(true);
+    // Load sidebar state from localStorage
+    const savedCollapsed = localStorage.getItem('sidebar-collapsed');
+    if (savedCollapsed !== null) {
+      setSidebarCollapsed(JSON.parse(savedCollapsed));
+    }
   }, []);
   
   async function logout() {
@@ -44,6 +51,13 @@ export function MainLayout({
     setSidebarVisible(!sidebarVisible);
   };
 
+  // Función para alternar el estado contraído del sidebar
+  const toggleSidebarCollapse = () => {
+    const newCollapsed = !sidebarCollapsed;
+    setSidebarCollapsed(newCollapsed);
+    localStorage.setItem('sidebar-collapsed', JSON.stringify(newCollapsed));
+  };
+
   // Función para cerrar el menú móvil
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
@@ -52,17 +66,49 @@ export function MainLayout({
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar condicional para pantallas grandes */}
-      {sidebarVisible && <div className="hidden lg:block w-64">
-          <MainSidebar onNavigate={closeMobileMenu} />
-        </div>}
+      {sidebarVisible && (
+        <div className={cn(
+          "hidden lg:block transition-all duration-300",
+          sidebarCollapsed ? "w-16" : "w-64"
+        )}>
+          <MainSidebar 
+            onNavigate={closeMobileMenu}
+            collapsed={sidebarCollapsed}
+            onCollapse={toggleSidebarCollapse}
+          />
+        </div>
+      )}
       
       <div className="flex flex-col flex-1">
         <header className="z-10 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-secondary">
           <div className="flex items-center">
             {/* Botón para mostrar/ocultar el sidebar en pantallas grandes */}
-            <Button variant="ghost" size="sm" onClick={toggleSidebar} className="mr-2 hidden lg:flex" aria-label={sidebarVisible ? "Ocultar menú lateral" : "Mostrar menú lateral"}>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={toggleSidebar} 
+              className="mr-2 hidden lg:flex" 
+              aria-label={sidebarVisible ? "Ocultar menú lateral" : "Mostrar menú lateral"}
+            >
               <MenuIcon className="w-5 h-5" />
             </Button>
+            
+            {/* Botón para contraer/expandir el sidebar cuando está visible */}
+            {sidebarVisible && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={toggleSidebarCollapse} 
+                className="mr-2 hidden lg:flex" 
+                aria-label={sidebarCollapsed ? "Expandir menú lateral" : "Contraer menú lateral"}
+              >
+                {sidebarCollapsed ? (
+                  <ChevronsRight className="w-4 h-4" />
+                ) : (
+                  <ChevronsLeft className="w-4 h-4" />
+                )}
+              </Button>
+            )}
             
             {/* Sheet para menú móvil */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -72,7 +118,15 @@ export function MainLayout({
             </Sheet>
             
             {/* Botón hamburguesa para dispositivos móviles */}
-            <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(true)} className="mr-2 lg:hidden" aria-label="Abrir menú de navegación" aria-expanded={mobileMenuOpen} aria-controls="mobile-menu">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setMobileMenuOpen(true)} 
+              className="mr-2 lg:hidden" 
+              aria-label="Abrir menú de navegación" 
+              aria-expanded={mobileMenuOpen} 
+              aria-controls="mobile-menu"
+            >
               <MenuIcon className="w-5 h-5" />
             </Button>
             
@@ -82,7 +136,8 @@ export function MainLayout({
           <div className="flex items-center gap-2 ml-auto">
             <InstallPWAButton />
             <ThemeToggle />
-            {mounted && user ? <DropdownMenu>
+            {mounted && user ? (
+              <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative w-8 h-8 rounded-full" aria-label="Opciones de usuario">
                     <Avatar className="w-8 h-8">
@@ -103,9 +158,12 @@ export function MainLayout({
                     Salir
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu> : <Link to="/auth">
+              </DropdownMenu>
+            ) : (
+              <Link to="/auth">
                 <Button>Login</Button>
-              </Link>}
+              </Link>
+            )}
           </div>
         </header>
         <main className="flex-1 p-4 overflow-y-auto">{children}</main>

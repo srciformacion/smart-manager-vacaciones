@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, UserRole } from "@/types";
 import { CircleUser, LogOut } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface UserProfileProps {
   user: User | null;
@@ -26,19 +27,20 @@ export function UserProfile({ user, role, collapsed, onLogout, onNavigate }: Use
   if (!user) return null;
 
   return (
-    <div className={cn(
-      "mt-auto border-t border-sidebar-border p-4",
-      collapsed ? "flex justify-center" : ""
-    )}>
+    <TooltipProvider>
       <div className={cn(
-        collapsed ? "" : "flex items-center gap-3 mb-4"
+        "mt-auto border-t border-sidebar-border p-4",
+        collapsed ? "flex flex-col items-center space-y-2" : ""
       )}>
-        {!collapsed ? (
-          <>
-            <Avatar>
-              <AvatarImage src={user.profilePicture} alt={`${user.name}`} />
-              <AvatarFallback>{getInitial()}</AvatarFallback>
-            </Avatar>
+        <div className={cn(
+          collapsed ? "flex flex-col items-center space-y-2" : "flex items-center gap-3 mb-4"
+        )}>
+          <Avatar className={collapsed ? "w-8 h-8" : "w-10 h-10"}>
+            <AvatarImage src={user.profilePicture} alt={`${user.name}`} />
+            <AvatarFallback>{getInitial()}</AvatarFallback>
+          </Avatar>
+          
+          {!collapsed && (
             <div className="space-y-1">
               <p className="text-sm font-medium text-sidebar-foreground">{user.name}</p>
               <p className="text-xs text-sidebar-foreground/70">{user.email}</p>
@@ -46,42 +48,76 @@ export function UserProfile({ user, role, collapsed, onLogout, onNavigate }: Use
                 {role === "hr" ? "RRHH" : "Trabajador"}
               </p>
             </div>
-          </>
-        ) : (
-          <Avatar>
-            <AvatarImage src={user.profilePicture} alt={`${user.name}`} />
-            <AvatarFallback>{getInitial()}</AvatarFallback>
-          </Avatar>
+          )}
+        </div>
+        
+        {/* Profile Link */}
+        <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-2")}>
+          {collapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <NavLink
+                  to="/profile"
+                  className={({ isActive }) => cn(
+                    "flex items-center justify-center rounded-lg p-2 h-10 w-10 text-sm transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground"
+                  )}
+                  onClick={onNavigate}
+                >
+                  <CircleUser className="h-4 w-4" />
+                </NavLink>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="ml-2">
+                Mi Perfil
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <NavLink
+              to="/profile"
+              className={({ isActive }) => cn(
+                "w-full flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground"
+              )}
+              onClick={onNavigate}
+            >
+              <CircleUser className="h-4 w-4" />
+              Mi Perfil
+            </NavLink>
+          )}
+        </div>
+        
+        {/* Logout Button */}
+        {onLogout && (
+          collapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  className="border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground w-10 h-10" 
+                  onClick={onLogout}
+                  aria-label="Cerrar sesión"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="ml-2">
+                Cerrar sesión
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button 
+              variant="outline" 
+              className="w-full mt-2 border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" 
+              onClick={onLogout}
+              aria-label="Cerrar sesión"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Cerrar sesión
+            </Button>
+          )
         )}
       </div>
-      
-      {!collapsed && (
-        <div className="flex items-center gap-2">
-          <NavLink
-            to="/profile"
-            className={({ isActive }) => cn(
-              "w-full flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground"
-            )}
-            onClick={onNavigate}
-          >
-            <CircleUser className="h-4 w-4" />
-            Mi Perfil
-          </NavLink>
-        </div>
-      )}
-      
-      {onLogout && (
-        <Button 
-          variant="outline" 
-          className={cn("w-full mt-2 border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", collapsed && "p-2")} 
-          onClick={onLogout}
-          aria-label="Cerrar sesión"
-        >
-          <LogOut className={cn("h-4 w-4", collapsed && "mr-0")} aria-hidden="true" />
-          {!collapsed && <span className="ml-2">Cerrar sesión</span>}
-        </Button>
-      )}
-    </div>
+    </TooltipProvider>
   );
 }

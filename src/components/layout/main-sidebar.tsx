@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { SidebarNavigation } from "./sidebar-navigation";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/auth";
@@ -7,9 +8,11 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface MainSidebarProps {
   onNavigate?: () => void;
+  collapsed?: boolean;
+  onCollapse?: () => void;
 }
 
-export function MainSidebar({ onNavigate }: MainSidebarProps) {
+export function MainSidebar({ onNavigate, collapsed = false, onCollapse }: MainSidebarProps) {
   const { user, signOut, userRole } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -82,12 +85,21 @@ export function MainSidebar({ onNavigate }: MainSidebarProps) {
   };
 
   return (
-    <aside className="h-full border-r border-sidebar-border bg-sidebar" role="navigation" aria-label="Menú principal">
+    <aside 
+      className={cn(
+        "h-full border-r border-sidebar-border bg-sidebar transition-all duration-300",
+        collapsed ? "w-16" : "w-64"
+      )} 
+      role="navigation" 
+      aria-label="Menú principal"
+    >
       <SidebarNavigation 
         user={typedUser}
         role={effectiveRole}
+        collapsed={collapsed}
         onLogout={handleLogout}
         onNavigate={handleNavigation}
+        onCollapse={onCollapse}
       />
     </aside>
   );
