@@ -11,8 +11,9 @@ import { InstallPWAButton } from '@/components/pwa/install-pwa-button';
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User } from "@/types";
 import { useAuth } from "@/hooks/auth";
-import { Menu as MenuIcon, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Menu as MenuIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface MainLayoutProps {
   children: React.ReactNode;
@@ -25,10 +26,10 @@ export function MainLayout({
 }: MainLayoutProps) {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
-  const [sidebarVisible, setSidebarVisible] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { signOut } = useAuth();
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     setMounted(true);
@@ -46,11 +47,6 @@ export function MainLayout({
     });
   }
 
-  // Función para alternar la visibilidad del sidebar
-  const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible);
-  };
-
   // Función para alternar el estado contraído del sidebar
   const toggleSidebarCollapse = () => {
     const newCollapsed = !sidebarCollapsed;
@@ -65,10 +61,10 @@ export function MainLayout({
   
   return (
     <div className="flex h-screen bg-background">
-      {/* Sidebar condicional para pantallas grandes */}
-      {sidebarVisible && (
+      {/* Sidebar solo visible en pantallas grandes */}
+      {!isMobile && (
         <div className={cn(
-          "hidden lg:block transition-all duration-300",
+          "transition-all duration-300",
           sidebarCollapsed ? "w-16" : "w-64"
         )}>
           <MainSidebar 
@@ -82,34 +78,6 @@ export function MainLayout({
       <div className="flex flex-col flex-1">
         <header className="z-10 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-secondary">
           <div className="flex items-center">
-            {/* Botón para mostrar/ocultar el sidebar en pantallas grandes */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={toggleSidebar} 
-              className="mr-2 hidden lg:flex" 
-              aria-label={sidebarVisible ? "Ocultar menú lateral" : "Mostrar menú lateral"}
-            >
-              <MenuIcon className="w-5 h-5" />
-            </Button>
-            
-            {/* Botón para contraer/expandir el sidebar cuando está visible */}
-            {sidebarVisible && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={toggleSidebarCollapse} 
-                className="mr-2 hidden lg:flex" 
-                aria-label={sidebarCollapsed ? "Expandir menú lateral" : "Contraer menú lateral"}
-              >
-                {sidebarCollapsed ? (
-                  <ChevronsRight className="w-4 h-4" />
-                ) : (
-                  <ChevronsLeft className="w-4 h-4" />
-                )}
-              </Button>
-            )}
-            
             {/* Sheet para menú móvil */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetContent side="left" className="p-0 w-[85%] sm:w-[300px] border-r border-sidebar-border">
@@ -118,17 +86,19 @@ export function MainLayout({
             </Sheet>
             
             {/* Botón hamburguesa para dispositivos móviles */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setMobileMenuOpen(true)} 
-              className="mr-2 lg:hidden" 
-              aria-label="Abrir menú de navegación" 
-              aria-expanded={mobileMenuOpen} 
-              aria-controls="mobile-menu"
-            >
-              <MenuIcon className="w-5 h-5" />
-            </Button>
+            {isMobile && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setMobileMenuOpen(true)} 
+                className="mr-2" 
+                aria-label="Abrir menú de navegación" 
+                aria-expanded={mobileMenuOpen} 
+                aria-controls="mobile-menu"
+              >
+                <MenuIcon className="w-5 h-5" />
+              </Button>
+            )}
             
             {/* Título o logo de la aplicación */}
             <span className="text-lg font-bold">La Rioja Cuida</span>
