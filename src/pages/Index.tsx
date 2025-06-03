@@ -3,16 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { UserRole } from "@/types";
+import { InstallPWAButton } from "@/components/pwa/install-pwa-button";
+import { Smartphone, Download } from "lucide-react";
 
 export default function Index() {
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [checking, setChecking] = useState(true);
+  const [isInstalled, setIsInstalled] = useState(false);
+
   useEffect(() => {
     checkUser();
+    // Check if app is installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsInstalled(true);
+    }
   }, []);
+
   const checkUser = () => {
     setChecking(true);
     try {
@@ -40,6 +47,7 @@ export default function Index() {
       setChecking(false);
     }
   };
+
   const handleDemoLoginWorker = () => {
     const demoUser = {
       id: "demo-worker-id",
@@ -55,6 +63,7 @@ export default function Index() {
       description: "Has iniciado sesión como trabajador en modo demostración"
     });
   };
+
   const handleDemoLoginHR = () => {
     const demoUser = {
       id: "demo-hr-id",
@@ -70,13 +79,31 @@ export default function Index() {
       description: "Has iniciado sesión como personal de RRHH en modo demostración"
     });
   };
-  return <div className="min-h-screen flex items-center justify-center bg-background p-4">
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md text-center space-y-8">
+        {/* App Header */}
         <div>
           <h1 className="text-4xl font-bold text-primary">Workify SRCI</h1>
           <p className="text-xl text-muted-foreground mt-4">Sistema de Gestión Inteligente de Horarios</p>
         </div>
+
+        {/* Install App Section - Only show if not installed */}
+        {!isInstalled && (
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-3">
+            <div className="flex items-center justify-center gap-2 text-primary">
+              <Smartphone className="h-5 w-5" />
+              <span className="font-semibold">¡Instala la App!</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Accede más rápido y úsala sin conexión instalándola en tu dispositivo
+            </p>
+            <InstallPWAButton />
+          </div>
+        )}
         
+        {/* Main Actions */}
         <div className="space-y-4">
           <Button onClick={() => navigate("/auth")} size="lg" className="w-full">
             Iniciar sesión
@@ -98,5 +125,6 @@ export default function Index() {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }
