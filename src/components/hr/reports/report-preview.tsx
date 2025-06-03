@@ -1,8 +1,7 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Download, Share, Calendar, Users, FileText, TrendingUp, UserX, Timer, ShieldCheck } from "lucide-react";
+import { Eye, Download, Share, Calendar, Users, FileText, TrendingUp, UserX, Timer, ShieldCheck, Clock, Mail, Bell } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -41,7 +40,6 @@ export function ReportPreview({ reportConfig, onDownload, onShare }: ReportPrevi
   };
 
   const formatFileSize = (type: string) => {
-    // Simular tamaños de archivo
     switch (type) {
       case "pdf": return "2.4 MB";
       case "excel": return "1.8 MB";
@@ -71,6 +69,32 @@ export function ReportPreview({ reportConfig, onDownload, onShare }: ReportPrevi
     return `${reportConfig.shifts.length} turnos seleccionados`;
   };
 
+  const getComparisonSummary = () => {
+    if (!reportConfig.comparison) return null;
+    
+    const comparisonTypes = {
+      "previous_period": "Período anterior",
+      "same_period_last_year": "Mismo período año anterior",
+      "custom_period": "Período personalizado",
+      "quarterly_comparison": "Comparación trimestral"
+    };
+    
+    return comparisonTypes[reportConfig.comparison.type] || "Comparación configurada";
+  };
+
+  const getSchedulingSummary = () => {
+    if (!reportConfig.scheduling) return null;
+    
+    const frequencies = {
+      "daily": "Diario",
+      "weekly": "Semanal", 
+      "monthly": "Mensual",
+      "quarterly": "Trimestral"
+    };
+    
+    return `${frequencies[reportConfig.scheduling.frequency]} a las ${reportConfig.scheduling.time}`;
+  };
+
   return (
     <Card className="border shadow-sm">
       <CardHeader>
@@ -96,6 +120,24 @@ export function ReportPreview({ reportConfig, onDownload, onShare }: ReportPrevi
               <Badge variant="outline">
                 {formatFileSize(reportConfig.format)}
               </Badge>
+              {reportConfig.scheduling && (
+                <Badge variant="outline" className="bg-green-100 text-green-800">
+                  <Clock className="h-3 w-3 mr-1" />
+                  Programado
+                </Badge>
+              )}
+              {reportConfig.comparison && (
+                <Badge variant="outline" className="bg-blue-100 text-blue-800">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  Con comparativas
+                </Badge>
+              )}
+              {reportConfig.alerts && (
+                <Badge variant="outline" className="bg-red-100 text-red-800">
+                  <Bell className="h-3 w-3 mr-1" />
+                  Con alertas
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -142,6 +184,53 @@ export function ReportPreview({ reportConfig, onDownload, onShare }: ReportPrevi
             </p>
           </div>
         </div>
+
+        {/* Nuevas secciones para funcionalidades avanzadas */}
+        {reportConfig.scheduling && (
+          <div className="space-y-2">
+            <span className="font-medium text-sm flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Programación automática:
+            </span>
+            <div className="bg-green-50 p-3 rounded-md border border-green-200">
+              <div className="text-sm">
+                <div className="font-medium text-green-900 mb-1">{getSchedulingSummary()}</div>
+                {reportConfig.scheduling.emailSending && (
+                  <div className="flex items-center gap-1 text-green-800">
+                    <Mail className="h-3 w-3" />
+                    <span>Envío automático por email configurado</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {reportConfig.comparison && (
+          <div className="space-y-2">
+            <span className="font-medium text-sm flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Análisis comparativo:
+            </span>
+            <Badge variant="outline" className="bg-blue-100 text-blue-800">
+              {getComparisonSummary()}
+            </Badge>
+          </div>
+        )}
+
+        {reportConfig.alerts && reportConfig.alerts.types.length > 0 && (
+          <div className="space-y-2">
+            <span className="font-medium text-sm flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              Alertas configuradas:
+            </span>
+            <div className="bg-amber-50 p-3 rounded-md border border-amber-200">
+              <div className="text-sm text-amber-900">
+                {reportConfig.alerts.types.length} tipo{reportConfig.alerts.types.length !== 1 ? 's' : ''} de alerta{reportConfig.alerts.types.length !== 1 ? 's' : ''}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-2">
           <span className="font-medium text-sm">Opciones:</span>
