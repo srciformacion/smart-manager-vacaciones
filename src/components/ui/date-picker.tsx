@@ -19,6 +19,7 @@ export interface DatePickerProps {
   placeholder?: string;
   className?: string;
   date?: Date; // Alias para selectedDate para compatibilidad
+  disabled?: boolean; // Añadir soporte para disabled
 }
 
 export function DatePicker({
@@ -27,6 +28,7 @@ export function DatePicker({
   onSelect,
   placeholder = "Seleccionar fecha",
   className,
+  disabled = false,
 }: DatePickerProps) {
   // Usar date como fallback para selectedDate para mantener compatibilidad
   const effectiveDate = selectedDate || date;
@@ -41,6 +43,7 @@ export function DatePicker({
             !effectiveDate && "text-muted-foreground",
             className
           )}
+          disabled={disabled}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {effectiveDate ? (

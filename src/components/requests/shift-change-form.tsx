@@ -32,7 +32,6 @@ export function ShiftChangeForm({
   const form = useForm<RequestFormValues>({
     resolver: zodResolver(requestFormSchema),
     defaultValues: {
-      reason: "",
       notes: "",
     },
   });
@@ -83,9 +82,8 @@ export function ShiftChangeForm({
       const payload = {
         userid: user.id,
         type: 'shiftChange',
-        startdate: values.dateRange?.from,
-        enddate: values.dateRange?.to || values.dateRange?.from,
-        reason: values.reason,
+        startdate: values.startDate,
+        enddate: values.endDate || values.startDate,
         notes: values.notes,
         status: 'pending'
       };
@@ -104,8 +102,8 @@ export function ShiftChangeForm({
           request_id: data[0].id,
           original_user_id: user.id,
           replacement_user_id: values.replacementUserId,
-          original_date: values.dateRange?.from,
-          return_date: values.dateRange?.to
+          original_date: values.startDate,
+          return_date: values.endDate
         };
         
         const { error: shiftChangeError } = await supabase
@@ -115,16 +113,18 @@ export function ShiftChangeForm({
         if (shiftChangeError) throw shiftChangeError;
         
         // Notificar al usuario de reemplazo
-        const { error: notificationError } = await supabase
-          .from('notifications')
-          .insert({
-            user_id: values.replacementUserId,
-            title: "Nueva solicitud de cambio de turno",
-            message: `${user.name} ha solicitado un cambio de turno contigo para el día ${new Date(values.dateRange?.from || new Date()).toLocaleDateString()}`,
-            type: "shiftChange"
-          });
-        
-        if (notificationError) console.error("Error al enviar notificación:", notificationError);
+        if (values.replacementUserId) {
+          const { error: notificationError } = await supabase
+            .from('notifications')
+            .insert({
+              user_id: values.replacementUserId,
+              title: "Nueva solicitud de cambio de turno",
+              message: `${user.name} ha solicitado un cambio de turno contigo para el día ${new Date(values.startDate || new Date()).toLocaleDateString()}`,
+              type: "shiftChange"
+            });
+          
+          if (notificationError) console.error("Error al enviar notificación:", notificationError);
+        }
         
         // Llamar a la función onSubmit original
         onSubmit(values);
