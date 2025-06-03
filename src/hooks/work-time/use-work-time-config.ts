@@ -8,8 +8,6 @@ export interface WorkTimeConfig {
   is_enabled: boolean;
   daily_hours_limit: number;
   weekly_hours_limit: number;
-  break_duration_minutes: number;
-  lunch_duration_minutes: number;
   alert_incomplete_workday: boolean;
   alert_missing_records: boolean;
   alert_overtime: boolean;

@@ -17,8 +17,6 @@ export function WorkTimeSettings() {
     is_enabled: false,
     daily_hours_limit: 8,
     weekly_hours_limit: 40,
-    break_duration_minutes: 30,
-    lunch_duration_minutes: 60,
     alert_incomplete_workday: true,
     alert_missing_records: true,
     alert_overtime: true
@@ -31,8 +29,6 @@ export function WorkTimeSettings() {
         is_enabled: config.is_enabled,
         daily_hours_limit: config.daily_hours_limit,
         weekly_hours_limit: config.weekly_hours_limit,
-        break_duration_minutes: config.break_duration_minutes,
-        lunch_duration_minutes: config.lunch_duration_minutes,
         alert_incomplete_workday: config.alert_incomplete_workday,
         alert_missing_records: config.alert_missing_records,
         alert_overtime: config.alert_overtime
@@ -136,36 +132,6 @@ export function WorkTimeSettings() {
                     onChange={(e) => setFormData(prev => ({
                       ...prev,
                       weekly_hours_limit: parseInt(e.target.value) || 40
-                    }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="break_duration">Duración descanso (minutos)</Label>
-                  <Input
-                    id="break_duration"
-                    type="number"
-                    min="0"
-                    max="480"
-                    value={formData.break_duration_minutes}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      break_duration_minutes: parseInt(e.target.value) || 30
-                    }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="lunch_duration">Duración almuerzo (minutos)</Label>
-                  <Input
-                    id="lunch_duration"
-                    type="number"
-                    min="0"
-                    max="480"
-                    value={formData.lunch_duration_minutes}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      lunch_duration_minutes: parseInt(e.target.value) || 60
                     }))}
                   />
                 </div>
