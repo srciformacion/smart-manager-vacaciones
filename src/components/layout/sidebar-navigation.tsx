@@ -1,4 +1,3 @@
-
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,7 +35,7 @@ export function SidebarNavigation({
       )}>
         {!collapsed && (
           <span className="text-lg font-bold text-sidebar-foreground">
-            La Rioja Cuida
+            Workify SRCI
           </span>
         )}
         {onCollapse && (

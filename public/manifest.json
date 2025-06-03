@@ -1,7 +1,7 @@
 
 {
-  "name": "La Rioja Cuida",
-  "short_name": "LRCuida",
+  "name": "Workify SRCI",
+  "short_name": "Workify",
   "description": "Sistema inteligente de gestión de vacaciones y permisos",
   "start_url": "/",
   "display": "standalone",

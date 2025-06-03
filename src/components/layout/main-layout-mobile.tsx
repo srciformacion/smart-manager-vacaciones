@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { SidebarNavigation } from "./sidebar-navigation";
@@ -56,7 +55,7 @@ export function MainLayoutMobile({
             <line x1="4" x2="20" y1="18" y2="18" />
           </svg>
         </button>
-        <div className="ml-4 text-lg font-bold">La Rioja Cuida</div>
+        <div className="ml-4 text-lg font-bold">Workify SRCI</div>
       </header>
 
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>

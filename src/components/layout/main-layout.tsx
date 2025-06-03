@@ -1,4 +1,3 @@
-
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -101,7 +100,7 @@ export function MainLayout({
             )}
             
             {/* Título o logo de la aplicación */}
-            <span className="text-lg font-bold">La Rioja Cuida</span>
+            <span className="text-lg font-bold">Workify SRCI</span>
           </div>
           <div className="flex items-center gap-2 ml-auto">
             <InstallPWAButton />

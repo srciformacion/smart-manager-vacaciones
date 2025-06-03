@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { UserRole } from "@/types";
+
 export default function Index() {
   const navigate = useNavigate();
   const {
@@ -72,7 +73,7 @@ export default function Index() {
   return <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md text-center space-y-8">
         <div>
-          <h1 className="text-4xl font-bold text-primary">La Rioja Cuida</h1>
+          <h1 className="text-4xl font-bold text-primary">Workify SRCI</h1>
           <p className="text-xl text-muted-foreground mt-4">Sistema de Gestión Inteligente de Horarios</p>
         </div>
         
