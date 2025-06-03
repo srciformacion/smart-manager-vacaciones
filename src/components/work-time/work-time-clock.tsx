@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Play, Square, Coffee, Utensils } from 'lucide-react';
+import { Clock, Play, Square, Coffee, Utensils, AlertTriangle } from 'lucide-react';
 import { useWorkTimeRecords } from '@/hooks/work-time/use-work-time-records';
+import { useWorkTimeConfig } from '@/hooks/work-time/use-work-time-config';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -20,6 +21,7 @@ export function WorkTimeClock() {
     endLunch
   } = useWorkTimeRecords();
 
+  const { config } = useWorkTimeConfig();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Update current time every second
@@ -62,6 +64,35 @@ export function WorkTimeClock() {
     
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
+
+  const getWorkedHours = () => {
+    if (!todayRecord?.clock_in_time) return 0;
+    
+    const start = new Date(todayRecord.clock_in_time);
+    const end = todayRecord.clock_out_time ? new Date(todayRecord.clock_out_time) : new Date();
+    
+    let duration = end.getTime() - start.getTime();
+    
+    // Subtract break time
+    if (todayRecord.break_start_time && todayRecord.break_end_time) {
+      const breakStart = new Date(todayRecord.break_start_time);
+      const breakEnd = new Date(todayRecord.break_end_time);
+      duration -= (breakEnd.getTime() - breakStart.getTime());
+    }
+    
+    // Subtract lunch time
+    if (todayRecord.lunch_start_time && todayRecord.lunch_end_time) {
+      const lunchStart = new Date(todayRecord.lunch_start_time);
+      const lunchEnd = new Date(todayRecord.lunch_end_time);
+      duration -= (lunchEnd.getTime() - lunchStart.getTime());
+    }
+    
+    return duration / (1000 * 60 * 60); // Convert to hours
+  };
+
+  const workedHours = getWorkedHours();
+  const referenceHours = config?.daily_hours_limit || 8;
+  const isOvertime = workedHours > referenceHours;
 
   const isOnBreak = todayRecord?.break_start_time && !todayRecord?.break_end_time;
   const isOnLunch = todayRecord?.lunch_start_time && !todayRecord?.lunch_end_time;
@@ -124,9 +155,17 @@ export function WorkTimeClock() {
 
         {/* Working time */}
         <div className="text-center">
-          <div className="text-xl font-semibold">
+          <div className="text-xl font-semibold flex items-center justify-center gap-2">
             Tiempo trabajado: {getWorkingTime()}
+            {isOvertime && hasClockedIn && (
+              <AlertTriangle className="h-5 w-5 text-amber-500" title="Exceso de jornada" />
+            )}
           </div>
+          {isOvertime && hasClockedIn && (
+            <div className="text-sm text-amber-600 mt-1">
+              Has superado la jornada de referencia ({referenceHours}h)
+            </div>
+          )}
         </div>
 
         {/* Time records */}

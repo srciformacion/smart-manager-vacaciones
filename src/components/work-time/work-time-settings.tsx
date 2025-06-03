@@ -107,18 +107,22 @@ export function WorkTimeSettings() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="daily_hours">Límite de horas diarias</Label>
+                  <Label htmlFor="daily_hours">Jornada laboral de referencia (horas)</Label>
                   <Input
                     id="daily_hours"
                     type="number"
                     min="1"
                     max="24"
+                    step="0.5"
                     value={formData.daily_hours_limit}
                     onChange={(e) => setFormData(prev => ({
                       ...prev,
-                      daily_hours_limit: parseInt(e.target.value) || 8
+                      daily_hours_limit: parseFloat(e.target.value) || 8
                     }))}
                   />
+                  <div className="text-xs text-muted-foreground">
+                    Referencia para alertas de exceso de jornada (sin límite estricto)
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -212,9 +216,9 @@ export function WorkTimeSettings() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="font-medium">Alertar horas extra</div>
+                    <div className="font-medium">Alertar exceso de jornada</div>
                     <div className="text-sm text-muted-foreground">
-                      Notifica cuando se exceden los límites de horas
+                      Notifica cuando se supera la jornada laboral de referencia (sin bloquear)
                     </div>
                   </div>
                   <Switch
