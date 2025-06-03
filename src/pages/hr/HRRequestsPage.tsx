@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from "@/components/layout/main-layout";
 import { useProfileAuth } from "@/hooks/profile/useProfileAuth";
@@ -21,6 +20,7 @@ export default function HRRequestsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("pending-approvals");
   const { toast } = useToast();
   
   const {
@@ -94,6 +94,12 @@ export default function HRRequestsPage() {
   
   const handleViewDetails = (request: Request) => {
     setSelectedRequestId(request.id);
+  };
+
+  const handleViewRequestFromWidget = (requestId: string) => {
+    console.log("Viewing request from widget:", requestId);
+    setSelectedRequestId(requestId);
+    setActiveTab("workflow");
   };
   
   const handleStatusChange = (request: Request, newStatus: RequestStatus) => {
@@ -181,7 +187,7 @@ export default function HRRequestsPage() {
             </CardContent>
           </Card>
         ) : (
-          <Tabs defaultValue="pending-approvals" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList>
               <TabsTrigger value="pending-approvals">Aprobaciones Pendientes ({pendingApprovals.length})</TabsTrigger>
               <TabsTrigger value="all-requests">Todas las Solicitudes</TabsTrigger>
@@ -193,9 +199,7 @@ export default function HRRequestsPage() {
                 pendingSteps={pendingApprovals}
                 requests={requests}
                 users={exampleWorkers}
-                onViewRequest={(requestId) => {
-                  setSelectedRequestId(requestId);
-                }}
+                onViewRequest={handleViewRequestFromWidget}
               />
             </TabsContent>
             

@@ -55,6 +55,11 @@ export function PendingApprovalsWidget({
     }
   };
 
+  const handleViewRequest = (requestId: string) => {
+    console.log("Viewing request:", requestId);
+    onViewRequest(requestId);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -86,7 +91,7 @@ export function PendingApprovalsWidget({
                     <Button 
                       size="sm" 
                       variant="outline"
-                      onClick={() => onViewRequest(info.request!.id)}
+                      onClick={() => handleViewRequest(info.request!.id)}
                     >
                       <Eye className="w-4 h-4 mr-1" />
                       Ver
